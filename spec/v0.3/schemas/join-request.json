@@ -1,0 +1,22 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://pact-protocol.org/schemas/v0.3/join-request.json",
+  "title": "PACT Join Request",
+  "description": "Request body for POST /api/pact/{documentId}/join",
+  "type": "object",
+  "required": ["agentName"],
+  "properties": {
+    "agentName": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 200,
+      "description": "Display name for this agent."
+    },
+    "role": {
+      "type": "string",
+      "maxLength": 100,
+      "description": "Optional role descriptor (e.g., 'editor', 'reviewer', 'compliance')."
+    }
+  },
+  "additionalProperties": false
+}

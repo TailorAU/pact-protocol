@@ -1,0 +1,34 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://pact-protocol.org/schemas/v0.3/join-response.json",
+  "title": "PACT Join Response",
+  "description": "Response body for POST /api/pact/{documentId}/join",
+  "type": "object",
+  "required": ["registrationId", "documentId", "agentName", "joinedAt"],
+  "properties": {
+    "registrationId": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Unique identifier for this agent registration."
+    },
+    "documentId": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Document the agent joined."
+    },
+    "agentName": {
+      "type": "string",
+      "description": "Display name of the agent."
+    },
+    "role": {
+      "type": ["string", "null"],
+      "description": "Role assigned to the agent."
+    },
+    "joinedAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp when the agent joined."
+    }
+  },
+  "additionalProperties": false
+}

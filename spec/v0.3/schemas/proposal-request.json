@@ -1,0 +1,32 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://pact-protocol.org/schemas/v0.3/proposal-request.json",
+  "title": "PACT Proposal Request",
+  "description": "Request body for POST /api/pact/{documentId}/proposals",
+  "type": "object",
+  "required": ["sectionId", "newContent"],
+  "properties": {
+    "sectionId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256,
+      "description": "Target section identifier (e.g., 'sec:intro')."
+    },
+    "newContent": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Proposed replacement content for the section (Markdown)."
+    },
+    "summary": {
+      "type": "string",
+      "maxLength": 500,
+      "description": "Brief summary of the change."
+    },
+    "reasoning": {
+      "type": "string",
+      "maxLength": 2000,
+      "description": "Detailed reasoning for the proposed change."
+    }
+  },
+  "additionalProperties": false
+}

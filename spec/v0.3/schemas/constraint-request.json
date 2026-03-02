@@ -1,0 +1,26 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://pact-protocol.org/schemas/v0.3/constraint-request.json",
+  "title": "PACT Constraint Request",
+  "description": "Request body for POST /api/pact/{documentId}/constraints",
+  "type": "object",
+  "required": ["sectionId", "boundary"],
+  "properties": {
+    "sectionId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256,
+      "description": "Target section identifier."
+    },
+    "boundary": {
+      "type": "string",
+      "minLength": 1,
+      "description": "What must or must not happen in this section."
+    },
+    "category": {
+      "type": "string",
+      "description": "Optional category for the constraint (e.g., 'legal', 'style', 'factual')."
+    }
+  },
+  "additionalProperties": false
+}

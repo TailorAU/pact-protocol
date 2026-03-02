@@ -1,0 +1,23 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://pact-protocol.org/schemas/v0.3/salience-request.json",
+  "title": "PACT Salience Request",
+  "description": "Request body for POST /api/pact/{documentId}/salience",
+  "type": "object",
+  "required": ["sectionId", "score"],
+  "properties": {
+    "sectionId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256,
+      "description": "Target section identifier."
+    },
+    "score": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 10,
+      "description": "Salience score (0 = no interest, 10 = critical)."
+    }
+  },
+  "additionalProperties": false
+}

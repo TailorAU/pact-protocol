@@ -1,0 +1,72 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://pact-protocol.org/schemas/v0.3/event.json",
+  "title": "PACT Event",
+  "description": "Every PACT operation produces an event with this structure.",
+  "type": "object",
+  "required": ["id", "epochMs", "actorDisplay", "actorKind", "eventType", "entityType", "entityId", "sequenceNumber", "payloadJson"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Unique event identifier."
+    },
+    "epochMs": {
+      "type": "integer",
+      "description": "Unix timestamp in milliseconds."
+    },
+    "actorId": {
+      "type": ["string", "null"],
+      "description": "Actor identifier (user or agent)."
+    },
+    "actorDisplay": {
+      "type": "string",
+      "description": "Human-readable actor name."
+    },
+    "actorKind": {
+      "type": "string",
+      "enum": ["Individual", "AiAgent", "GovernanceGroup", "System"],
+      "description": "Type of actor that produced the event."
+    },
+    "eventType": {
+      "type": "string",
+      "description": "Dot-delimited event type (e.g., 'pact.proposal.created').",
+      "pattern": "^pact\\.[a-z]+\\.[a-z-]+$"
+    },
+    "entityType": {
+      "type": "string",
+      "const": "pact-document",
+      "description": "Always 'pact-document'."
+    },
+    "entityId": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Document identifier."
+    },
+    "correlationId": {
+      "type": ["string", "null"],
+      "format": "uuid",
+      "description": "Links related events (e.g., create → approve → merge)."
+    },
+    "inResponseTo": {
+      "type": ["string", "null"],
+      "format": "uuid",
+      "description": "Direct reply chain."
+    },
+    "sequenceNumber": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Per-document monotonic counter."
+    },
+    "sectionId": {
+      "type": ["string", "null"],
+      "maxLength": 256,
+      "description": "Target section (nullable)."
+    },
+    "payloadJson": {
+      "type": "string",
+      "description": "JSON payload with operation-specific data."
+    }
+  },
+  "additionalProperties": false
+}

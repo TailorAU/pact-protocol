@@ -1,0 +1,16 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://pact-protocol.org/schemas/v0.3/lock-request.json",
+  "title": "PACT Lock Section Request",
+  "description": "Request body for POST /api/pact/{documentId}/sections/{sectionId}/lock",
+  "type": "object",
+  "properties": {
+    "ttlSeconds": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 60,
+      "description": "Lock time-to-live in seconds. If omitted, the server applies a default TTL."
+    }
+  },
+  "additionalProperties": false
+}

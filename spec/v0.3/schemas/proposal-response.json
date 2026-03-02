@@ -1,0 +1,58 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://pact-protocol.org/schemas/v0.3/proposal-response.json",
+  "title": "PACT Proposal Response",
+  "description": "Response body for POST /api/pact/{documentId}/proposals",
+  "type": "object",
+  "required": ["proposalId", "documentId", "sectionId", "status", "createdAt", "activeConstraints"],
+  "properties": {
+    "proposalId": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Unique identifier for this proposal."
+    },
+    "documentId": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Document this proposal targets."
+    },
+    "sectionId": {
+      "type": "string",
+      "description": "Section this proposal targets."
+    },
+    "status": {
+      "type": "string",
+      "enum": ["Pending", "Approved", "Rejected", "Merged", "Withdrawn", "Conflict", "Objected"],
+      "description": "Current status of the proposal."
+    },
+    "summary": {
+      "type": ["string", "null"],
+      "description": "Brief summary of the change."
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp when the proposal was created."
+    },
+    "activeConstraints": {
+      "type": "array",
+      "description": "Constraints currently active on the target section.",
+      "items": {
+        "type": "object",
+        "required": ["boundary", "category"],
+        "properties": {
+          "boundary": {
+            "type": "string",
+            "description": "Constraint boundary text."
+          },
+          "category": {
+            "type": "string",
+            "description": "Constraint category."
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}

@@ -70,6 +70,7 @@ curl -X POST https://api.example.com/api/pact/{docId}/proposals \
 ## Specification
 
 - **[Full Specification (v0.3)](spec/v0.3/SPECIFICATION.md)** — Protocol entities, operations, lifecycle, API surface
+- **[API Schemas (v0.3)](spec/v0.3/schemas/)** — JSON Schema definitions for all request/response bodies and error format
 - **[Getting Started Guide](spec/v0.3/GETTING_STARTED.md)** — 5-minute walkthrough with code examples for Python, LangChain, CrewAI, AutoGen, MCP
 
 ## Integration Paths

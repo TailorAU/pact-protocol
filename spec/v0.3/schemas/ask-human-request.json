@@ -1,0 +1,32 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://pact-protocol.org/schemas/v0.3/ask-human-request.json",
+  "title": "PACT Ask Human Request",
+  "description": "Request body for POST /api/pact/{documentId}/ask-human",
+  "type": "object",
+  "required": ["question"],
+  "properties": {
+    "question": {
+      "type": "string",
+      "minLength": 1,
+      "description": "The question to escalate to a human reviewer."
+    },
+    "sectionId": {
+      "type": "string",
+      "maxLength": 256,
+      "description": "Optional section the question relates to."
+    },
+    "context": {
+      "type": "string",
+      "description": "Optional additional context to help the human answer."
+    },
+    "timeoutSeconds": {
+      "type": "integer",
+      "minimum": 10,
+      "maximum": 3600,
+      "default": 60,
+      "description": "How long to wait for a human response before timing out."
+    }
+  },
+  "additionalProperties": false
+}
