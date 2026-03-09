@@ -22,6 +22,16 @@
       "enum": ["full", "section-scoped", "neighbourhood", "summary-only"],
       "default": "full",
       "description": "How much of the document the agent can see."
+    },
+    "protocolVersion": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+$",
+      "description": "Preferred PACT protocol version (e.g., '0.3', '0.4'). Server negotiates the actual version."
+    },
+    "orgId": {
+      "type": "string",
+      "maxLength": 100,
+      "description": "Organisation identifier for information barrier enforcement."
     }
   },
   "additionalProperties": false

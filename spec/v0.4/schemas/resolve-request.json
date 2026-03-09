@@ -1,0 +1,36 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://pact-spec.dev/schemas/v0.4/resolve-request.json",
+  "title": "PACT Human Resolution Request",
+  "description": "Request body for POST /api/pact/{documentId}/resolve — human resolves an escalation with a binding decision.",
+  "type": "object",
+  "required": ["escalationId", "decision"],
+  "properties": {
+    "escalationId": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The escalation being resolved."
+    },
+    "sectionId": {
+      "type": "string",
+      "maxLength": 256,
+      "description": "Section the escalation relates to."
+    },
+    "decision": {
+      "type": "string",
+      "minLength": 1,
+      "description": "The human's binding decision text."
+    },
+    "isOverride": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether this resolution overrides agent consensus."
+    },
+    "resolvedProposalIds": {
+      "type": "array",
+      "items": { "type": "string", "format": "uuid" },
+      "description": "Proposal IDs affected by this resolution."
+    }
+  },
+  "additionalProperties": false
+}

@@ -1,8 +1,8 @@
-# PACT — Protocol for Agent Consensus and Truth — Specification v0.4-draft
+# PACT — Protocol for Agent Consensus and Truth — Specification v0.3
 
-> **Status:** Draft  
-> **Author:** Knox Hart + AI  
-> **Date:** 2 March 2026  
+> **Status:** Stable
+> **Author:** Knox Hart + AI
+> **Date:** 9 March 2026
 > **Vision:** Enable millions of agents to collaborate on a common document at machine speed, with humans retaining final authority.
 
 ---
@@ -62,6 +62,8 @@ The platform that defines how agents coordinate on shared documents becomes the 
 5. **Event-sourced truth.** The operation log is the source of truth for collaboration state. The document content is a projection that can be rebuilt from events.
 
 6. **Section-level granularity.** Operations target document sections (headings, paragraphs, list items), not character offsets. This keeps the protocol coarse enough for LLMs to reason about.
+
+7. **Canonical naming.** The protocol prefix is `pact`. All event types use the `pact.*` namespace. All API routes use `/api/pact/`. Implementations MAY alias internally but the protocol layer MUST use `pact` as the canonical prefix.
 
 ---
 
@@ -125,9 +127,26 @@ Sections are identified by a stable `sectionId` derived from heading hierarchy:
 ### Personnel            → sec:budget/line-items/personnel
 ```
 
-If headings change, the server maintains a mapping from old to new `sectionId` values. Agents always reference sections by ID, never by character offset.
-
 For content outside headings (preamble, top-level paragraphs), a synthetic `sec:_root` section captures everything before the first heading.
+
+#### 3.2.1 Slug Generation Algorithm
+
+Section IDs are generated from heading text using this algorithm:
+
+1. Convert to lowercase
+2. Replace spaces and underscores with hyphens (`-`)
+3. Remove all characters except `a-z`, `0-9`, and `-`
+4. Collapse consecutive hyphens into one
+5. Strip leading and trailing hyphens
+6. Prefix with `sec:` and join with parent using `/`
+
+#### 3.2.2 Duplicate Heading Resolution
+
+When two headings at the same level produce the same slug, the server appends a numeric suffix (starting at `-2`).
+
+#### 3.2.3 Heading Changes and ID Stability
+
+When a proposal changes a heading, the server maintains a mapping from old to new `sectionId` values. The old ID remains valid for a grace period of **300 seconds**. Agents always reference sections by ID, never by character offset.
 
 ---
 
@@ -169,7 +188,7 @@ For content outside headings (preamble, top-level paragraphs), a synthetic `sec:
 | `comment.resolve` | Mark a comment as resolved | Collaborator+ |
 | `section.lock` | Claim exclusive edit on a section (TTL max 60s) | Collaborator+ |
 | `section.unlock` | Release a section lock | Collaborator+ |
-| `escalate.human` | Flag something for human review | Any |
+| `escalate.human` | Flag something for human review. Pauses auto-merge on the affected section until resolved. | Any |
 
 ### 4.4 Merge Operations (Server-Side)
 
@@ -228,11 +247,20 @@ A conflict is detected when:
 - Two pending proposals target the same `sectionId`
 - A proposal targets a section that has been modified since the proposal was created (stale base)
 
-Conflict resolution strategies (configurable):
-- `first-wins` — earliest proposal by timestamp wins
-- `vote` — agents vote on competing proposals
-- `human-escalate` — always escalate conflicts to human
-- `merge-both` — attempt to merge both changes (LLM-assisted)
+Conflict detection is **synchronous**: the server checks for conflicts at `proposal.create` time.
+
+### Conflict Resolution
+
+Conflict resolution strategies (configurable per document):
+
+| Strategy | Behaviour |
+|----------|-----------|
+| `first-wins` | Earliest proposal by `epochMs` wins; later proposals move to `REJECTED` |
+| `vote` | Agents vote on competing proposals. Ties broken by earliest creation time. |
+| `human-escalate` | Conflicts always escalated to the human custodian |
+| `merge-both` | Server attempts to merge both changes; escalates if they overlap |
+
+Unresolved conflicts auto-escalate to the human custodian after a configurable timeout (default: **600 seconds**).
 
 ---
 
@@ -263,6 +291,7 @@ Every PACT operation produces an event. Implementations MUST store events with a
 ```
 pact.agent.joined              // Agent registered on document
 pact.agent.left                // Agent unregistered
+pact.agent.completed           // Agent signalled completion (status + summary)
 pact.proposal.created          // Edit proposal submitted
 pact.proposal.approved         // Proposal approved by agent/human
 pact.proposal.rejected         // Proposal rejected with reason
@@ -272,6 +301,7 @@ pact.proposal.conflict         // Conflict detected (System actor)
 pact.proposal.conflict-resolved // Conflict resolved
 pact.proposal.objected         // Agent objected to a proposal
 pact.proposal.auto-merged      // Proposal auto-merged after TTL with no objections
+pact.proposal.auto-merge-scheduled // Auto-merge scheduled (TTL countdown started)
 pact.section.locked            // Section locked by agent
 pact.section.unlocked          // Section released
 pact.comment.added             // Agent comment on section
@@ -284,6 +314,10 @@ pact.intent.objected           // Agent objected to an intent
 pact.constraint.published      // Agent published a constraint on a section
 pact.constraint.withdrawn      // Agent withdrew a constraint
 pact.salience.set              // Agent set salience score for a section
+pact.human.asked               // Agent asked a question requiring human judgement
+pact.human.responded           // Human responded to an agent question
+pact.human.resolved            // Human resolved an escalation with binding decision
+pact.human.cascade-validated   // Cascade validation completed
 ```
 
 ---

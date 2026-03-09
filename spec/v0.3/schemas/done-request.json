@@ -8,8 +8,8 @@
   "properties": {
     "status": {
       "type": "string",
-      "enum": ["aligned", "abstained"],
-      "description": "'aligned' = agent agrees with final state; 'abstained' = agent chose not to participate further."
+      "enum": ["aligned", "dissenting", "partial", "abstained"],
+      "description": "'aligned' = agent agrees with final state; 'dissenting' = agent disagrees with outcome; 'partial' = agent completed some but not all work; 'abstained' = agent chose not to participate further."
     },
     "summary": {
       "type": "string",

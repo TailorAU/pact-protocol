@@ -1,0 +1,47 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://pact-spec.dev/schemas/v0.4/classification-framework-request.json",
+  "title": "PACT Classification Framework Request",
+  "description": "Request body for POST /api/pact/{documentId}/classification/framework — create or update a classification framework.",
+  "type": "object",
+  "required": ["name", "levels"],
+  "properties": {
+    "name": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 200,
+      "description": "Human-readable framework name (e.g., 'Australian Government', 'Corporate')."
+    },
+    "levels": {
+      "type": "array",
+      "minItems": 2,
+      "items": {
+        "type": "object",
+        "required": ["levelId", "label", "rank"],
+        "properties": {
+          "levelId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100,
+            "pattern": "^[a-z][a-z0-9-]*$",
+            "description": "Machine-readable identifier (e.g., 'official', 'protected', 'secret')."
+          },
+          "label": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200,
+            "description": "Display name (e.g., 'OFFICIAL', 'PROTECTED', 'SECRET')."
+          },
+          "rank": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "Numeric rank — higher values indicate higher sensitivity. Must be unique within the framework."
+          }
+        },
+        "additionalProperties": false
+      },
+      "description": "Ordered list of classification levels, from lowest to highest sensitivity."
+    }
+  },
+  "additionalProperties": false
+}

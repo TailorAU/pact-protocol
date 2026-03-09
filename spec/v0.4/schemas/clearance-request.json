@@ -1,0 +1,22 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://pact-spec.dev/schemas/v0.4/clearance-request.json",
+  "title": "PACT Clearance Grant Request",
+  "description": "Request body for POST /api/pact/{documentId}/clearance — grant an agent clearance to a classification level.",
+  "type": "object",
+  "required": ["agentRegistrationId", "clearanceLevel"],
+  "properties": {
+    "agentRegistrationId": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The agent's registration ID."
+    },
+    "clearanceLevel": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 100,
+      "description": "The classification level ID the agent is cleared to access (inclusive of lower levels)."
+    }
+  },
+  "additionalProperties": false
+}

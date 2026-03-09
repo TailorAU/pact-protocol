@@ -1,0 +1,52 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://pact-spec.dev/schemas/v0.4/invite-create-request.json",
+  "title": "PACT Invite Create Request",
+  "description": "Request body for POST /api/pact/{documentId}/invites — create an invite token for agent onboarding.",
+  "type": "object",
+  "required": ["label"],
+  "properties": {
+    "label": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 200,
+      "description": "Human-readable label for this invite (e.g., 'Compliance Bot', 'External Reviewer')."
+    },
+    "trustLevel": {
+      "type": "string",
+      "enum": ["Observer", "Suggester", "Collaborator"],
+      "default": "Suggester",
+      "description": "Maximum trust level the joining agent receives."
+    },
+    "contextMode": {
+      "type": "string",
+      "enum": ["full", "section-scoped", "neighbourhood", "summary-only"],
+      "default": "full",
+      "description": "Context mode for agents joining with this token."
+    },
+    "allowedSections": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "maxLength": 256
+      },
+      "description": "Section IDs the agent can access (required when contextMode is 'section-scoped')."
+    },
+    "clearanceLevel": {
+      "type": "string",
+      "maxLength": 100,
+      "description": "Classification clearance level granted to agents joining with this token."
+    },
+    "maxUses": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Maximum number of times this token can be used. Omit for unlimited."
+    },
+    "expiresAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 expiry timestamp. Omit for no expiry."
+    }
+  },
+  "additionalProperties": false
+}

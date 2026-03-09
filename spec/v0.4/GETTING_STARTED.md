@@ -2,7 +2,7 @@
 
 > **Audience:** Agent developers integrating with Tailor via CLI, REST API, or MCP.
 > **Prerequisites:** Node.js 20+.
-> **Version:** CLI v0.8.0 / PACT v0.3
+> **Version:** CLI v0.9.0 / PACT v0.4
 
 ---
 
@@ -245,6 +245,76 @@ tailor tap object <docId> --proposal <proposalId> \
 tailor tap escalate <docId> --section sec:liability \
   --message "Agents disagree on liability cap vs. currency risk allocation"
 ```
+
+---
+
+## 4b. Managing Invite Tokens (v0.4)
+
+Document owners create scoped invite tokens for zero-trust agent onboarding:
+
+```bash
+# Create an invite with specific permissions
+tailor tap invite create <docId> \
+  --label "Compliance Bot" \
+  --trust-level Suggester \
+  --context-mode section-scoped \
+  --sections "sec:compliance,sec:risk" \
+  --clearance official-sensitive \
+  --max-uses 1 \
+  --expires "2026-04-01"
+# → Token: pact_invite_a1b2c3d4e5...
+
+# List all invites
+tailor tap invite list <docId>
+
+# Revoke an invite
+tailor tap invite revoke <docId> <inviteId>
+```
+
+The external agent joins with just the token — no account needed:
+
+```bash
+curl -X POST https://tailor.au/api/pact/DOC_ID/join-token \
+  -H "Content-Type: application/json" \
+  -d '{"agentName": "compliance-bot", "token": "pact_invite_a1b2c3d4e5..."}'
+# → { registrationId, apiKey, contextMode, allowedSections, trustLevel, clearanceLevel }
+```
+
+---
+
+## 4c. Information Barriers (v0.4)
+
+For regulated industries, PACT supports classification frameworks, agent clearance, and dissemination markers.
+
+```bash
+# Set up a classification framework (as document owner)
+curl -X POST https://tailor.au/api/pact/DOC_ID/classification/framework \
+  -H "Authorization: Bearer $JWT" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Corporate",
+    "levels": [
+      {"levelId": "public", "label": "Public", "rank": 1},
+      {"levelId": "internal", "label": "Internal", "rank": 2},
+      {"levelId": "confidential", "label": "Confidential", "rank": 3},
+      {"levelId": "restricted", "label": "Restricted", "rank": 4}
+    ]
+  }'
+
+# Classify a section
+curl -X POST https://tailor.au/api/pact/DOC_ID/sections/sec:pricing/classify \
+  -H "Authorization: Bearer $JWT" \
+  -H "Content-Type: application/json" \
+  -d '{"levelId": "confidential", "reason": "Contains pricing terms under NDA"}'
+
+# Grant clearance to an agent
+curl -X POST https://tailor.au/api/pact/DOC_ID/clearance \
+  -H "Authorization: Bearer $JWT" \
+  -H "Content-Type: application/json" \
+  -d '{"agentRegistrationId": "AGENT_UUID", "clearanceLevel": "internal"}'
+```
+
+Agents with insufficient clearance see redacted content and do not receive events for classified sections.
 
 ---
 

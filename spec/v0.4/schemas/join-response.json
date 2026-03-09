@@ -2,7 +2,7 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "https://pact-spec.dev/schemas/v0.4/join-response.json",
   "title": "PACT Join Response",
-  "description": "Response body for POST /api/pact/{documentId}/join",
+  "description": "Response body for POST /api/pact/{documentId}/join and POST /api/pact/{documentId}/join-token",
   "type": "object",
   "required": ["registrationId", "documentId", "agentName", "joinedAt"],
   "properties": {
@@ -28,6 +28,33 @@
       "type": "string",
       "enum": ["full", "section-scoped", "neighbourhood", "summary-only"],
       "description": "Context mode assigned to the agent."
+    },
+    "allowedSections": {
+      "type": ["array", "null"],
+      "items": { "type": "string" },
+      "description": "Section IDs the agent can access (only set when contextMode is 'section-scoped')."
+    },
+    "apiKey": {
+      "type": "string",
+      "description": "Document-scoped API key for authentication. Only returned on join-token (BYOK) flow."
+    },
+    "trustLevel": {
+      "type": "string",
+      "enum": ["Observer", "Suggester", "Collaborator", "Autonomous"],
+      "description": "Trust level assigned to the agent."
+    },
+    "clearanceLevel": {
+      "type": ["string", "null"],
+      "description": "Classification clearance level granted (if information barriers are active)."
+    },
+    "protocolVersion": {
+      "type": "string",
+      "description": "Negotiated protocol version."
+    },
+    "capabilities": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Available capabilities at the negotiated protocol version."
     },
     "joinedAt": {
       "type": "string",

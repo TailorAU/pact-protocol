@@ -1,8 +1,8 @@
 # PACT — Protocol for Agent Consensus and Truth — Specification v0.4-draft
 
-> **Status:** Draft  
-> **Author:** Knox Hart + AI  
-> **Date:** 2 March 2026  
+> **Status:** Draft
+> **Author:** Knox Hart + AI
+> **Date:** 9 March 2026
 > **Vision:** Enable millions of agents to collaborate on a common document at machine speed, with humans retaining final authority.
 
 ---
@@ -62,6 +62,8 @@ The platform that defines how agents coordinate on shared documents becomes the 
 5. **Event-sourced truth.** The operation log is the source of truth for collaboration state. The document content is a projection that can be rebuilt from events.
 
 6. **Section-level granularity.** Operations target document sections (headings, paragraphs, list items), not character offsets. This keeps the protocol coarse enough for LLMs to reason about.
+
+7. **Canonical naming.** The protocol prefix is `pact`. All event types use the `pact.*` namespace. All API routes use `/api/pact/`. Implementations MAY alias internally (e.g., `tap` for Tailor Agent Protocol) but the protocol layer MUST use `pact` as the canonical prefix.
 
 ---
 
@@ -125,9 +127,76 @@ Sections are identified by a stable `sectionId` derived from heading hierarchy:
 ### Personnel            → sec:budget/line-items/personnel
 ```
 
-If headings change, the server maintains a mapping from old to new `sectionId` values. Agents always reference sections by ID, never by character offset.
-
 For content outside headings (preamble, top-level paragraphs), a synthetic `sec:_root` section captures everything before the first heading.
+
+#### 3.2.1 Slug Generation Algorithm
+
+Section IDs are generated from heading text using this algorithm:
+
+1. Convert to lowercase
+2. Replace spaces and underscores with hyphens (`-`)
+3. Remove all characters except `a-z`, `0-9`, and `-`
+4. Collapse consecutive hyphens into one
+5. Strip leading and trailing hyphens
+6. Prefix with `sec:` and join with parent using `/`
+
+Examples:
+```
+"Introduction"           → sec:introduction
+"Line Items"             → sec:line-items
+"Cost → Budget"          → sec:cost-budget
+"§2.1 Risk Factors"      → sec:21-risk-factors
+"  Trailing Spaces  "    → sec:trailing-spaces
+```
+
+#### 3.2.2 Duplicate Heading Resolution
+
+When two headings at the same level produce the same slug, the server appends a numeric suffix:
+
+```markdown
+## Summary               → sec:report/summary
+## Details               → sec:report/details
+## Summary               → sec:report/summary-2
+## Summary               → sec:report/summary-3
+```
+
+Suffixes are assigned in document order, starting at `-2`.
+
+#### 3.2.3 Heading Changes and ID Stability
+
+When a proposal changes a heading (and thus its slug), the server:
+
+1. Generates the new `sectionId` from the updated heading
+2. Records an `old → new` mapping in the section registry
+3. Fires a `pact.section.renamed` event with both IDs
+4. For a grace period of **300 seconds**, the server accepts operations targeting either the old or new ID
+5. After the grace period, the old ID returns `section.not_found`
+
+Pending proposals targeting a renamed section are **not** automatically invalidated — the server transparently remaps them to the new ID.
+
+#### 3.2.4 Nested Heading Rules
+
+Heading levels must not skip more than one level. The server normalises skipped levels:
+
+```markdown
+# Finance                → sec:finance           (L1)
+### Budget               → sec:finance/budget    (treated as L2 child of nearest L1)
+```
+
+If a heading level is skipped (e.g., `#` followed by `###`), the server treats the deeper heading as a direct child of the nearest ancestor at a valid parent level.
+
+#### 3.2.5 Structural Changes
+
+Agents MAY propose structural changes (adding or removing headings) by including the heading in `newContent`. When a proposal adds a new heading:
+
+- The server generates a new `sectionId` on merge
+- A `pact.section.created` event is fired
+
+When a proposal removes a heading:
+
+- The section is marked as deleted; its ID enters the stale mapping
+- A `pact.section.deleted` event is fired
+- Pending proposals targeting a deleted section are moved to `CONFLICT` status
 
 ---
 
@@ -169,7 +238,7 @@ For content outside headings (preamble, top-level paragraphs), a synthetic `sec:
 | `comment.resolve` | Mark a comment as resolved | Collaborator+ |
 | `section.lock` | Claim exclusive edit on a section (TTL max 60s) | Collaborator+ |
 | `section.unlock` | Release a section lock | Collaborator+ |
-| `escalate.human` | Flag something for human review | Any |
+| `escalate.human` | Flag something for human review. Pauses auto-merge on the affected section until resolved. | Any |
 
 ### 4.4 Merge Operations (Server-Side)
 
@@ -228,11 +297,29 @@ A conflict is detected when:
 - Two pending proposals target the same `sectionId`
 - A proposal targets a section that has been modified since the proposal was created (stale base)
 
-Conflict resolution strategies (configurable):
-- `first-wins` — earliest proposal by timestamp wins
-- `vote` — agents vote on competing proposals
-- `human-escalate` — always escalate conflicts to human
-- `merge-both` — attempt to merge both changes (LLM-assisted)
+Conflict detection is **synchronous**: the server checks for conflicts at `proposal.create` time. If a conflict exists, the server MUST:
+1. Set the new proposal's status to `CONFLICT`
+2. Fire a `pact.proposal.conflict` event referencing both proposal IDs
+3. Return the conflict in the create response with `activeConflicts[]`
+
+#### Stale Base Detection
+
+A proposal has a stale base when `baseVersion` in the request is less than the section's current version. The server tracks section versions as a monotonic counter incremented on each merge.
+
+### Conflict Resolution
+
+Conflict resolution strategies (configurable per document):
+
+| Strategy | Behaviour |
+|----------|-----------|
+| `first-wins` | Earliest proposal by `epochMs` wins; later proposals move to `REJECTED` with reason `conflict.superseded` |
+| `vote` | Agents vote on competing proposals. The proposal with the most votes after a configurable TTL wins. Ties are broken by earliest creation time. Only agents with salience > 0 on the section may vote. |
+| `human-escalate` | Conflicts are always escalated to the human custodian. Both proposals are paused (no auto-merge TTL) until the human resolves. |
+| `merge-both` | Server attempts to merge both changes. If the changes target different paragraphs within the section, the server applies both. If they overlap, the conflict is escalated to `human-escalate`. Implementations MAY use LLM-assisted merging for overlapping changes; if so, the merge result MUST be presented as a new proposal requiring approval. |
+
+#### Conflict Timeout
+
+Unresolved conflicts MUST auto-escalate to the human custodian after a configurable timeout (default: **600 seconds**). The server fires a `pact.escalation.conflict-timeout` event.
 
 ---
 
@@ -260,9 +347,12 @@ Every PACT operation produces an event. Implementations MUST store events with a
 
 ### 6.2 Event Types
 
+#### Core Events
+
 ```
 pact.agent.joined              // Agent registered on document
 pact.agent.left                // Agent unregistered
+pact.agent.completed           // Agent signalled completion (status + summary)
 pact.proposal.created          // Edit proposal submitted
 pact.proposal.approved         // Proposal approved by agent/human
 pact.proposal.rejected         // Proposal rejected with reason
@@ -272,18 +362,61 @@ pact.proposal.conflict         // Conflict detected (System actor)
 pact.proposal.conflict-resolved // Conflict resolved
 pact.proposal.objected         // Agent objected to a proposal
 pact.proposal.auto-merged      // Proposal auto-merged after TTL with no objections
+pact.proposal.auto-merge-scheduled // Auto-merge scheduled (TTL countdown started)
 pact.section.locked            // Section locked by agent
 pact.section.unlocked          // Section released
+pact.section.renamed           // Section heading changed (old + new sectionId)
+pact.section.created           // New section added via proposal merge
+pact.section.deleted           // Section removed via proposal merge
 pact.comment.added             // Agent comment on section
 pact.comment.resolved          // Comment marked resolved
 pact.escalation.human          // Escalated to human review
+pact.escalation.conflict-timeout // Conflict auto-escalated after timeout
 pact.document.snapshot         // Periodic content snapshot for replay
+pact.document.locked           // Entire document frozen by human
+pact.document.unlocked         // Document unfrozen
+```
+
+#### ICS Events
+
+```
 pact.intent.declared           // Agent declared intent on a section
 pact.intent.accepted           // Intent accepted (no objections within TTL)
 pact.intent.objected           // Agent objected to an intent
 pact.constraint.published      // Agent published a constraint on a section
 pact.constraint.withdrawn      // Agent withdrew a constraint
 pact.salience.set              // Agent set salience score for a section
+```
+
+#### Human Loop Events
+
+```
+pact.human.asked               // Agent asked a question requiring human judgement
+pact.human.responded           // Human responded to an agent question
+pact.human.resolved            // Human resolved an escalation with binding decision
+pact.human.cascade-validated   // Cascade validation completed
+```
+
+#### Invite & Key Events
+
+```
+pact.invite.created            // Invite token created by document owner
+pact.invite.used               // Invite token consumed by agent join
+pact.invite.revoked            // Invite token revoked
+pact.apikey.created            // Document-scoped API key created
+pact.apikey.revoked            // Document-scoped API key revoked
+```
+
+#### Information Barrier Events
+
+```
+pact.classification.framework-created    // Classification framework created
+pact.classification.section-classified   // Section assigned a classification level
+pact.classification.section-declassified // Section classification removed
+pact.clearance.granted         // Agent granted clearance level
+pact.clearance.revoked         // Agent clearance revoked
+pact.dissemination.marker-set  // Dissemination marker applied to section
+pact.dissemination.marker-removed // Dissemination marker removed
 ```
 
 ---
@@ -332,6 +465,35 @@ GET    /api/pact/{documentId}/escalation-briefing/{escalationId}  // Get escalat
 POST   /api/pact/{documentId}/pre-validate            // Preview resolution against constraints
 GET    /api/pact/{documentId}/cascade-status           // Get cascade validation status
 POST   /api/pact/{documentId}/cascade-validate         // Submit cascade validation result
+
+// Agent Invite & Key Management (v0.4)
+POST   /api/pact/{documentId}/invites                 // Create invite token
+GET    /api/pact/{documentId}/invites                 // List invites (owner/custodian)
+GET    /api/pact/{documentId}/invites/{inviteId}      // Get invite details
+DELETE /api/pact/{documentId}/invites/{inviteId}      // Revoke invite
+POST   /api/pact/{documentId}/join-token              // Join with invite token (BYOK)
+POST   /api/pact/{documentId}/keys                    // Create document-scoped API key
+GET    /api/pact/{documentId}/keys                    // List keys (owner/custodian, masked)
+DELETE /api/pact/{documentId}/keys/{keyId}            // Revoke API key
+
+// Information Barriers (v0.4)
+POST   /api/pact/{documentId}/classification/framework    // Create/update framework
+GET    /api/pact/{documentId}/classification/framework    // Get active framework
+DELETE /api/pact/{documentId}/classification/framework    // Remove framework
+POST   /api/pact/{documentId}/sections/{sectionId}/classify     // Classify section
+DELETE /api/pact/{documentId}/sections/{sectionId}/classify     // Declassify section
+GET    /api/pact/{documentId}/sections/{sectionId}/classification // Get classification
+GET    /api/pact/{documentId}/classification/map          // Get classification map
+POST   /api/pact/{documentId}/clearance                   // Grant clearance
+DELETE /api/pact/{documentId}/clearance/{agentRegistrationId}  // Revoke clearance
+GET    /api/pact/{documentId}/clearance                   // List clearance grants
+POST   /api/pact/{documentId}/sections/{sectionId}/markers      // Add dissemination marker
+DELETE /api/pact/{documentId}/sections/{sectionId}/markers/{markerId}  // Remove marker
+POST   /api/pact/{documentId}/sections/{sectionId}/orgs         // Set org restrictions
+DELETE /api/pact/{documentId}/sections/{sectionId}/orgs/{orgId} // Remove org restriction
+
+// Version Discovery
+GET    /api/pact/version                              // Server version and capabilities
 ```
 
 ### 7.2 Real-Time Events
@@ -362,6 +524,24 @@ OnHumanResponded(documentId, queryId, responderId, agentId, agentName)
 OnAgentCompleted(documentId, completionId, agentId, agentName, status, summary)
 OnHumanResolved(documentId, resolutionId, sectionId, decision, isOverride)
 OnCascadeValidated(documentId, resolutionId, agentRegistrationId, result, cascadeStatus)
+
+// Invite & key events
+OnInviteUsed(documentId, inviteId, agentRegistrationId)
+OnInviteRevoked(documentId, inviteId, revokedBy)
+OnApiKeyCreated(documentId, keyId, agentRegistrationId, scopes)
+OnApiKeyRevoked(documentId, keyId, revokedBy)
+
+// Information barrier events
+OnSectionClassified(documentId, sectionId, classificationLevel, frameworkId)
+OnClearanceGranted(documentId, agentRegistrationId, clearanceLevel, frameworkId)
+OnClearanceRevoked(documentId, agentRegistrationId, revokedBy)
+
+// Section structure events
+OnSectionRenamed(documentId, oldSectionId, newSectionId)
+OnSectionCreated(documentId, sectionId, heading, level)
+OnSectionDeleted(documentId, sectionId)
+OnDocumentLocked(documentId, lockedBy)
+OnDocumentUnlocked(documentId, unlockedBy)
 ```
 
 ### 7.3 MCP Tools
@@ -413,6 +593,8 @@ PACT supports multiple document formats. The server parses each format into a un
 | PDF | `application/pdf` | Via DOCX conversion | Binary `.pdf` + text projection |
 
 All formats produce the same `sec:slug/child-slug` section IDs. Agents interact with any format using the same commands and API endpoints.
+
+**Important:** PACT operates on a **Markdown projection** of the document, not the source file. Non-Markdown source formats (DOCX, PDF, HTML) are converted to Markdown by the server. Proposals target the Markdown projection; the implementation is responsible for mapping changes back to the source format. The source format is an implementation detail — the protocol only sees Markdown.
 
 ### 8.2 Section Parsing Rules
 
@@ -880,7 +1062,530 @@ A document's mediation mode is set at creation time or by the human custodian.
 
 ---
 
-## 14. Open Questions
+## 14. Information Barriers
+
+### 14.1 Design Rationale
+
+Regulated industries (government, legal, financial services) require formal information barriers between agents operating on the same document. An agent representing one party in a negotiation must not see content classified above its clearance level, and must not leak classified information through its proposals.
+
+PACT Information Barriers provide four mechanisms:
+
+| Mechanism | Purpose |
+|-----------|---------|
+| **Classification Frameworks** | Define ordered sensitivity levels per document |
+| **Section Classification** | Tag sections with a classification level |
+| **Agent Clearance** | Grant agents access to specific classification levels |
+| **Dissemination Markers** | Fine-grained access tags beyond classification |
+
+### 14.2 Classification Frameworks
+
+A classification framework defines an ordered set of sensitivity levels for a document. Each document has at most one active framework.
+
+#### Framework Structure
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `frameworkId` | UUID | Unique identifier |
+| `name` | string | Human-readable name (e.g., "Australian Government", "Corporate") |
+| `levels` | array | Ordered list of classification levels, from lowest to highest sensitivity |
+
+Each level has:
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `levelId` | string | Machine-readable identifier (e.g., `official`, `protected`, `secret`) |
+| `label` | string | Display name (e.g., "OFFICIAL", "PROTECTED", "SECRET") |
+| `rank` | integer | Numeric rank (higher = more sensitive). Must be unique within the framework. |
+
+#### Predefined Frameworks
+
+Implementations SHOULD support these common frameworks:
+
+**Australian Government (Protective Security Policy Framework):**
+
+| levelId | Label | Rank |
+|---------|-------|------|
+| `official` | OFFICIAL | 1 |
+| `official-sensitive` | OFFICIAL: Sensitive | 2 |
+| `protected` | PROTECTED | 3 |
+| `secret` | SECRET | 4 |
+| `top-secret` | TOP SECRET | 5 |
+
+**Corporate:**
+
+| levelId | Label | Rank |
+|---------|-------|------|
+| `public` | Public | 1 |
+| `internal` | Internal | 2 |
+| `confidential` | Confidential | 3 |
+| `restricted` | Restricted | 4 |
+
+Implementations MAY also support custom frameworks defined at document creation time.
+
+#### API Endpoints
+
+```
+POST   /api/pact/{documentId}/classification/framework    // Create or update framework
+GET    /api/pact/{documentId}/classification/framework    // Get active framework
+DELETE /api/pact/{documentId}/classification/framework    // Remove framework
+```
+
+Only the document owner or a human custodian may manage frameworks. Framework changes fire `pact.classification.framework-created` events.
+
+### 14.3 Section Classification
+
+Each section in a document may be assigned a classification level from the active framework.
+
+#### Rules
+
+1. **Default classification:** Unclassified sections are treated as the lowest level in the active framework. If no framework is active, all sections are unrestricted.
+2. **Inheritance:** A child section inherits its parent's classification unless explicitly overridden. A child section's classification MUST NOT be lower than its parent's.
+3. **Classification changes:** Only human custodians and agents with `Collaborator+` trust level and sufficient clearance may classify sections.
+4. **Declassification:** Lowering a section's classification requires human custodian approval.
+
+#### API Endpoints
+
+```
+POST   /api/pact/{documentId}/sections/{sectionId}/classify     // Set classification
+DELETE /api/pact/{documentId}/sections/{sectionId}/classify     // Remove classification (declassify)
+GET    /api/pact/{documentId}/sections/{sectionId}/classification // Get section classification
+GET    /api/pact/{documentId}/classification/map                 // Get classification map for all sections
+```
+
+#### Request Schema
+
+```json
+{
+  "levelId": "protected",
+  "reason": "Contains pricing terms under NDA"
+}
+```
+
+### 14.4 Agent Clearance
+
+Agents are granted clearance to access sections up to a specific classification level. An agent can only read, propose to, or receive events about sections at or below its clearance level.
+
+#### Clearance Model
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `agentRegistrationId` | UUID | The agent's registration ID |
+| `frameworkId` | UUID | The classification framework |
+| `clearanceLevel` | string | The `levelId` the agent is cleared to (inclusive) |
+| `grantedBy` | string | Who granted the clearance (user ID or system) |
+| `grantedAt` | datetime | When clearance was granted |
+
+An agent with clearance to level `protected` (rank 3) can access sections classified at `official` (1), `official-sensitive` (2), and `protected` (3), but not `secret` (4) or above.
+
+#### Visibility Rules
+
+When an agent's clearance is lower than a section's classification:
+
+| Operation | Behaviour |
+|-----------|-----------|
+| `document.get` | Section content is **redacted** (replaced with `[REDACTED — insufficient clearance]`) |
+| `document.sections` | Section appears in the tree with `classified: true` but no heading text or content |
+| `proposals.list` | Proposals targeting the section are **hidden** |
+| `events.history` | Events referencing the section are **filtered out** |
+| `poll` | Events referencing the section are **filtered out** |
+| `proposal.create` | Returns `clearance.insufficient` error |
+| `section.lock` | Returns `clearance.insufficient` error |
+| Real-time events | Events referencing the section are **not delivered** |
+
+#### API Endpoints
+
+```
+POST   /api/pact/{documentId}/clearance                 // Grant clearance to an agent
+DELETE /api/pact/{documentId}/clearance/{agentRegistrationId}  // Revoke clearance
+GET    /api/pact/{documentId}/clearance                  // List all clearance grants
+GET    /api/pact/{documentId}/clearance/{agentRegistrationId}  // Get agent's clearance
+```
+
+#### Request Schema
+
+```json
+{
+  "agentRegistrationId": "uuid",
+  "clearanceLevel": "protected"
+}
+```
+
+Only human custodians may grant or revoke clearance. Clearance changes fire `pact.clearance.granted` or `pact.clearance.revoked` events.
+
+### 14.5 Dissemination Markers
+
+Dissemination markers provide fine-grained access control beyond classification levels. A section may have zero or more markers that restrict which agents can access it.
+
+#### Marker Structure
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `markerId` | string | Machine-readable identifier (e.g., `legal-eyes-only`, `board-only`) |
+| `label` | string | Display name (e.g., "Legal Eyes Only") |
+| `description` | string | What this marker restricts |
+
+#### Rules
+
+1. An agent must hold **all** markers applied to a section (in addition to sufficient clearance) to access it.
+2. Markers are additive restrictions — each marker narrows the audience.
+3. Markers are assigned to sections by human custodians or `Collaborator+` agents with sufficient clearance.
+4. Markers are granted to agents by human custodians.
+
+#### API Endpoints
+
+```
+POST   /api/pact/{documentId}/sections/{sectionId}/markers      // Add marker to section
+DELETE /api/pact/{documentId}/sections/{sectionId}/markers/{markerId}  // Remove marker
+GET    /api/pact/{documentId}/sections/{sectionId}/markers       // List section markers
+POST   /api/pact/{documentId}/agents/{agentRegistrationId}/markers     // Grant marker to agent
+DELETE /api/pact/{documentId}/agents/{agentRegistrationId}/markers/{markerId}  // Revoke marker
+GET    /api/pact/{documentId}/agents/{agentRegistrationId}/markers     // List agent markers
+```
+
+### 14.6 Organisation Boundaries
+
+In multi-organisation scenarios (e.g., contract negotiation between two companies), sections can be restricted to specific organisations.
+
+#### Organisation Model
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `orgId` | string | Organisation identifier |
+| `orgName` | string | Display name |
+
+Agents declare their `orgId` at join time (in the join request). Sections may be tagged with one or more `orgId` values indicating which organisations can access them.
+
+#### Visibility Rules
+
+| Scenario | Behaviour |
+|----------|-----------|
+| Section has no org restriction | All agents can access (subject to clearance) |
+| Section restricted to `[orgA]` | Only agents with `orgId = orgA` can access |
+| Section restricted to `[orgA, orgB]` | Agents from either org can access |
+| Agent has no `orgId` | Can only access unrestricted sections |
+
+#### API Endpoints
+
+```
+POST   /api/pact/{documentId}/sections/{sectionId}/orgs         // Restrict section to orgs
+DELETE /api/pact/{documentId}/sections/{sectionId}/orgs/{orgId}  // Remove org restriction
+GET    /api/pact/{documentId}/sections/{sectionId}/orgs          // List section org restrictions
+```
+
+### 14.7 Event Filtering
+
+All event delivery mechanisms (poll, real-time, history) MUST respect information barriers:
+
+1. **Classification filtering:** Events referencing sections above the agent's clearance are excluded from the response.
+2. **Marker filtering:** Events referencing sections with markers the agent does not hold are excluded.
+3. **Organisation filtering:** Events referencing sections restricted to organisations the agent does not belong to are excluded.
+4. **Metadata-only events:** When an event is filtered, implementations MAY deliver a metadata-only stub: `{ eventType, epochMs, sectionId: "[classified]" }` so agents know *something* happened without seeing details. This is configurable per document.
+
+### 14.8 Cross-Pollination Prevention
+
+Agents MUST NOT be able to leak classified information through their proposals. The server enforces:
+
+1. **Content scanning:** When an agent proposes content for a lower-classified section, the server checks if the content references or contains text from higher-classified sections the agent has accessed. Implementations MAY use text similarity or LLM-based detection.
+2. **Constraint redaction:** Constraints published by an agent are checked against the agent's clearance. Constraint text that references classified content is blocked with `clearance.constraint_leak`.
+3. **Intent redaction:** Similarly, intent goals are checked for classified content leakage.
+
+---
+
+## 15. Agent Invite System
+
+### 15.1 Design Rationale
+
+PACT uses a zero-trust agent onboarding model. Agents do not need user accounts to participate — they join documents via scoped invite tokens created by document owners.
+
+### 15.2 Invite Tokens
+
+An invite token grants an agent permission to join a specific document with specific permissions.
+
+#### Invite Structure
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `inviteId` | UUID | Unique identifier |
+| `documentId` | UUID | The document this invite is for |
+| `token` | string | The secret token string (shown once at creation) |
+| `label` | string | Human-readable label (e.g., "Legal Review Bot") |
+| `trustLevel` | enum | Maximum trust level the joining agent receives: `Observer`, `Suggester`, `Collaborator` |
+| `contextMode` | enum | Context mode for the agent: `full`, `section-scoped`, `neighbourhood`, `summary-only` |
+| `allowedSections` | string[]? | If `contextMode` is `section-scoped`, the list of section IDs the agent can access |
+| `clearanceLevel` | string? | If information barriers are active, the clearance level granted on join |
+| `maxUses` | integer? | Maximum number of times the token can be used. `null` = unlimited |
+| `usedCount` | integer | Number of times the token has been used |
+| `expiresAt` | datetime? | Expiry timestamp. `null` = no expiry |
+| `createdBy` | string | User ID of the creator |
+| `createdAt` | datetime | Creation timestamp |
+| `revoked` | boolean | Whether the token has been revoked |
+
+#### Context Modes
+
+| Mode | What the agent can see |
+|------|------------------------|
+| `full` | The entire document content, all sections, all events |
+| `section-scoped` | Only sections listed in `allowedSections` and their children. Other sections are hidden from content, section tree, and events. |
+| `neighbourhood` | The target sections plus their parent and sibling sections (one level of context around each allowed section) |
+| `summary-only` | Section tree structure and headings only. No section content. Agent can only declare intents and publish constraints, not propose edits. |
+
+### 15.3 Invite API Endpoints
+
+```
+POST   /api/pact/{documentId}/invites              // Create an invite token
+GET    /api/pact/{documentId}/invites              // List all invites (owner/custodian only)
+GET    /api/pact/{documentId}/invites/{inviteId}   // Get invite details
+DELETE /api/pact/{documentId}/invites/{inviteId}   // Revoke an invite
+```
+
+#### Create Invite Request
+
+```json
+{
+  "label": "Compliance Bot",
+  "trustLevel": "Suggester",
+  "contextMode": "section-scoped",
+  "allowedSections": ["sec:compliance", "sec:risk"],
+  "clearanceLevel": "official-sensitive",
+  "maxUses": 1,
+  "expiresAt": "2026-04-01T00:00:00Z"
+}
+```
+
+#### Create Invite Response
+
+```json
+{
+  "inviteId": "uuid",
+  "token": "pact_invite_a1b2c3d4e5f6...",
+  "label": "Compliance Bot",
+  "documentId": "uuid",
+  "createdAt": "2026-03-09T10:00:00Z",
+  "expiresAt": "2026-04-01T00:00:00Z",
+  "maxUses": 1
+}
+```
+
+The `token` value is shown **once** at creation and cannot be retrieved again.
+
+### 15.4 BYOK Join Flow
+
+Agents join a document using an invite token via the `join-token` endpoint:
+
+```
+POST /api/pact/{documentId}/join-token
+```
+
+Request:
+```json
+{
+  "agentName": "compliance-bot",
+  "token": "pact_invite_a1b2c3d4e5f6..."
+}
+```
+
+Response:
+```json
+{
+  "registrationId": "uuid",
+  "documentId": "uuid",
+  "agentName": "compliance-bot",
+  "apiKey": "pact_sk_scoped_...",
+  "contextMode": "section-scoped",
+  "allowedSections": ["sec:compliance", "sec:risk"],
+  "trustLevel": "Suggester",
+  "clearanceLevel": "official-sensitive",
+  "joinedAt": "2026-03-09T10:01:00Z"
+}
+```
+
+The returned `apiKey` is scoped to the document and inherits the invite's permissions.
+
+### 15.5 API Key Lifecycle
+
+Document-scoped API keys are the primary authentication mechanism for agents.
+
+#### Key Properties
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `keyId` | UUID | Unique identifier |
+| `documentId` | UUID | Document scope |
+| `agentRegistrationId` | UUID | Associated agent registration |
+| `prefix` | string | First 8 characters of the key (for identification without exposing the secret) |
+| `createdAt` | datetime | Creation timestamp |
+| `lastUsedAt` | datetime? | Last successful authentication |
+| `revoked` | boolean | Whether the key is revoked |
+
+#### API Endpoints
+
+```
+POST   /api/pact/{documentId}/keys                 // Create a new key (owner/custodian)
+GET    /api/pact/{documentId}/keys                 // List keys (owner/custodian only, keys are masked)
+DELETE /api/pact/{documentId}/keys/{keyId}          // Revoke a key
+```
+
+When a key is revoked, all subsequent requests using that key return `auth.unauthorized`. Active WebSocket/SignalR connections authenticated with the key are disconnected.
+
+---
+
+## 16. Authentication & Security
+
+### 16.1 Authentication Methods
+
+PACT supports two authentication methods. Implementations MUST support API Key authentication and SHOULD support JWT authentication.
+
+#### API Key Authentication
+
+Agents authenticate using a document-scoped API key passed in the `X-Api-Key` header:
+
+```
+X-Api-Key: pact_sk_scoped_abc123...
+```
+
+API keys are issued:
+- On `agent.join` (for authenticated users)
+- On `join-token` (for BYOK agents, from invite tokens)
+- Via the key management API (for human custodians)
+
+API key format: `pact_sk_scoped_{random}` — implementations SHOULD use at least 32 bytes of cryptographically random data.
+
+#### JWT Authentication
+
+Human users accessing PACT features through a web UI authenticate using JWT bearer tokens:
+
+```
+Authorization: Bearer eyJhbGciOiJSUzI1NiIs...
+```
+
+JWT requirements:
+- Signing algorithm: RS256 or ES256
+- Required claims: `sub` (user ID), `exp` (expiry), `aud` (audience — the PACT server URL)
+- Optional claims: `pact:documents` (list of document IDs the token grants access to)
+
+#### Authentication Precedence
+
+When both `X-Api-Key` and `Authorization: Bearer` headers are present, the server MUST use `X-Api-Key` and ignore the Bearer token.
+
+### 16.2 Transport Security
+
+All PACT API communication MUST use HTTPS (TLS 1.2 or later). Implementations MUST reject HTTP connections to API endpoints.
+
+### 16.3 Rate Limiting
+
+Implementations MUST enforce rate limiting and SHOULD return these headers on every response:
+
+| Header | Description |
+|--------|-------------|
+| `X-RateLimit-Limit` | Maximum requests per window |
+| `X-RateLimit-Remaining` | Requests remaining in current window |
+| `X-RateLimit-Reset` | Unix timestamp when the window resets |
+| `Retry-After` | Seconds to wait before retrying (only on 429 responses) |
+
+Default limits (implementations MAY adjust):
+
+| Scope | Limit |
+|-------|-------|
+| Per API key, per document | 120 requests/minute |
+| Per API key, write operations | 30 requests/minute |
+| Per document, all agents | 600 requests/minute |
+
+### 16.4 CORS
+
+Implementations serving web clients MUST support CORS with:
+
+- `Access-Control-Allow-Origin`: Configurable per deployment
+- `Access-Control-Allow-Headers`: `X-Api-Key, Authorization, Content-Type`
+- `Access-Control-Allow-Methods`: `GET, POST, DELETE, OPTIONS`
+
+---
+
+## 17. Version Negotiation
+
+### 17.1 Protocol Version
+
+Every PACT server advertises its supported protocol versions. The current version is `0.4`.
+
+#### Version Header
+
+The server MUST include a `X-PACT-Version` header in every response:
+
+```
+X-PACT-Version: 0.4
+```
+
+#### Version Discovery
+
+```
+GET /api/pact/version
+```
+
+Response:
+```json
+{
+  "current": "0.4",
+  "supported": ["0.3", "0.4"],
+  "capabilities": [
+    "core",
+    "ics",
+    "pact-live",
+    "mediation",
+    "information-barriers",
+    "invites"
+  ]
+}
+```
+
+### 17.2 Version Negotiation on Join
+
+Agents MAY specify their preferred protocol version in the join request:
+
+```json
+{
+  "agentName": "compliance-bot",
+  "protocolVersion": "0.3"
+}
+```
+
+The server responds with the negotiated version:
+
+```json
+{
+  "registrationId": "uuid",
+  "protocolVersion": "0.3",
+  "capabilities": ["core", "ics", "pact-live"]
+}
+```
+
+If the agent requests a version the server does not support, the server returns `version.unsupported` (400).
+
+### 17.3 Capability Advertisement
+
+The `capabilities` array tells agents which feature sets are available:
+
+| Capability | Description | Min Version |
+|------------|-------------|-------------|
+| `core` | Proposals, sections, events, locking, escalation | 0.3 |
+| `ics` | Intents, constraints, salience, objection-based merge | 0.3 |
+| `pact-live` | Poll, done, ask-human, resolve, cascade | 0.3 |
+| `mediation` | Mediated messages, queries, negotiations, register | 0.4 |
+| `information-barriers` | Classification, clearance, dissemination, org boundaries | 0.4 |
+| `invites` | Invite tokens, BYOK join, key lifecycle | 0.4 |
+
+### 17.4 Backward Compatibility
+
+A v0.4 server MUST support v0.3 agents with these guarantees:
+
+1. All v0.3 endpoints continue to work without modification
+2. v0.3 agents do not receive mediation or information barrier events
+3. v0.3 agents cannot access v0.4-only endpoints (returns `version.feature_unavailable`, 400)
+4. v0.3 agents see unmediated event streams even if the document is in mediated mode
+
+A v0.3 agent connecting to a v0.4 server with information barriers active will see redacted content where clearance is insufficient, using the same visibility rules as v0.4 agents.
+
+---
+
+## 18. Open Questions
 
 1. **Should PACT documents coexist with DOCX documents, or should DOCX documents gain PACT capabilities too?** Initial recommendation: PACT is Markdown-only, DOCX keeps existing review workflows. Convergence later.
 
@@ -897,6 +1602,10 @@ A document's mediation mode is set at creation time or by the human custodian.
 7. **Should the Mediator be LLM-powered?** A rules-based Mediator is deterministic and auditable. An LLM-powered Mediator can summarise and paraphrase across clearance boundaries, but introduces non-determinism and cost. Should the spec require deterministic mediation with LLM summarisation as an optional enhancement?
 
 8. **How does the Mediator handle agent liveness during negotiation?** If Agent B goes silent during a negotiation round, should the Mediator auto-close the negotiation, escalate to the human, or continue with remaining agents?
+
+9. **Cross-pollination detection accuracy.** Content scanning for classified information leakage (Section 14.8) may produce false positives. Should the spec define a tolerance threshold or require human review of flagged content?
+
+10. **Invite token rotation.** Should compromised invite tokens be rotatable (new token, same permissions) or only revocable (requiring a new invite)?
 
 ---
 
@@ -936,17 +1645,40 @@ The `errors` array contains one or more error objects. Each error has a machine-
 | `document.not_found` | 404 | Document does not exist |
 | `document.locked` | 423 | Entire document is frozen |
 | `rate.limited` | 429 | Rate limit exceeded |
+| `clearance.insufficient` | 403 | Agent's clearance level is below the section's classification |
+| `clearance.constraint_leak` | 400 | Constraint or intent text references classified content |
+| `classification.invalid_level` | 400 | The specified classification level does not exist in the active framework |
+| `classification.no_framework` | 400 | No classification framework is active on this document |
+| `classification.child_violation` | 400 | Child section classification cannot be lower than parent |
+| `invite.not_found` | 404 | Invite ID does not exist |
+| `invite.expired` | 410 | Invite token has expired |
+| `invite.exhausted` | 410 | Invite token has reached its maximum use count |
+| `invite.revoked` | 410 | Invite token has been revoked |
+| `invite.invalid_token` | 401 | Token string does not match any active invite |
+| `contextmode.violation` | 403 | Agent attempted to access a section outside its context mode scope |
+| `mediation.blocked` | 403 | Message was blocked by the Mediator |
+| `mediation.agent_not_visible` | 404 | Target agent is not visible to the sender in mediated mode |
+| `query.timeout` | 408 | Query response was not received within the timeout |
+| `negotiation.not_found` | 404 | Negotiation ID does not exist |
+| `negotiation.closed` | 400 | Cannot submit a position to a closed negotiation |
+| `version.unsupported` | 400 | Requested protocol version is not supported |
+| `version.feature_unavailable` | 400 | Requested feature is not available at the agent's protocol version |
+| `dissemination.marker_required` | 403 | Agent lacks a required dissemination marker for this section |
+| `org.access_denied` | 403 | Agent's organisation does not have access to this section |
 
-Implementations MAY define additional error codes under custom namespaces (e.g., `classification.access_denied`). All custom codes MUST use the dot-delimited format.
+Implementations MAY define additional error codes under custom namespaces. All custom codes MUST use the dot-delimited format.
 
 ### A.2 Request/Response Schemas
 
-Full JSON Schema (draft-07) definitions for all API endpoints are available in the [schemas directory](https://github.com/TailorAU/pact/tree/main/spec/v0.3/schemas).
+Full JSON Schema (draft-07) definitions for all API endpoints are available in the [schemas directory](https://github.com/TailorAU/pact/tree/main/spec/v0.4/schemas).
+
+#### Core Schemas
 
 | Schema | Endpoint | Description |
 |---|---|---|
 | `join-request.json` | `POST /join` | Agent registration request |
 | `join-response.json` | `POST /join` | Agent registration response |
+| `join-token-request.json` | `POST /join-token` | BYOK join with invite token |
 | `proposal-request.json` | `POST /proposals` | Edit proposal creation |
 | `proposal-response.json` | `POST /proposals` | Edit proposal with constraint warnings |
 | `intent-request.json` | `POST /intents` | Intent declaration |
@@ -955,8 +1687,36 @@ Full JSON Schema (draft-07) definitions for all API endpoints are available in t
 | `lock-request.json` | `POST /sections/{id}/lock` | Section lock with TTL |
 | `done-request.json` | `POST /done` | Agent completion signal |
 | `ask-human-request.json` | `POST /ask-human` | Human escalation |
+| `resolve-request.json` | `POST /resolve` | Human resolution of escalation |
 | `error-response.json` | All endpoints | Standard error envelope |
 | `event.json` | Events / polling | Event structure (Section 6) |
+
+#### Mediation Schemas
+
+| Schema | Endpoint | Description |
+|---|---|---|
+| `message-send-request.json` | `POST /messages` | Send mediated message |
+| `message-response.json` | `GET /messages/inbox` | Delivered message with mediation metadata |
+| `query-submit-request.json` | `POST /queries` | Submit mediated query |
+| `query-respond-request.json` | `POST /queries/{id}/respond` | Respond to routed query |
+| `negotiation-position-request.json` | `POST /negotiations/{id}/position` | Submit negotiation position |
+| `negotiation-response.json` | `GET /negotiations/{id}/synthesis` | Negotiation state with synthesis |
+| `register-entry.json` | `GET /register` | Message Register entry |
+
+#### Information Barrier Schemas
+
+| Schema | Endpoint | Description |
+|---|---|---|
+| `classification-framework-request.json` | `POST /classification/framework` | Create/update classification framework |
+| `classify-section-request.json` | `POST /sections/{id}/classify` | Classify a section |
+| `clearance-request.json` | `POST /clearance` | Grant clearance to an agent |
+
+#### Invite & Key Schemas
+
+| Schema | Endpoint | Description |
+|---|---|---|
+| `invite-create-request.json` | `POST /invites` | Create invite token |
+| `invite-response.json` | `POST /invites` | Created invite with token |
 
 ### A.3 Pagination
 

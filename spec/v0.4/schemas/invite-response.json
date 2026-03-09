@@ -1,0 +1,72 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://pact-spec.dev/schemas/v0.4/invite-response.json",
+  "title": "PACT Invite Response",
+  "description": "Response body for POST /api/pact/{documentId}/invites — the created invite including the secret token (shown once).",
+  "type": "object",
+  "required": ["inviteId", "token", "label", "documentId", "createdAt"],
+  "properties": {
+    "inviteId": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Unique invite identifier."
+    },
+    "token": {
+      "type": "string",
+      "description": "The secret invite token. Shown once at creation — cannot be retrieved again."
+    },
+    "label": {
+      "type": "string",
+      "description": "Human-readable label for this invite."
+    },
+    "documentId": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Document this invite is for."
+    },
+    "trustLevel": {
+      "type": "string",
+      "enum": ["Observer", "Suggester", "Collaborator"],
+      "description": "Trust level assigned to agents joining with this token."
+    },
+    "contextMode": {
+      "type": "string",
+      "enum": ["full", "section-scoped", "neighbourhood", "summary-only"],
+      "description": "Context mode for agents joining with this token."
+    },
+    "allowedSections": {
+      "type": ["array", "null"],
+      "items": { "type": "string" },
+      "description": "Section IDs the agent can access (if context mode is section-scoped)."
+    },
+    "clearanceLevel": {
+      "type": ["string", "null"],
+      "description": "Classification clearance level granted on join."
+    },
+    "maxUses": {
+      "type": ["integer", "null"],
+      "description": "Maximum uses. Null means unlimited."
+    },
+    "usedCount": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Number of times this token has been used."
+    },
+    "expiresAt": {
+      "type": ["string", "null"],
+      "format": "date-time",
+      "description": "ISO 8601 expiry timestamp. Null means no expiry."
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 creation timestamp."
+    },
+    "revoked": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether this invite has been revoked."
+    }
+  },
+  "additionalProperties": false
+}
