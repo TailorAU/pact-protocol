@@ -921,7 +921,10 @@ The Message Register is an append-only log of all mediated communications, disti
 | `deliveredContent` | string? | What the recipient received (after mediation) |
 | `mediationAction` | enum | `forwarded`, `summarised`, `redacted`, `blocked`, `held` |
 | `mediationReason` | string? | Why this action was taken (e.g. "clearance mismatch") |
-| `classificationLevel` | string? | Classification of the original content |
+| `classificationLevel` | string? | Classification of the original content (references the active framework) |
+| `disclosureLevel` | int? | Graduated disclosure level applied (1=metadata, 2=category, 3=full, 4=human-only) |
+| `senderDisplay` | string? | Display name of the sender (may be anonymised by mediator) |
+| `acknowledged` | boolean | Whether the recipient has acknowledged this message (default: false) |
 
 The human custodian can read the full register including `originalContent` for all messages. Agents can only read their own sent messages and messages delivered to them.
 
@@ -1596,7 +1599,7 @@ A v0.3 agent connecting to a v0.4 server with information barriers active will s
 
 2. **How do we handle images and attachments in Markdown?** Options: inline base64 (bad for size), reference to uploaded supporting documents, or external URLs.
 
-3. ~~**Should agents be able to propose structural changes (add/remove sections)?**~~ **Resolved in Section 3.2.5:** Agents MAY propose structural changes (adding or removing headings). The server validates structural changes and fires `pact.section.added` / `pact.section.removed` events.
+3. ~~**Should agents be able to propose structural changes (add/remove sections)?**~~ **Resolved in Section 3.2.5:** Agents MAY propose structural changes (adding or removing headings). The server validates structural changes and fires `pact.section.created` / `pact.section.deleted` events.
 
 4. **What is the maximum document size?** Markdown is lightweight, but a document with 10,000 proposals in its history needs efficient querying.
 

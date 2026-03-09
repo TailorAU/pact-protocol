@@ -367,8 +367,6 @@ POST   /api/pact/{documentId}/pre-validate            // Preview resolution agai
 GET    /api/pact/{documentId}/cascade-status           // Get cascade validation status
 POST   /api/pact/{documentId}/cascade-validate         // Submit cascade validation result
 
-// Agent Invite & Key Management
-POST   /api/pact/{documentId}/join-token              // Join with invite token (BYOK)
 ```
 
 ### 7.2 Real-Time Events
