@@ -30,8 +30,8 @@
       "description": "Content as submitted by the sender (before mediation)."
     },
     "deliveredContent": {
-      "type": "string",
-      "description": "Content as delivered to the recipient (after mediation)."
+      "type": ["string", "null"],
+      "description": "Content as delivered to the recipient (after mediation). Null when mediationAction is 'blocked'."
     },
     "mediationAction": {
       "type": "string",
@@ -42,11 +42,15 @@
       "type": ["string", "null"],
       "description": "Why the mediator applied this action."
     },
-    "classificationLevel": {
+    "disclosureLevel": {
       "type": ["integer", "null"],
       "minimum": 1,
       "maximum": 4,
-      "description": "Disclosure level applied."
+      "description": "Graduated disclosure level applied (1=metadata only, 2=category, 3=full content, 4=human-only)."
+    },
+    "classificationLevel": {
+      "type": ["string", "null"],
+      "description": "Classification of the original content (e.g., 'official', 'protected', 'secret')."
     },
     "sectionId": {
       "type": ["string", "null"],

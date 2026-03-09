@@ -22,6 +22,11 @@
       "maxLength": 500,
       "description": "Brief summary of the change."
     },
+    "baseVersion": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Document version the proposal is based on. Used for conflict detection."
+    },
     "reasoning": {
       "type": "string",
       "maxLength": 2000,

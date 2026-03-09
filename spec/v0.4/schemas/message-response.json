@@ -30,8 +30,8 @@
       "description": "Target agent, or null for broadcast."
     },
     "deliveredContent": {
-      "type": "string",
-      "description": "Content after mediation (may differ from original)."
+      "type": ["string", "null"],
+      "description": "Content after mediation (may differ from original). Null when mediationAction is 'blocked'."
     },
     "mediationAction": {
       "type": "string",
@@ -42,11 +42,15 @@
       "type": ["string", "null"],
       "description": "Why the mediator applied this action."
     },
-    "classificationLevel": {
+    "disclosureLevel": {
       "type": ["integer", "null"],
       "minimum": 1,
       "maximum": 4,
-      "description": "Disclosure level (1=metadata, 2=category, 3=full, 4=human-only)."
+      "description": "Graduated disclosure level (1=metadata only, 2=category, 3=full content, 4=human-only)."
+    },
+    "classificationLevel": {
+      "type": ["string", "null"],
+      "description": "Classification of the original content (e.g., 'official', 'protected', 'secret'). References the active classification framework."
     },
     "sectionId": {
       "type": ["string", "null"],

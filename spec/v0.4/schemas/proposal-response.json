@@ -52,6 +52,30 @@
         },
         "additionalProperties": false
       }
+    },
+    "activeConflicts": {
+      "type": "array",
+      "description": "Conflicting proposals on the same section, if any.",
+      "items": {
+        "type": "object",
+        "required": ["proposalId", "sectionId", "status"],
+        "properties": {
+          "proposalId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "ID of the conflicting proposal."
+          },
+          "sectionId": {
+            "type": "string",
+            "description": "Section targeted by the conflicting proposal."
+          },
+          "status": {
+            "type": "string",
+            "description": "Status of the conflicting proposal."
+          }
+        },
+        "additionalProperties": false
+      }
     }
   },
   "additionalProperties": false

@@ -9,25 +9,25 @@
 
 ## Quick Start
 
-New to PACT? See **[PACT Getting Started](./PACT_GETTING_STARTED.md)** for a 5-minute walkthrough: authenticate, join a document, and make your first proposal.
+New to PACT? See **[PACT Getting Started](./GETTING_STARTED.md)** for a 5-minute walkthrough: authenticate, join a document, and make your first proposal.
 
 **60-second overview:**
 
 ```bash
 # Join a document (BYOK — invite token, no account needed)
-POST /api/pact/{docId}/join-token
+POST /api/pact/{documentId}/join-token
   { "agentName": "my-agent", "token": "INVITE_TOKEN" }
-  → { registrationId, apiKey, contextMode }
+  → { registrationId, apiKey, contextMode, allowedSections, trustLevel, clearanceLevel }
 
 # Read the document
-GET /api/pact/{docId}/content → { content, version }
+GET /api/pact/{documentId}/content → { content, version }
 
 # See section structure
-GET /api/pact/{docId}/sections → [{ sectionId, heading, level }]
+GET /api/pact/{documentId}/sections → [{ sectionId, heading, level }]
 
 # Propose a change
-POST /api/pact/{docId}/proposals
-  { "sectionId": "sec:intro", "newContent": "...", "summary": "..." }
+POST /api/pact/{documentId}/proposals
+  { "sectionId": "sec:intro", "baseVersion": 1, "newContent": "...", "summary": "..." }
 ```
 
 ---
@@ -487,8 +487,13 @@ GET    /api/pact/{documentId}/classification/map          // Get classification 
 POST   /api/pact/{documentId}/clearance                   // Grant clearance
 DELETE /api/pact/{documentId}/clearance/{agentRegistrationId}  // Revoke clearance
 GET    /api/pact/{documentId}/clearance                   // List clearance grants
+GET    /api/pact/{documentId}/clearance/{agentRegistrationId}  // Get agent's clearance
 POST   /api/pact/{documentId}/sections/{sectionId}/markers      // Add dissemination marker
 DELETE /api/pact/{documentId}/sections/{sectionId}/markers/{markerId}  // Remove marker
+GET    /api/pact/{documentId}/sections/{sectionId}/markers       // List section markers
+POST   /api/pact/{documentId}/agents/{agentRegistrationId}/markers     // Grant marker to agent
+DELETE /api/pact/{documentId}/agents/{agentRegistrationId}/markers/{markerId}  // Revoke marker from agent
+GET    /api/pact/{documentId}/agents/{agentRegistrationId}/markers     // List agent markers
 POST   /api/pact/{documentId}/sections/{sectionId}/orgs         // Set org restrictions
 DELETE /api/pact/{documentId}/sections/{sectionId}/orgs/{orgId} // Remove org restriction
 
@@ -1587,11 +1592,11 @@ A v0.3 agent connecting to a v0.4 server with information barriers active will s
 
 ## 18. Open Questions
 
-1. **Should PACT documents coexist with DOCX documents, or should DOCX documents gain PACT capabilities too?** Initial recommendation: PACT is Markdown-only, DOCX keeps existing review workflows. Convergence later.
+1. ~~**Should PACT documents coexist with DOCX documents, or should DOCX documents gain PACT capabilities too?**~~ **Resolved in Section 8:** PACT operates on a Markdown projection. DOCX and PDF documents are supported via round-trip conversion; the protocol operates on the Markdown representation. DOCX retains its native review workflows outside of PACT.
 
 2. **How do we handle images and attachments in Markdown?** Options: inline base64 (bad for size), reference to uploaded supporting documents, or external URLs.
 
-3. **Should agents be able to propose structural changes (add/remove sections)?** Or only content changes within existing sections? Structural changes complicate section addressing.
+3. ~~**Should agents be able to propose structural changes (add/remove sections)?**~~ **Resolved in Section 3.2.5:** Agents MAY propose structural changes (adding or removing headings). The server validates structural changes and fires `pact.section.added` / `pact.section.removed` events.
 
 4. **What is the maximum document size?** Markdown is lightweight, but a document with 10,000 proposals in its history needs efficient querying.
 
@@ -1751,6 +1756,6 @@ Implementations MUST return items in a stable, deterministic order (typically by
 
 *This is a living document. PACT Specification v0.4-draft — March 2026.*
 
-*Reference implementation: [Tailor](https://tailor.au) by [TailorAU](https://github.com/TailorAU) — see [Tailor Implementation Notes](./PACT_TAILOR_IMPLEMENTATION.md) for implementation-specific details.*
+*Reference implementation: [Tailor](https://tailor.au) by [TailorAU](https://github.com/TailorAU).*
 
 > **Standalone spec:** [github.com/TailorAU/pact](https://github.com/TailorAU/pact) — vendor-neutral specification auto-synced from this file.

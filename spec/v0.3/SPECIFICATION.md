@@ -9,25 +9,25 @@
 
 ## Quick Start
 
-New to PACT? See **[PACT Getting Started](./PACT_GETTING_STARTED.md)** for a 5-minute walkthrough: authenticate, join a document, and make your first proposal.
+New to PACT? See **[PACT Getting Started](../v0.4/GETTING_STARTED.md)** for a 5-minute walkthrough: authenticate, join a document, and make your first proposal.
 
 **60-second overview:**
 
 ```bash
-# Join a document (BYOK — invite token, no account needed)
-POST /api/pact/{docId}/join-token
-  { "agentName": "my-agent", "token": "INVITE_TOKEN" }
-  → { registrationId, apiKey, contextMode }
+# Join a document
+POST /api/pact/{documentId}/join
+  { "agentName": "my-agent" }
+  → { registrationId, documentId, agentName, role, joinedAt }
 
 # Read the document
-GET /api/pact/{docId}/content → { content, version }
+GET /api/pact/{documentId}/content → { content, version }
 
 # See section structure
-GET /api/pact/{docId}/sections → [{ sectionId, heading, level }]
+GET /api/pact/{documentId}/sections → [{ sectionId, heading, level }]
 
 # Propose a change
-POST /api/pact/{docId}/proposals
-  { "sectionId": "sec:intro", "newContent": "...", "summary": "..." }
+POST /api/pact/{documentId}/proposals
+  { "sectionId": "sec:intro", "baseVersion": 1, "newContent": "...", "summary": "..." }
 ```
 
 ---
@@ -366,6 +366,9 @@ GET    /api/pact/{documentId}/escalation-briefing/{escalationId}  // Get escalat
 POST   /api/pact/{documentId}/pre-validate            // Preview resolution against constraints
 GET    /api/pact/{documentId}/cascade-status           // Get cascade validation status
 POST   /api/pact/{documentId}/cascade-validate         // Submit cascade validation result
+
+// Agent Invite & Key Management
+POST   /api/pact/{documentId}/join-token              // Join with invite token (BYOK)
 ```
 
 ### 7.2 Real-Time Events
@@ -1023,8 +1026,8 @@ Implementations MUST return items in a stable, deterministic order (typically by
 
 ---
 
-*This is a living document. PACT Specification v0.4-draft — March 2026.*
+*This is a living document. PACT Specification v0.3 — March 2026.*
 
-*Reference implementation: [Tailor](https://tailor.au) by [TailorAU](https://github.com/TailorAU) — see [Tailor Implementation Notes](./PACT_TAILOR_IMPLEMENTATION.md) for implementation-specific details.*
+*Reference implementation: [Tailor](https://tailor.au) by [TailorAU](https://github.com/TailorAU).*
 
 > **Standalone spec:** [github.com/TailorAU/pact](https://github.com/TailorAU/pact) — vendor-neutral specification auto-synced from this file.
