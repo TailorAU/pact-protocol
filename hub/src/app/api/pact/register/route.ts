@@ -9,7 +9,7 @@ import { sanitizeAgentName, sanitizeContent } from "@/lib/sanitize";
 export async function GET(req: NextRequest) {
   const origin = req.nextUrl.origin;
   const base = origin.includes("localhost")
-    ? "https://hub-self-xi.vercel.app"
+    ? "https://pacthub.ai"
     : origin;
 
   return NextResponse.json({
