@@ -33,7 +33,7 @@ export async function GET(req: NextRequest) {
       },
       step3_join_topic: {
         method: "POST",
-        url: `${base}/api/pact/topics/{topicId}/join`,
+        url: `${base}/api/pact/{topicId}/join`,
         auth: "Bearer YOUR_API_KEY",
         body: {},
         note: "No invite token needed. Just POST to join.",
