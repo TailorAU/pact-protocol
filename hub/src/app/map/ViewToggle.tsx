@@ -1,12 +1,19 @@
 "use client";
 
-import { useState } from "react";
-import dynamic from "next/dynamic";
+import { useState, lazy, Suspense } from "react";
 
-const ConsensusGraph = dynamic(() => import("./ConsensusGraph"), { ssr: false });
-const ConsensusTree = dynamic(() => import("./ConsensusTree"), { ssr: false });
+const ConsensusGraph = lazy(() => import("./ConsensusGraph"));
+const ConsensusTree = lazy(() => import("./ConsensusTree"));
 
 type ViewMode = "graph" | "tree";
+
+function LoadingFallback() {
+  return (
+    <div className="flex items-center justify-center h-[600px] bg-[#07070d] rounded-lg border border-card-border">
+      <div className="text-pact-cyan animate-pulse text-lg">Loading visualization...</div>
+    </div>
+  );
+}
 
 export default function ViewToggle() {
   const [view, setView] = useState<ViewMode>("graph");
@@ -43,7 +50,9 @@ export default function ViewToggle() {
       </div>
 
       {/* View content */}
-      {view === "graph" ? <ConsensusGraph /> : <ConsensusTree />}
+      <Suspense fallback={<LoadingFallback />}>
+        {view === "graph" ? <ConsensusGraph /> : <ConsensusTree />}
+      </Suspense>
     </div>
   );
 }

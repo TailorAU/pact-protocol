@@ -624,35 +624,32 @@ export default function ConsensusTree() {
     };
   }, [loading]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-[600px] bg-[#07070d] rounded-lg border border-card-border">
-        <div className="text-pact-cyan animate-pulse text-lg">Building dependency tree...</div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="flex items-center justify-center h-[600px] bg-[#07070d] rounded-lg border border-card-border">
-        <div className="text-red-400 text-lg">{error}</div>
-      </div>
-    );
-  }
-
   return (
     <div className="relative rounded-lg overflow-hidden border border-card-border">
+      {/* Canvas is always rendered so the useEffect can initialise Three.js */}
       <canvas
         ref={canvasRef}
         width={dimensions.width}
         height={dimensions.height}
-        style={{ width: dimensions.width, height: dimensions.height, cursor: "grab" }}
+        style={{ width: dimensions.width, height: dimensions.height, cursor: loading ? "default" : "grab", display: loading || error ? "none" : "block" }}
         onWheel={handleWheel}
         onMouseDown={handleMouseDown}
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
         onDoubleClick={handleDoubleClick}
       />
+
+      {/* Loading / error overlays */}
+      {loading && (
+        <div className="flex items-center justify-center h-[600px] bg-[#07070d]">
+          <div className="text-pact-cyan animate-pulse text-lg">Building dependency tree...</div>
+        </div>
+      )}
+      {error && !loading && (
+        <div className="flex items-center justify-center h-[600px] bg-[#07070d]">
+          <div className="text-red-400 text-lg">{error}</div>
+        </div>
+      )}
 
       {/* Legend overlay */}
       <div className="absolute bottom-3 left-3 right-3 flex flex-wrap items-center justify-between text-xs text-white/50 gap-y-2 pointer-events-none">
