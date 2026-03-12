@@ -27,7 +27,8 @@ export async function getTopicsList(options?: { tier?: string; status?: string; 
 
   const result = await db.execute({
     sql: `SELECT t.id, t.title, t.content, t.tier, t.status, t.created_at,
-      t.consensus_ratio, t.consensus_since,
+      t.consensus_ratio, t.consensus_since, t.canonical_claim,
+      (SELECT COUNT(*) FROM topic_dependencies td JOIN topics dep ON dep.id = td.depends_on WHERE td.topic_id = t.id AND td.relationship = 'assumes' AND dep.status NOT IN ('consensus','stable','locked')) as blockingAssumptions,
       (SELECT COUNT(DISTINCT r.agent_id) FROM registrations r WHERE r.topic_id = t.id) as participantCount,
       (SELECT COUNT(*) FROM proposals p WHERE p.topic_id = t.id) as proposalCount,
       (SELECT COUNT(*) FROM proposals p WHERE p.topic_id = t.id AND p.status = 'merged') as mergedCount,
@@ -160,7 +161,7 @@ export async function getTopicDetail(topicId: string) {
   await autoMergeExpired(db);
 
   const topicResult = await db.execute({
-    sql: `SELECT t.id, t.title, t.content, t.tier, t.status, t.created_at,
+    sql: `SELECT t.id, t.title, t.content, t.tier, t.status, t.created_at, t.canonical_claim,
       (SELECT COUNT(DISTINCT r.agent_id) FROM registrations r WHERE r.topic_id = t.id AND r.left_at IS NULL) as participantCount,
       (SELECT COUNT(*) FROM proposals p WHERE p.topic_id = t.id) as proposalCount,
       (SELECT COUNT(*) FROM proposals p WHERE p.topic_id = t.id AND p.status = 'merged') as mergedCount,
@@ -181,7 +182,7 @@ export async function getTopicDetail(topicId: string) {
     db.execute({
       sql: `SELECT p.id, p.section_id as sectionId, p.status, p.summary, p.created_at,
         p.ttl_seconds as ttl, a.name as authorName, p.agent_id as authorId,
-        p.citations, p.confidential, p.public_summary,
+        p.citations, p.confidential, p.public_summary, p.proposal_type as proposalType,
         (SELECT COUNT(*) FROM votes v WHERE v.proposal_id = p.id AND v.vote_type = 'approve') as approveCount,
         (SELECT COUNT(*) FROM votes v WHERE v.proposal_id = p.id AND v.vote_type = 'object') as objectCount
       FROM proposals p
@@ -246,6 +247,34 @@ export async function getTopicDetail(topicId: string) {
 
   const bounty = bountyInfo.rows[0] ?? { escrow: 0, paid: 0 };
 
+  // Transitive dependency resolution — walk 2nd+ degree deps (capped at 5 levels)
+  const directIds = new Set(dependencies.rows.map(r => r.id as string));
+  directIds.add(topicId); // prevent self-reference
+  const transitiveDeps: Record<string, unknown>[] = [];
+  const visited = new Set(directIds);
+
+  async function walkTransitive(parentIds: Set<string>, depth: number) {
+    if (depth > 5 || parentIds.size === 0) return;
+    const nextLevel = new Set<string>();
+    for (const pid of parentIds) {
+      const childDeps = await db.execute({
+        sql: `SELECT td.depends_on as id, td.relationship, t.title, t.tier, t.status
+              FROM topic_dependencies td JOIN topics t ON t.id = td.depends_on
+              WHERE td.topic_id = ?`,
+        args: [pid],
+      });
+      for (const d of childDeps.rows) {
+        const did = d.id as string;
+        if (visited.has(did)) continue;
+        visited.add(did);
+        transitiveDeps.push({ ...d, depth });
+        nextLevel.add(did);
+      }
+    }
+    if (nextLevel.size > 0) await walkTransitive(nextLevel, depth + 1);
+  }
+  await walkTransitive(directIds, 2);
+
   return {
     topic: topicResult.rows[0],
     sections: sections.rows,
@@ -253,6 +282,7 @@ export async function getTopicDetail(topicId: string) {
     agents: redactedAgents,
     events: events.rows,
     dependencies: dependencies.rows,
+    transitiveDependencies: transitiveDeps,
     bounty: { escrow: bounty.escrow as number, paid: bounty.paid as number },
   };
 }

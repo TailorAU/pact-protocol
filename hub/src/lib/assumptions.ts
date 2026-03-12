@@ -21,14 +21,14 @@ export interface CreateTopicResult {
  */
 export async function createTopicRecord(
   db: DbClient,
-  opts: { title: string; content: string; tier: string }
+  opts: { title: string; content: string; tier: string; canonicalClaim?: string }
 ): Promise<CreateTopicResult> {
   const topicTier = VALID_TIERS.includes(opts.tier) ? opts.tier : "axiom";
 
   const topicId = uuid();
   await db.execute({
-    sql: "INSERT INTO topics (id, title, content, tier, status) VALUES (?, ?, ?, ?, 'proposed')",
-    args: [topicId, opts.title, opts.content, topicTier],
+    sql: "INSERT INTO topics (id, title, content, tier, status, canonical_claim) VALUES (?, ?, ?, ?, 'proposed', ?)",
+    args: [topicId, opts.title, opts.content, topicTier, opts.canonicalClaim ?? null],
   });
 
   // Create standard sections

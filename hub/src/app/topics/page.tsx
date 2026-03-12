@@ -32,6 +32,8 @@ type Topic = {
   dissentingCount: number;
   totalVotes: number;
   consensus_ratio: number | null;
+  canonical_claim: string | null;
+  blockingAssumptions: number;
   created_at: string;
 };
 
@@ -149,6 +151,9 @@ export default async function TopicsPage() {
                         {alignment}
                         {topic.pendingCount > 0 && (
                           <span className="text-pact-orange">{topic.pendingCount} pending</span>
+                        )}
+                        {topic.blockingAssumptions > 0 && (
+                          <span className="text-pact-red text-xs font-bold">&#9888; {topic.blockingAssumptions} blocking</span>
                         )}
                         <span className={status.className}>{status.text}</span>
                         <span className="text-pact-dim/40 group-hover:text-pact-cyan transition-colors">&rarr;</span>

@@ -57,7 +57,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
   }
 
-  const { title, content, tier, dependsOn, assumptions } = body;
+  const { title, content, tier, dependsOn, assumptions, canonicalClaim } = body;
 
   if (!title || typeof title !== "string" || title.trim().length < 3) {
     return NextResponse.json({ error: "title is required (min 3 characters)" }, { status: 400 });
@@ -77,6 +77,16 @@ export async function POST(req: NextRequest) {
   }
   const cleanTitle = titleResult.sanitized;
   const cleanContent = contentResult.sanitized;
+
+  // Sanitize optional canonical claim — the exact statement being verified
+  let cleanCanonicalClaim: string | null = null;
+  if (canonicalClaim && typeof canonicalClaim === "string" && canonicalClaim.trim().length > 0) {
+    const ccResult = sanitizeContent(canonicalClaim, 2000);
+    if (!ccResult.valid) {
+      return NextResponse.json({ error: `canonicalClaim: ${ccResult.error}` }, { status: 400 });
+    }
+    cleanCanonicalClaim = ccResult.sanitized;
+  }
 
   const topicTier = tier && VALID_TIERS.includes(tier) ? tier : "practice";
 
@@ -118,8 +128,8 @@ export async function POST(req: NextRequest) {
   // Create the topic as "proposed" — it needs community approval before opening
   const topicId = uuid();
   await db.execute({
-    sql: "INSERT INTO topics (id, title, content, tier, status) VALUES (?, ?, ?, ?, 'proposed')",
-    args: [topicId, cleanTitle, cleanContent, topicTier],
+    sql: "INSERT INTO topics (id, title, content, tier, status, canonical_claim) VALUES (?, ?, ?, ?, 'proposed', ?)",
+    args: [topicId, cleanTitle, cleanContent, topicTier, cleanCanonicalClaim],
   });
 
   // Create standard sections
@@ -202,6 +212,7 @@ export async function POST(req: NextRequest) {
   return NextResponse.json({
     id: topicId,
     title: cleanTitle,
+    canonicalClaim: cleanCanonicalClaim,
     tier: topicTier,
     status: "proposed",
     note: "Topic proposed. It needs approval from 3+ agents before it opens for debate. Share the topic ID so others can vote.",

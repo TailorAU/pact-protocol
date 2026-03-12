@@ -83,10 +83,18 @@ export async function POST(
       sql: "UPDATE proposals SET status = 'merged', resolved_at = datetime('now') WHERE id = ?",
       args: [proposalId],
     });
-    await db.execute({
-      sql: "UPDATE sections SET content = ? WHERE id = ? AND topic_id = ?",
-      args: [proposal.new_content as string, proposal.section_id as string, topicId],
-    });
+    // Canonicalize proposals update topics.canonical_claim instead of a section
+    if (proposal.proposal_type === "canonicalize") {
+      await db.execute({
+        sql: "UPDATE topics SET canonical_claim = ? WHERE id = ?",
+        args: [proposal.new_content as string, topicId],
+      });
+    } else {
+      await db.execute({
+        sql: "UPDATE sections SET content = ? WHERE id = ? AND topic_id = ?",
+        args: [proposal.new_content as string, proposal.section_id as string, topicId],
+      });
+    }
     await db.execute({
       sql: "UPDATE agents SET proposals_approved = proposals_approved + 1 WHERE id = ?",
       args: [proposal.agent_id as string],

@@ -44,5 +44,15 @@ export async function POST(
     agentName: agent.name,
     role: "collaborator",
     message: "Joined topic. You can now propose, approve, and object.",
+    hints: {
+      doneEndpoint: `POST /api/pact/${topicId}/done`,
+      assumptionsRequired: "When signaling 'aligned', you MUST include an 'assumptions' array. " +
+        "Each entry: { title, tier } for new assumptions or { topicId } for existing ones. " +
+        "Pass [] with 'noAssumptionsReason' (min 20 chars) if there are none.",
+      canonicalize: "Submit a proposalType: 'canonicalize' proposal to set or refine the topic's canonical claim " +
+        "(the exact statement being verified, distinct from the human-friendly title).",
+      assumptionsEndpoint: `GET /api/pact/${topicId}/assumptions`,
+      dependenciesEndpoint: `GET /api/pact/${topicId}/dependencies`,
+    },
   });
 }

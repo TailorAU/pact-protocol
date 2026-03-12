@@ -19,7 +19,7 @@ export async function GET(
   const result = await db.execute({
     sql: `SELECT p.id, p.section_id as sectionId, p.status, p.summary, p.created_at,
            p.ttl_seconds as ttl, a.name as authorName, p.agent_id as authorId,
-           p.citations, p.confidential, p.public_summary,
+           p.citations, p.confidential, p.public_summary, p.proposal_type as proposalType,
            (SELECT COUNT(*) FROM votes v WHERE v.proposal_id = p.id AND v.vote_type = 'approve') as approveCount,
            (SELECT COUNT(*) FROM votes v WHERE v.proposal_id = p.id AND v.vote_type = 'object') as objectCount
     FROM proposals p
@@ -72,11 +72,21 @@ export async function POST(
   } catch {
     return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
   }
-  const { sectionId, newContent, summary, ttl, citations, confidential, publicSummary } = body;
+  const { sectionId, newContent, summary, ttl, citations, confidential, publicSummary, proposalType } = body;
   const isConfidential = confidential ? 1 : 0;
   const cleanPublicSummary = publicSummary ? String(publicSummary).slice(0, 500) : null;
 
-  if (!sectionId || !newContent || !summary) {
+  // Validate proposal type
+  const VALID_PROPOSAL_TYPES = ["edit", "canonicalize"];
+  const cleanProposalType = proposalType && VALID_PROPOSAL_TYPES.includes(proposalType) ? proposalType : "edit";
+  const isCanonicalize = cleanProposalType === "canonicalize";
+
+  if (isCanonicalize) {
+    // Canonicalize proposals target topics.canonical_claim — sectionId is not required
+    if (!newContent || !summary) {
+      return NextResponse.json({ error: "newContent (the canonical claim text) and summary are required for canonicalize proposals" }, { status: 400 });
+    }
+  } else if (!sectionId || !newContent || !summary) {
     return NextResponse.json({ error: "sectionId, newContent, and summary are required" }, { status: 400 });
   }
 
@@ -133,17 +143,23 @@ export async function POST(
 
   const isLocked = topicStatus === "locked";
 
-  // Verify section exists
-  const sectionResult = await db.execute({ sql: "SELECT id FROM sections WHERE id = ? AND topic_id = ?", args: [sectionId, topicId] });
-  if (!sectionResult.rows[0]) {
-    return NextResponse.json({ error: "Section not found" }, { status: 404 });
+  // Verify section exists (skip for canonicalize proposals which target topics.canonical_claim)
+  const effectiveSectionId = isCanonicalize ? null : sectionId;
+  if (!isCanonicalize) {
+    const sectionResult = await db.execute({ sql: "SELECT id FROM sections WHERE id = ? AND topic_id = ?", args: [sectionId, topicId] });
+    if (!sectionResult.rows[0]) {
+      return NextResponse.json({ error: "Section not found" }, { status: 404 });
+    }
   }
+
+  // Canonicalize proposals use a shorter default TTL (2 min) for quick turnaround
+  const effectiveTtl = isCanonicalize && !ttl ? 120 : ttlResult.value;
 
   const proposalId = uuid();
   const proposalStatus = isLocked ? "challenge" : "pending";
   await db.execute({
-    sql: "INSERT INTO proposals (id, topic_id, section_id, agent_id, new_content, summary, ttl_seconds, status, citations, confidential, public_summary) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-    args: [proposalId, topicId, sectionId, agent.id, contentResult.sanitized, summaryResult.sanitized, ttlResult.value, proposalStatus, citationsJson, isConfidential, cleanPublicSummary],
+    sql: "INSERT INTO proposals (id, topic_id, section_id, agent_id, new_content, summary, ttl_seconds, status, citations, confidential, public_summary, proposal_type) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+    args: [proposalId, topicId, effectiveSectionId, agent.id, contentResult.sanitized, summaryResult.sanitized, effectiveTtl, proposalStatus, citationsJson, isConfidential, cleanPublicSummary, cleanProposalType],
   });
 
   await db.execute({
@@ -152,7 +168,7 @@ export async function POST(
   });
 
   const eventType = isLocked ? "pact.consensus.challenged" : "pact.proposal.created";
-  await emitEvent(db, topicId, eventType, agent.id, sectionId, {
+  await emitEvent(db, topicId, eventType, agent.id, effectiveSectionId ?? undefined, {
     proposalId,
     summary: isConfidential ? (cleanPublicSummary || "[Confidential proposal]") : summaryResult.sanitized,
     ...(isConfidential ? { confidential: true } : {}),
@@ -160,7 +176,8 @@ export async function POST(
 
   return NextResponse.json({
     id: proposalId,
-    sectionId,
+    sectionId: effectiveSectionId,
+    proposalType: cleanProposalType,
     status: proposalStatus,
     summary: summaryResult.sanitized,
     confidential: !!isConfidential,

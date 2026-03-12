@@ -253,6 +253,10 @@ async function initSchema(db: DbClient) {
     "ALTER TABLE votes ADD COLUMN public_summary TEXT",
     // Assumption QA gate — track whether agent has declared assumptions for a topic
     "ALTER TABLE registrations ADD COLUMN assumptions_declared INTEGER NOT NULL DEFAULT 0",
+    // Canonical claim — the exact statement being verified (distinct from human-friendly title)
+    "ALTER TABLE topics ADD COLUMN canonical_claim TEXT",
+    // Proposal type — 'edit' (default), 'canonicalize' (precision edit to canonical_claim)
+    "ALTER TABLE proposals ADD COLUMN proposal_type TEXT NOT NULL DEFAULT 'edit'",
   ];
   for (const m of migrations) {
     try { await db.execute(m); } catch { /* Column already exists — ignore */ }
@@ -743,10 +747,18 @@ export async function autoMergeExpired(db: DbClient) {
       sql: "UPDATE proposals SET status = 'merged', resolved_at = datetime('now') WHERE id = ?",
       args: [p.id as string],
     });
-    await db.execute({
-      sql: "UPDATE sections SET content = ? WHERE id = ? AND topic_id = ?",
-      args: [p.new_content as string, p.section_id as string, p.topic_id as string],
-    });
+    // Canonicalize proposals update topics.canonical_claim instead of a section
+    if (p.proposal_type === "canonicalize") {
+      await db.execute({
+        sql: "UPDATE topics SET canonical_claim = ? WHERE id = ?",
+        args: [p.new_content as string, p.topic_id as string],
+      });
+    } else {
+      await db.execute({
+        sql: "UPDATE sections SET content = ? WHERE id = ? AND topic_id = ?",
+        args: [p.new_content as string, p.section_id as string, p.topic_id as string],
+      });
+    }
     await db.execute({
       sql: "UPDATE agents SET proposals_approved = proposals_approved + 1 WHERE id = ?",
       args: [p.agent_id as string],

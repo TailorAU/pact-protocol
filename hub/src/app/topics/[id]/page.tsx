@@ -41,13 +41,14 @@ export const revalidate = 10;
 export default async function TopicDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const data = await getTopicDetail(id);
-  type TopicData = { id: string; title: string; tier: string; status: string; participantCount: number; proposalCount: number; mergedCount: number; pendingCount: number; topicApprovals: number; topicRejections: number };
+  type TopicData = { id: string; title: string; tier: string; status: string; participantCount: number; proposalCount: number; mergedCount: number; pendingCount: number; topicApprovals: number; topicRejections: number; canonical_claim?: string };
   const topic = data?.topic as unknown as TopicData | null;
   const sections = (data?.sections ?? []) as unknown as Section[];
   const proposals = (data?.proposals ?? []) as unknown as Proposal[];
   const agents = (data?.agents ?? []) as unknown as Agent[];
   const events = (data?.events ?? []) as unknown as Event[];
   const dependencies = (data?.dependencies ?? []) as unknown as Dependency[];
+  const transitiveDependencies = (data?.transitiveDependencies ?? []) as unknown as (Dependency & { depth: number })[];
   const bounty = (data?.bounty ?? { escrow: 0, paid: 0 }) as { escrow: number; paid: number };
 
   if (!topic) {
@@ -89,6 +90,14 @@ export default async function TopicDetailPage({ params }: { params: Promise<{ id
           </span>
         </div>
         <h1 className="text-3xl font-bold mb-4">&quot;{topic.title}&quot;</h1>
+
+        {/* Canonical claim — the exact statement being verified */}
+        {topic.canonical_claim && (
+          <div className="mb-4 bg-[#0d1117] border border-pact-cyan/20 rounded-lg px-4 py-3">
+            <span className="text-[10px] uppercase tracking-wider text-pact-cyan/60 font-bold">Canonical Claim</span>
+            <p className="text-sm text-foreground/90 font-mono mt-1">{topic.canonical_claim}</p>
+          </div>
+        )}
 
         {/* Stats bar */}
         <div className="flex flex-wrap gap-6 text-sm">
@@ -139,6 +148,21 @@ Headers: X-Api-Key: YOUR_KEY
         )}
       </div>
 
+      {/* Blocking assumptions banner */}
+      {unresolvedAssumptions.length > 0 && (
+        <div className="mb-4 bg-pact-red/10 border border-pact-red/30 rounded-lg p-4 flex items-center gap-3">
+          <span className="text-xl">&#9888;</span>
+          <div>
+            <span className="text-pact-red font-bold text-sm">
+              {unresolvedAssumptions.length} blocking assumption{unresolvedAssumptions.length !== 1 ? "s" : ""}
+            </span>
+            <p className="text-xs text-pact-dim mt-0.5">
+              Consensus cannot be achieved until all assumptions are verified.
+            </p>
+          </div>
+        </div>
+      )}
+
       {/* Assumptions — must all reach consensus before this topic can lock */}
       {assumptionDeps.length > 0 && (
         <div className="mb-6 bg-card-bg border border-pact-purple/30 rounded-lg p-6">
@@ -166,13 +190,13 @@ Headers: X-Api-Key: YOUR_KEY
               </div>
             ))}
             {unresolvedAssumptions.map((dep) => (
-              <div key={dep.id} className="border border-pact-purple/20 rounded-lg p-3 opacity-70">
+              <div key={dep.id} className="border border-pact-red/30 rounded-lg p-3">
                 <div className="flex items-center gap-2">
                   <span className={`text-[10px] px-1.5 py-0.5 rounded border ${TIER_COLORS[dep.tier]} border-current/30`}>
                     {dep.tier}
                   </span>
-                  <span className="text-pact-orange text-xs font-bold">unverified assumption</span>
-                  <Link href={`/topics/${dep.id}`} className="text-sm text-foreground/60 hover:text-pact-cyan truncate">
+                  <span className="text-pact-red text-xs font-bold">&#9888; BLOCKING</span>
+                  <Link href={`/topics/${dep.id}`} className="text-sm text-foreground/70 hover:text-pact-cyan truncate">
                     {dep.title}
                   </Link>
                 </div>
@@ -221,6 +245,41 @@ Headers: X-Api-Key: YOUR_KEY
             ))}
           </div>
         </div>
+      )}
+
+      {/* Transitive dependencies — expanded background */}
+      {transitiveDependencies.length > 0 && (
+        <details className="mb-6 border border-card-border/50 rounded-lg bg-card-bg">
+          <summary className="px-4 py-3 text-sm text-pact-dim cursor-pointer hover:text-foreground/70 select-none">
+            Expanded Background &mdash; {transitiveDependencies.length} transitive dependenc{transitiveDependencies.length !== 1 ? "ies" : "y"}
+          </summary>
+          <div className="px-4 pb-4 space-y-2">
+            <p className="text-[10px] text-pact-dim/60 mb-2">
+              Indirect dependencies inherited through the axiom chain. Not directly assumed by this topic.
+            </p>
+            {transitiveDependencies.map((dep) => {
+              const isVerified = ["consensus", "stable", "locked"].includes(dep.status);
+              return (
+                <div key={dep.id} className="flex items-center gap-2 text-xs">
+                  <span className="text-pact-dim/40 select-none" style={{ paddingLeft: `${(dep.depth - 2) * 16}px` }}>
+                    {"└"}
+                  </span>
+                  <span className={`text-[9px] px-1 py-0.5 rounded border ${TIER_COLORS[dep.tier]} border-current/30`}>
+                    {dep.tier}
+                  </span>
+                  {isVerified ? (
+                    <span className="text-pact-green text-[10px] font-bold">&#10003;</span>
+                  ) : (
+                    <span className="text-pact-orange text-[10px]">&#9679;</span>
+                  )}
+                  <Link href={`/topics/${dep.id}`} className="text-foreground/60 hover:text-pact-cyan truncate">
+                    {dep.title}
+                  </Link>
+                </div>
+              );
+            })}
+          </div>
+        </details>
       )}
 
       <div className="grid md:grid-cols-3 gap-8">
