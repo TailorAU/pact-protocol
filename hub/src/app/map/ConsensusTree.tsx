@@ -34,6 +34,7 @@ type TreeNode = {
   x: number;
   y: number;
   collapsed: boolean;
+  dependentCount: number; // How many other topics depend on this one
 };
 
 // ── Colors ─────────────────────────────────────────────────────────
@@ -54,6 +55,8 @@ const STATUS_COLORS: Record<string, string> = {
   challenged: "#ef4444",
 };
 
+const SHARED_COLOR = "#f59e0b"; // Amber for shared dependencies (2+ dependents)
+const KEYSTONE_COLOR = "#ef4444"; // Red for keystone dependencies (3+ dependents)
 const BG_COLOR = 0x07070d;
 const LINE_COLOR = 0x334155;
 const LINE_HIGHLIGHT = 0xd97706;
@@ -111,17 +114,23 @@ export default function ConsensusTree() {
   }, []);
 
   // Build tree structure from flat topic + dependency data
+  const dependentCountMapRef = useRef<Map<string, number>>(new Map());
+
   const buildTree = useCallback((topics: TopicNode[], deps: DepData[]): TreeNode[] => {
     const topicMap = new Map(topics.map(t => [t.id, t]));
     const childrenMap = new Map<string, string[]>(); // parent -> children (depends_on -> topic_ids)
     const parentSet = new Set<string>();
 
+    // Count how many topics depend on each topic (for shared dependency highlighting)
+    const depCountMap = new Map<string, number>();
     for (const d of deps) {
       const children = childrenMap.get(d.depends_on) || [];
       children.push(d.topic_id);
       childrenMap.set(d.depends_on, children);
-      parentSet.add(d.topic_id); // This topic has a parent
+      parentSet.add(d.topic_id);
+      depCountMap.set(d.depends_on, (depCountMap.get(d.depends_on) || 0) + 1);
     }
+    dependentCountMapRef.current = depCountMap;
 
     // Root topics = those with no parent dependencies
     const rootIds = topics.filter(t => !parentSet.has(t.id)).map(t => t.id);
@@ -146,6 +155,7 @@ export default function ConsensusTree() {
         x: 0,
         y: 0,
         collapsed: isCollapsed,
+        dependentCount: depCountMap.get(id) || 0,
       };
     }
 
@@ -228,11 +238,16 @@ export default function ConsensusTree() {
           points.push(new THREE.Vector3(px, -py, 0));
         }
 
+        // Color lines to shared/keystone deps differently
+        const childDepCount = dependentCountMapRef.current.get(child.topic.id) || 0;
+        const lineColorVal = childDepCount >= 3 ? 0xef4444 : childDepCount >= 2 ? 0xf59e0b : LINE_COLOR;
+        const lineOpacity = childDepCount >= 2 ? 0.7 : 0.5;
+
         const geometry = new THREE.BufferGeometry().setFromPoints(points);
         const material = new THREE.LineBasicMaterial({
-          color: LINE_COLOR,
+          color: lineColorVal,
           transparent: true,
-          opacity: 0.5,
+          opacity: lineOpacity,
         });
         const line = new THREE.Line(geometry, material);
         scene.add(line);
@@ -247,6 +262,9 @@ export default function ConsensusTree() {
       const statusColor = STATUS_COLORS[topic.status] ?? "#6b7280";
       const isVerified = ["locked", "stable", "consensus"].includes(topic.status);
       const hasChildren = (collapsedSetRef.current.has(topic.id)) || node.children.length > 0;
+      const depCount = node.dependentCount;
+      const isKeystone = depCount >= 3; // 3+ topics depend on this
+      const isShared = depCount >= 2;   // 2+ topics depend on this
 
       // Card background
       const cardGeo = new THREE.PlaneGeometry(NODE_WIDTH, NODE_HEIGHT);
@@ -255,21 +273,22 @@ export default function ConsensusTree() {
       canvas.height = NODE_HEIGHT * 2;
       const ctx = canvas.getContext("2d")!;
 
-      // Background
-      ctx.fillStyle = isVerified ? "#1a1a0f" : "#0d0d1a";
+      // Background — shared/keystone deps get special background
+      const borderColor = isKeystone ? KEYSTONE_COLOR : isShared ? SHARED_COLOR : tierColor;
+      ctx.fillStyle = isKeystone ? "#1a0f0f" : isShared ? "#1a1a0f" : isVerified ? "#1a1a0f" : "#0d0d1a";
       ctx.roundRect(2, 2, canvas.width - 4, canvas.height - 4, 12);
       ctx.fill();
 
-      // Border
-      ctx.strokeStyle = tierColor;
-      ctx.lineWidth = isVerified ? 3 : 1.5;
-      ctx.globalAlpha = isVerified ? 0.8 : 0.4;
+      // Border — thicker and brighter for shared deps
+      ctx.strokeStyle = borderColor;
+      ctx.lineWidth = isKeystone ? 4 : isShared ? 3 : isVerified ? 3 : 1.5;
+      ctx.globalAlpha = isKeystone ? 1 : isShared ? 0.9 : isVerified ? 0.8 : 0.4;
       ctx.roundRect(2, 2, canvas.width - 4, canvas.height - 4, 12);
       ctx.stroke();
       ctx.globalAlpha = 1;
 
       // Left accent bar
-      ctx.fillStyle = tierColor;
+      ctx.fillStyle = borderColor;
       ctx.globalAlpha = 0.8;
       ctx.fillRect(2, 16, 6, canvas.height - 32);
       ctx.globalAlpha = 1;
@@ -289,12 +308,27 @@ export default function ConsensusTree() {
       const tierWidth = ctx.measureText(tierText).width;
       ctx.fillText(statusText, 24 + tierWidth + 16, 34);
 
-      // Participant count
-      ctx.font = "14px system-ui";
-      ctx.fillStyle = DIM_TEXT;
-      const agentText = `${topic.participantCount} agent${topic.participantCount !== 1 ? "s" : ""}`;
-      const agentWidth = ctx.measureText(agentText).width;
-      ctx.fillText(agentText, canvas.width - agentWidth - 20, 34);
+      // Shared dependency badge
+      if (isKeystone) {
+        ctx.font = "bold 14px system-ui";
+        ctx.fillStyle = KEYSTONE_COLOR;
+        const keystoneText = `⬢ KEYSTONE (${depCount} dependents)`;
+        const keystoneWidth = ctx.measureText(keystoneText).width;
+        ctx.fillText(keystoneText, canvas.width - keystoneWidth - 20, 34);
+      } else if (isShared) {
+        ctx.font = "bold 14px system-ui";
+        ctx.fillStyle = SHARED_COLOR;
+        const sharedText = `◆ SHARED (${depCount} dependents)`;
+        const sharedWidth = ctx.measureText(sharedText).width;
+        ctx.fillText(sharedText, canvas.width - sharedWidth - 20, 34);
+      } else {
+        // Participant count
+        ctx.font = "14px system-ui";
+        ctx.fillStyle = DIM_TEXT;
+        const agentText = `${topic.participantCount} agent${topic.participantCount !== 1 ? "s" : ""}`;
+        const agentWidth = ctx.measureText(agentText).width;
+        ctx.fillText(agentText, canvas.width - agentWidth - 20, 34);
+      }
 
       // Title
       ctx.font = "500 22px system-ui";
@@ -629,6 +663,15 @@ export default function ConsensusTree() {
               <span style={{ color: TIER_COLORS[tier] }}>{tier}</span>
             </span>
           ))}
+          <span className="text-white/20">|</span>
+          <span className="flex items-center gap-1">
+            <span className="w-2.5 h-2.5 rounded-sm" style={{ backgroundColor: SHARED_COLOR }} />
+            <span style={{ color: SHARED_COLOR }}>shared</span>
+          </span>
+          <span className="flex items-center gap-1">
+            <span className="w-2.5 h-2.5 rounded-sm" style={{ backgroundColor: KEYSTONE_COLOR }} />
+            <span style={{ color: KEYSTONE_COLOR }}>keystone</span>
+          </span>
           <span className="text-white/20">|</span>
           <span>{stats.topics} topics</span>
           <span className="text-white/20">|</span>
