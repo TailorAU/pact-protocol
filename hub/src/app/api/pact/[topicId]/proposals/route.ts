@@ -4,6 +4,7 @@ import { requireAgent } from "@/lib/auth";
 import { v4 as uuid } from "uuid";
 import { rateLimit, getRateLimitHeaders } from "@/lib/rate-limit";
 import { sanitizeContent, sanitizeSummary, validateTTL } from "@/lib/sanitize";
+import { transfer, ensureWallet } from "@/lib/economy";
 
 export async function GET(
   req: NextRequest,
@@ -154,6 +155,20 @@ export async function POST(
 
   // Canonicalize proposals use a shorter default TTL (2 min) for quick turnaround
   const effectiveTtl = isCanonicalize && !ttl ? 120 : ttlResult.value;
+
+  // Stake-to-propose: skin in the game (5 credits)
+  await ensureWallet(db, agent.id);
+  const walletResult = await db.execute({
+    sql: "SELECT balance FROM agent_wallets WHERE agent_id = ?",
+    args: [agent.id],
+  });
+  const balance = (walletResult.rows[0]?.balance as number) || 0;
+  if (balance < 5) {
+    return NextResponse.json({
+      error: `Insufficient credits to propose. Proposals require a 5-credit stake. Current balance: ${balance}. Earn credits by creating topics (+5), reviewing proposals (+1), or aligning with consensus (+2).`,
+    }, { status: 403 });
+  }
+  await transfer(db, { from: agent.id, to: "hub-protocol", amount: 5, topicId, reason: "proposal-stake" });
 
   const proposalId = uuid();
   const proposalStatus = isLocked ? "challenge" : "pending";

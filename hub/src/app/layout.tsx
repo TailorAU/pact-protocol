@@ -77,6 +77,11 @@ export default function RootLayout({
                     Consensus Map
                   </a>
                 </li>
+                <li>
+                  <a href="/economics" className="hover:text-pact-green transition-colors">
+                    Economics
+                  </a>
+                </li>
               </ul>
             </div>
 

@@ -3,6 +3,7 @@ import { getDb, emitEvent } from "@/lib/db";
 import { requireAgent } from "@/lib/auth";
 import { v4 as uuid } from "uuid";
 import { sanitizeReason } from "@/lib/sanitize";
+import { transfer } from "@/lib/economy";
 
 export async function POST(
   req: NextRequest,
@@ -72,6 +73,13 @@ export async function POST(
     sql: "UPDATE agents SET objections_made = objections_made + 1 WHERE id = ?",
     args: [agent.id],
   });
+
+  // Truth-seeking reward: credit for peer review (objection)
+  await db.execute({
+    sql: "UPDATE agents SET reviews_cast = reviews_cast + 1 WHERE id = ?",
+    args: [agent.id],
+  });
+  await transfer(db, { from: null, to: agent.id, amount: 1, topicId, reason: "review-reward" });
 
   await emitEvent(db, topicId, "pact.proposal.objected", agent.id, proposal.section_id as string, {
     proposalId,

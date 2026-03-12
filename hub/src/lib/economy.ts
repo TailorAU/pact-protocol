@@ -142,18 +142,32 @@ export async function distributeBounty(
     }
   }
 
-  // Assumption subsidy split equally across dependency topics
+  // Assumption subsidy — depth-weighted across dependency topics
+  // Foundational axioms with more downstream dependents get a larger share
   let assumptionPayouts: { topicId: string; amount: number }[] = [];
   if (depTopicIds.length > 0 && assumptionCut > 0) {
-    const perDep = Math.floor(assumptionCut / depTopicIds.length);
+    // Query downstream dependent count for each dependency
+    const depWeights: { topicId: string; weight: number }[] = [];
+    for (const depId of depTopicIds) {
+      const depCountResult = await db.execute({
+        sql: "SELECT COUNT(*) as cnt FROM topic_dependencies WHERE depends_on = ?",
+        args: [depId],
+      });
+      const dependentCount = (depCountResult.rows[0]?.cnt as number) || 0;
+      depWeights.push({ topicId: depId, weight: 1 + dependentCount });
+    }
+    const totalWeight = depWeights.reduce((sum, d) => sum + d.weight, 0);
+
     let distributed = 0;
-    assumptionPayouts = depTopicIds.map(tid => {
-      distributed += perDep;
-      return { topicId: tid, amount: perDep };
+    assumptionPayouts = depWeights.map(d => {
+      const payout = Math.floor(assumptionCut * (d.weight / totalWeight));
+      distributed += payout;
+      return { topicId: d.topicId, amount: payout };
     });
-    // Dust to first dependency
+    // Dust to highest-weight dependency
     const dust = assumptionCut - distributed;
     if (dust > 0 && assumptionPayouts.length > 0) {
+      assumptionPayouts.sort((a, b) => b.amount - a.amount);
       assumptionPayouts[0].amount += dust;
     }
   }

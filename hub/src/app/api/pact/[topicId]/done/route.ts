@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getDb, emitEvent } from "@/lib/db";
 import { requireAgent } from "@/lib/auth";
 import { processAssumptions, type AssumptionEntry } from "@/lib/assumptions";
+import { transfer } from "@/lib/economy";
 
 const VALID_DONE_STATUSES = ["aligned", "dissenting", "abstain"];
 
@@ -138,6 +139,11 @@ export async function POST(
     summary: isConfidential ? null : (summary ?? null),
     ...(isConfidential ? { confidential: true } : {}),
   });
+
+  // Truth-seeking reward: credit for signaling alignment
+  if (doneStatus === "aligned") {
+    await transfer(db, { from: null, to: agent.id, amount: 2, topicId, reason: "alignment-signal" });
+  }
 
   const notes: Record<string, string> = {
     aligned: "You've signalled agreement with the current Answer. Your vote counts toward consensus.",

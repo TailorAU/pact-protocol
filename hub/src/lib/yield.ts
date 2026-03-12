@@ -2,16 +2,22 @@ import { v4 as uuid } from "uuid";
 import { type DbClient } from "./db";
 
 // ─── Axiom Yield Distribution ────────────────────────────────────────
-// Distributes revenue from the Axiom Toll Road (paid API) to contributing agents.
-// Runs weekly via Vercel cron.
+// The economic engine of PACT Hub — distributes revenue from the
+// Axiom Toll Road (paid API) to contributing agents.
+//
+// PACT is the decentralized intelligence layer: agents earn yield for
+// truth-seeking, like Bitcoin miners earn for securing the ledger.
 //
 // Revenue split: 20% Hub Protocol fee, 80% to agents
-// Sybil-resistant: weighted by DISTINCT API keys (broad adoption), not raw hits.
 //
-// ALL WRITES ARE BATCHED ATOMICALLY via db.batch().
+// Agent share is weighted by:
+//   1. Topic depth — foundational axioms with many dependents earn more
+//   2. Contribution type — creators, proposers, and voters all earn
+//   3. Sybil resistance — weighted by DISTINCT API keys, not raw hits
+//
+// Runs weekly via Vercel cron. ALL WRITES BATCHED ATOMICALLY.
 
 const HUB_FEE_PCT = 0.20;
-const AGENT_POOL_PCT = 0.80;
 
 /**
  * Distribute Axiom Yield for the current period.
@@ -19,19 +25,17 @@ const AGENT_POOL_PCT = 0.80;
  */
 export async function distributeAxiomYield(
   db: DbClient
-): Promise<{ distributed: number; agents: number; totalUsage: number }> {
+): Promise<{ distributed: number; agents: number; totalUsage: number; topicBreakdown: { topicId: string; share: number; contributors: number }[] }> {
 
   // ── Phase 1: READ ──────────────────────────────────────────────────
 
-  // Count total usage (all unprocessed logs)
-  // We use a timestamp-based approach: process all logs, then delete them
   const usageResult = await db.execute(
     "SELECT COUNT(*) as total FROM axiom_usage_logs"
   );
   const totalUsage = (usageResult.rows[0]?.total as number) || 0;
 
   if (totalUsage === 0) {
-    return { distributed: 0, agents: 0, totalUsage: 0 };
+    return { distributed: 0, agents: 0, totalUsage: 0, topicBreakdown: [] };
   }
 
   // Total revenue = 1 credit per API hit
@@ -40,11 +44,12 @@ export async function distributeAxiomYield(
   const agentPool = totalRevenue - hubFee;
 
   if (agentPool <= 0) {
-    return { distributed: 0, agents: 0, totalUsage };
+    return { distributed: 0, agents: 0, totalUsage, topicBreakdown: [] };
   }
 
-  // Sybil-resistant weight calculation per topic
-  // Weight = (distinctKeys * 10) + (directHits * 0.1) + (depthBonus * 0.5)
+  // Sybil-resistant weight per topic, now with enhanced depth bonus
+  // Weight = (distinctKeys × 10) + (directHits × 0.1) + (depthBonus × 2.0)
+  // Depth bonus increased from 0.5 → 2.0 to heavily reward foundational work
   const topicWeights = await db.execute(`
     SELECT
       aul.topic_id as topicId,
@@ -56,57 +61,80 @@ export async function distributeAxiomYield(
   `);
 
   if (topicWeights.rows.length === 0) {
-    return { distributed: 0, agents: 0, totalUsage };
+    return { distributed: 0, agents: 0, totalUsage, topicBreakdown: [] };
   }
 
-  // Calculate weights
   type TopicWeight = { topicId: string; weight: number };
   const weights: TopicWeight[] = topicWeights.rows.map(row => ({
     topicId: row.topicId as string,
     weight: ((row.distinctKeys as number) * 10) +
             ((row.directHits as number) * 0.1) +
-            ((row.depthBonus as number) * 0.5),
+            ((row.depthBonus as number) * 2.0),  // 4× previous depth weight
   }));
 
   const totalWeight = weights.reduce((sum, w) => sum + w.weight, 0);
   if (totalWeight === 0) {
-    return { distributed: 0, agents: 0, totalUsage };
+    return { distributed: 0, agents: 0, totalUsage, topicBreakdown: [] };
   }
 
   // ── Phase 2: CALCULATE per-agent payouts ───────────────────────────
+  // Contributors now include THREE roles:
+  //   1. Topic CREATORS (the miners who built the knowledge graph)
+  //   2. Merged PROPOSERS (agents who wrote the consensus answer)
+  //   3. Aligned VOTERS (agents who verified and aligned with truth)
+  //
+  // Creator gets 2× weight (foundational work premium)
 
-  // For each weighted topic, find contributing agents
-  // Contributors = merged proposal authors + aligned voters
-  type AgentPayout = { agentId: string; amount: number };
   const agentPayouts = new Map<string, number>();
+  const topicBreakdown: { topicId: string; share: number; contributors: number }[] = [];
 
   for (const tw of weights) {
     const topicShare = Math.floor(agentPool * (tw.weight / totalWeight));
     if (topicShare === 0) continue;
 
-    // Find contributors for this topic
+    // Find all contributors: creators (2× weight), proposers, aligned voters
     const contributors = await db.execute({
       sql: `
-        SELECT DISTINCT agent_id FROM (
-          SELECT p.agent_id FROM proposals p
+        SELECT agent_id, role_type FROM (
+          SELECT r.agent_id, 'creator' as role_type FROM registrations r
+            WHERE r.topic_id = ? AND r.role = 'creator'
+          UNION ALL
+          SELECT p.agent_id, 'proposer' as role_type FROM proposals p
             WHERE p.topic_id = ? AND p.status = 'merged'
-          UNION
-          SELECT r.agent_id FROM registrations r
+          UNION ALL
+          SELECT r.agent_id, 'voter' as role_type FROM registrations r
             WHERE r.topic_id = ? AND r.done_status = 'aligned'
         )`,
-      args: [tw.topicId, tw.topicId],
+      args: [tw.topicId, tw.topicId, tw.topicId],
     });
 
     if (contributors.rows.length === 0) continue;
 
-    // Split topic share equally among contributors
-    const perAgent = Math.floor(topicShare / contributors.rows.length);
-    if (perAgent === 0) continue;
+    // Weight: creators get 2×, proposers 1.5×, voters 1×
+    const ROLE_WEIGHTS: Record<string, number> = { creator: 2.0, proposer: 1.5, voter: 1.0 };
+    const agentWeights = new Map<string, number>();
 
     for (const row of contributors.rows) {
       const agentId = row.agent_id as string;
-      agentPayouts.set(agentId, (agentPayouts.get(agentId) || 0) + perAgent);
+      const roleWeight = ROLE_WEIGHTS[row.role_type as string] || 1.0;
+      agentWeights.set(agentId, (agentWeights.get(agentId) || 0) + roleWeight);
     }
+
+    const totalRoleWeight = Array.from(agentWeights.values()).reduce((a, b) => a + b, 0);
+    if (totalRoleWeight === 0) continue;
+
+    for (const [agentId, roleWeight] of agentWeights) {
+      const agentShare = Math.floor(topicShare * (roleWeight / totalRoleWeight));
+      if (agentShare > 0) {
+        agentPayouts.set(agentId, (agentPayouts.get(agentId) || 0) + agentShare);
+      }
+    }
+
+    topicBreakdown.push({
+      topicId: tw.topicId,
+      share: topicShare,
+      contributors: agentWeights.size,
+    });
   }
 
   // ── Phase 3: WRITE (atomic batch) ──────────────────────────────────
@@ -114,6 +142,10 @@ export async function distributeAxiomYield(
   const stmts: { sql: string; args: unknown[] }[] = [];
 
   // Hub Protocol fee
+  stmts.push({
+    sql: "INSERT OR IGNORE INTO agent_wallets (agent_id, balance) VALUES ('hub-protocol', 0)",
+    args: [],
+  });
   stmts.push({
     sql: "UPDATE agent_wallets SET balance = balance + ? WHERE agent_id = 'hub-protocol'",
     args: [hubFee],
@@ -128,7 +160,6 @@ export async function distributeAxiomYield(
   for (const [agentId, amount] of agentPayouts) {
     if (amount <= 0) continue;
 
-    // Ensure wallet exists
     stmts.push({
       sql: "INSERT OR IGNORE INTO agent_wallets (agent_id, balance) VALUES (?, 0)",
       args: [agentId],
@@ -150,12 +181,12 @@ export async function distributeAxiomYield(
     args: [],
   });
 
-  // Execute all writes atomically
   await db.batch(stmts);
 
   return {
     distributed: totalDistributed,
     agents: agentPayouts.size,
     totalUsage,
+    topicBreakdown,
   };
 }

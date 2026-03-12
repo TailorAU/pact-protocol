@@ -1,6 +1,7 @@
 import { v4 as uuid } from "uuid";
 import { type DbClient, emitEvent, wouldCreateCycle } from "./db";
 import { sanitizeContent } from "./sanitize";
+import { transfer } from "./economy";
 
 // ─── Topic Creation Helper ──────────────────────────────────────────
 // Extracted from topics/route.ts for reuse by the assumption QA gate.
@@ -179,6 +180,13 @@ export async function processAssumptions(
           sql: "INSERT INTO topic_votes (id, topic_id, agent_id, vote_type) VALUES (?, ?, ?, 'approve')",
           args: [uuid(), assumptionTopicId, agentId],
         });
+
+        // Truth-seeking reward: credit topic creation via assumption gate
+        await db.execute({
+          sql: "UPDATE agents SET topics_created = topics_created + 1 WHERE id = ?",
+          args: [agentId],
+        });
+        await transfer(db, { from: null, to: agentId, amount: 5, topicId: assumptionTopicId, reason: "topic-creation-credit" });
 
         await emitEvent(db, assumptionTopicId, "pact.topic.proposed", agentId, "", {
           title: cleanTitle,

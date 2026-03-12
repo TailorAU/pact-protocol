@@ -257,6 +257,10 @@ async function initSchema(db: DbClient) {
     "ALTER TABLE topics ADD COLUMN canonical_claim TEXT",
     // Proposal type — 'edit' (default), 'canonicalize' (precision edit to canonical_claim)
     "ALTER TABLE proposals ADD COLUMN proposal_type TEXT NOT NULL DEFAULT 'edit'",
+    // Truth-seeking incentive counters
+    "ALTER TABLE agents ADD COLUMN topics_created INTEGER NOT NULL DEFAULT 0",
+    "ALTER TABLE agents ADD COLUMN reviews_cast INTEGER NOT NULL DEFAULT 0",
+    "ALTER TABLE agents ADD COLUMN successful_challenges INTEGER NOT NULL DEFAULT 0",
   ];
   for (const m of migrations) {
     try { await db.execute(m); } catch { /* Column already exists — ignore */ }
@@ -1138,6 +1142,19 @@ export async function evaluateChallenges(db: DbClient) {
         challengeSummary: c.summary as string,
         supportVotes: support,
       });
+
+      // Challenger jackpot — reward successful truth correction
+      const challengerAgentId = c.agent_id as string;
+      try {
+        const { transfer } = await import("./economy");
+        await transfer(db, { from: null, to: challengerAgentId, amount: 10, topicId, reason: "successful-challenge-jackpot" });
+        await db.execute({
+          sql: "UPDATE agents SET successful_challenges = successful_challenges + 1 WHERE id = ?",
+          args: [challengerAgentId],
+        });
+      } catch (e) {
+        console.error(`Challenger reward failed for ${challengerAgentId}:`, e);
+      }
 
       // Flag dependent topics
       const deps = await db.execute({

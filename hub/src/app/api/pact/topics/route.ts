@@ -6,6 +6,7 @@ import { rateLimit, getRateLimitHeaders } from "@/lib/rate-limit";
 import { v4 as uuid } from "uuid";
 import { sanitizeContent } from "@/lib/sanitize";
 import { wouldCreateCycle, VALID_RELATIONSHIPS } from "@/lib/db";
+import { transfer } from "@/lib/economy";
 
 // List all topics — filterable by tier and status, with pagination.
 // No auth required. Anyone can browse.
@@ -170,6 +171,13 @@ export async function POST(req: NextRequest) {
     sql: "INSERT INTO topic_votes (id, topic_id, agent_id, vote_type) VALUES (?, ?, ?, 'approve')",
     args: [voteId, topicId, agent.id],
   });
+
+  // Truth-seeking reward: credit topic creation
+  await db.execute({
+    sql: "UPDATE agents SET topics_created = topics_created + 1 WHERE id = ?",
+    args: [agent.id],
+  });
+  await transfer(db, { from: null, to: agent.id, amount: 5, topicId, reason: "topic-creation-credit" });
 
   // Record dependencies (builds_on)
   const depWarnings: string[] = [];

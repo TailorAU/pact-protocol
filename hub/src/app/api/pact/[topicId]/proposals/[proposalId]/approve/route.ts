@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getDb, emitEvent } from "@/lib/db";
 import { requireAgent, checkAgentReputation } from "@/lib/auth";
 import { v4 as uuid } from "uuid";
+import { transfer } from "@/lib/economy";
 
 export async function POST(
   req: NextRequest,
@@ -48,6 +49,13 @@ export async function POST(
   } catch {
     return NextResponse.json({ error: "Already voted" }, { status: 409 });
   }
+
+  // Truth-seeking reward: credit for peer review
+  await db.execute({
+    sql: "UPDATE agents SET reviews_cast = reviews_cast + 1 WHERE id = ?",
+    args: [agent.id],
+  });
+  await transfer(db, { from: null, to: agent.id, amount: 1, topicId, reason: "review-reward" });
 
   // Count current votes on this proposal
   const voteCountResult = await db.execute({
@@ -99,6 +107,9 @@ export async function POST(
       sql: "UPDATE agents SET proposals_approved = proposals_approved + 1 WHERE id = ?",
       args: [proposal.agent_id as string],
     });
+
+    // Return stake + bonus to proposer (5 returned + 5 bonus = 10)
+    await transfer(db, { from: null, to: proposal.agent_id as string, amount: 10, topicId, reason: "proposal-stake-return-plus-bonus" });
 
     await emitEvent(db, topicId, "pact.proposal.merged", agent.id, proposal.section_id as string, {
       proposalId,

@@ -98,16 +98,31 @@ export async function getAgentsList(options?: { limit?: number; offset?: number 
     sql: `SELECT a.id, a.name, a.model, a.framework, a.description, a.created_at,
       a.proposals_made, a.proposals_approved, a.proposals_rejected,
       a.objections_made, a.karma,
+      a.topics_created, a.reviews_cast, a.successful_challenges,
       CASE WHEN a.proposals_made > 0
         THEN CAST(a.proposals_approved AS REAL) / a.proposals_made
         ELSE 0 END as correctness,
       (SELECT COUNT(DISTINCT r.topic_id) FROM registrations r WHERE r.agent_id = a.id) as topicsParticipated,
       COALESCE((SELECT SUM(lt.amount) FROM ledger_txs lt WHERE lt.to_wallet = a.id), 0) as earnings,
-      COALESCE((SELECT aw.balance FROM agent_wallets aw WHERE aw.agent_id = a.id), 0) as balance
+      COALESCE((SELECT aw.balance FROM agent_wallets aw WHERE aw.agent_id = a.id), 0) as balance,
+      (
+        COALESCE((
+          SELECT SUM(1 + COALESCE((SELECT COUNT(*) FROM topic_dependencies td2 WHERE td2.depends_on = r_inner.topic_id), 0))
+          FROM registrations r_inner
+          WHERE r_inner.agent_id = a.id AND r_inner.role = 'creator'
+        ), 0)
+        + (a.proposals_approved * 10)
+        + (a.reviews_cast * 2)
+        + COALESCE((
+          SELECT COUNT(*) * 5 FROM registrations r2
+          JOIN topics t2 ON t2.id = r2.topic_id
+          WHERE r2.agent_id = a.id AND r2.done_status = 'aligned'
+          AND t2.status IN ('consensus', 'stable', 'locked')
+        ), 0)
+        + (a.successful_challenges * 20)
+      ) as truthScore
     FROM agents a
-    ORDER BY (CASE WHEN a.proposals_made > 0
-      THEN (CAST(a.proposals_approved AS REAL) / a.proposals_made) * a.proposals_made
-      ELSE 0 END) DESC
+    ORDER BY truthScore DESC
     LIMIT ? OFFSET ?`,
     args: [limit, offset],
   });

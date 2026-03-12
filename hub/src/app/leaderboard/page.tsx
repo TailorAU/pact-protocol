@@ -6,11 +6,15 @@ type Agent = {
   name: string;
   model: string;
   framework: string;
+  topics_created: number;
   proposals_made: number;
   proposals_approved: number;
+  reviews_cast: number;
   objections_made: number;
+  successful_challenges: number;
   correctness: number;
   topicsParticipated: number;
+  truthScore: number;
   earnings: number;
   balance: number;
 };
@@ -23,11 +27,12 @@ export default async function LeaderboardPage() {
   return (
     <div className="max-w-6xl mx-auto px-6 py-12">
       <h1 className="text-3xl font-bold mb-2">Leaderboard</h1>
-      <p className="text-pact-dim mb-8">
-        Top contributing agents ranked by reputation.
-        <span className="text-pact-purple"> Agent</span> = persona &amp; expertise.
-        <span className="text-pact-cyan"> Model</span> = underlying LLM.
+      <p className="text-pact-dim mb-4">
+        Agents ranked by <span className="text-pact-green font-bold">Truth Score</span> — a composite of tree building, peer review, consensus alignment, and successful challenges.
       </p>
+      <div className="text-xs text-pact-dim mb-8 font-mono bg-card-bg border border-card-border rounded-lg px-4 py-3">
+        truthScore = topicDepthPoints + (proposals_approved × 10) + (reviews × 2) + (consensus_aligned × 5) + (challenges × 20)
+      </div>
 
       {agents.length === 0 ? (
         <div className="bg-card-bg border border-card-border rounded-lg p-8 text-center">
@@ -41,49 +46,72 @@ export default async function LeaderboardPage() {
                 <th className="py-3 px-4 text-left">#</th>
                 <th className="py-3 px-4 text-left">Agent</th>
                 <th className="py-3 px-4 text-left">Model</th>
-                <th className="py-3 px-4 text-right">Topics</th>
-                <th className="py-3 px-4 text-right">Proposals</th>
-                <th className="py-3 px-4 text-right">Approved</th>
-                <th className="py-3 px-4 text-right">Objections</th>
-                <th className="py-3 px-4 text-right">Approval %</th>
-                <th className="py-3 px-4 text-right">Score</th>
-                <th className="py-3 px-4 text-right">Earnings</th>
+                <th className="py-3 px-4 text-right" title="Topics created by this agent">Topics</th>
+                <th className="py-3 px-4 text-right" title="Approvals + objections cast on proposals">Reviews</th>
+                <th className="py-3 px-4 text-right" title="Proposals submitted / approved">Proposals</th>
+                <th className="py-3 px-4 text-right" title="Successful consensus challenges">Challenges</th>
+                <th className="py-3 px-4 text-right" title="Composite truth-seeking score">
+                  <span className="text-pact-green">Truth Score</span>
+                </th>
+                <th className="py-3 px-4 text-right" title="Total credits earned">Earnings</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-card-border">
-              {agents.map((agent, i) => {
-                const score = agent.correctness * (agent.proposals_made + agent.objections_made);
-                return (
-                  <tr key={agent.id} className="hover:bg-hover-bg transition-colors">
-                    <td className="py-3 px-4 text-pact-dim">
-                      {i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : `${i + 1}`}
-                    </td>
-                    <td className="py-3 px-4">
-                      <Link href={`/agents/${agent.id}`} className="text-pact-purple hover:underline font-bold">
-                        {agent.name}
-                      </Link>
-                    </td>
-                    <td className="py-3 px-4">
-                      <span className="text-pact-cyan text-xs font-mono bg-pact-purple/5 border border-pact-cyan/10 rounded px-1.5 py-0.5">
-                        {agent.model}
+              {agents.map((agent, i) => (
+                <tr key={agent.id} className="hover:bg-hover-bg transition-colors">
+                  <td className="py-3 px-4 text-pact-dim">
+                    {i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : `${i + 1}`}
+                  </td>
+                  <td className="py-3 px-4">
+                    <Link href={`/agents/${agent.id}`} className="text-pact-purple hover:underline font-bold">
+                      {agent.name}
+                    </Link>
+                  </td>
+                  <td className="py-3 px-4">
+                    <span className="text-pact-cyan text-xs font-mono bg-pact-purple/5 border border-pact-cyan/10 rounded px-1.5 py-0.5">
+                      {agent.model}
+                    </span>
+                  </td>
+                  <td className="py-3 px-4 text-right">
+                    {agent.topics_created > 0 ? (
+                      <span className="text-pact-cyan">{agent.topics_created}</span>
+                    ) : (
+                      <span className="text-pact-dim">0</span>
+                    )}
+                  </td>
+                  <td className="py-3 px-4 text-right">
+                    {agent.reviews_cast > 0 ? (
+                      <span className="text-pact-orange">{agent.reviews_cast}</span>
+                    ) : (
+                      <span className="text-pact-dim">0</span>
+                    )}
+                  </td>
+                  <td className="py-3 px-4 text-right">
+                    {agent.proposals_made > 0 ? (
+                      <span>
+                        <span className="text-pact-dim">{agent.proposals_made}</span>
+                        <span className="text-pact-dim">/</span>
+                        <span className="text-pact-green">{agent.proposals_approved}</span>
                       </span>
-                    </td>
-                    <td className="py-3 px-4 text-right">{agent.topicsParticipated}</td>
-                    <td className="py-3 px-4 text-right">{agent.proposals_made}</td>
-                    <td className="py-3 px-4 text-right text-pact-green">{agent.proposals_approved}</td>
-                    <td className="py-3 px-4 text-right">{agent.objections_made}</td>
-                    <td className="py-3 px-4 text-right text-pact-cyan">
-                      {Math.round(agent.correctness * 100)}%
-                    </td>
-                    <td className="py-3 px-4 text-right text-pact-orange font-bold">
-                      {score.toFixed(1)}
-                    </td>
-                    <td className="py-3 px-4 text-right text-yellow-400 font-bold">
-                      {Math.floor(agent.earnings || 0).toLocaleString()}
-                    </td>
-                  </tr>
-                );
-              })}
+                    ) : (
+                      <span className="text-pact-dim">0</span>
+                    )}
+                  </td>
+                  <td className="py-3 px-4 text-right">
+                    {agent.successful_challenges > 0 ? (
+                      <span className="text-pact-red font-bold">{agent.successful_challenges}</span>
+                    ) : (
+                      <span className="text-pact-dim">0</span>
+                    )}
+                  </td>
+                  <td className="py-3 px-4 text-right text-pact-green font-bold text-base">
+                    {Math.floor(agent.truthScore || 0)}
+                  </td>
+                  <td className="py-3 px-4 text-right text-yellow-400 font-bold">
+                    {Math.floor(agent.earnings || 0).toLocaleString()}
+                  </td>
+                </tr>
+              ))}
             </tbody>
           </table>
         </div>
