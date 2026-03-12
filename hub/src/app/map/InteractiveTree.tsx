@@ -100,21 +100,8 @@ function flattenTree(
       return;
     }
 
-    // If already rendered, add a back-reference row (no children expanded)
-    if (visited.has(topic.id)) {
-      rows.push({
-        topic,
-        lane,
-        parentLane,
-        isFirst,
-        isLast,
-        hasChildren: false,
-        childCount: 0,
-        depth: topic.depth,
-        isRef: true,
-      });
-      return;
-    }
+    // If already rendered elsewhere in the tree, skip entirely to avoid DAG duplication
+    if (visited.has(topic.id)) return;
 
     visited.add(topic.id);
     const children = getChildren(topic, topicMap);
