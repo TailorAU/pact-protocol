@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useCallback } from "react";
+import { useState, useMemo, useCallback, useEffect, useRef } from "react";
 import Link from "next/link";
 
 // ── Types ──────────────────────────────────────────────────────────
@@ -104,7 +104,9 @@ function flattenTree(
 
     visited.add(topic.id);
     const children = getChildren(topic, topicMap);
-    const hasChildren = children.length > 0;
+    // Count only children not yet claimed by another subtree
+    const availableChildren = children.filter(c => !visited.has(c.id));
+    const hasChildren = availableChildren.length > 0;
     const isExpanded = expanded.has(topic.id) || !!searchMatches;
 
     rows.push({
@@ -114,7 +116,7 @@ function flattenTree(
       isFirst,
       isLast,
       hasChildren,
-      childCount: topic.childIds.length,
+      childCount: availableChildren.length,
       depth: topic.depth,
     });
 
@@ -148,12 +150,33 @@ export default function InteractiveTree({ topics }: { topics: TreeTopic[] }) {
   const [expanded, setExpanded] = useState<Set<string>>(() => {
     return new Set(topics.filter(t => t.depth === 0).map(t => t.id));
   });
+  const [searchInput, setSearchInput] = useState("");
   const [search, setSearch] = useState("");
   const [tierFilter, setTierFilter] = useState<string | null>(null);
   const [statusFilter, setStatusFilter] = useState<string | null>(null);
 
+  // Debounce search input (300ms)
+  const debounceRef = useRef<ReturnType<typeof setTimeout>>(undefined);
+  useEffect(() => {
+    debounceRef.current = setTimeout(() => setSearch(searchInput), 300);
+    return () => clearTimeout(debounceRef.current);
+  }, [searchInput]);
+
   const topicMap = useMemo(() => new Map(topics.map(t => [t.id, t])), [topics]);
   const roots = useMemo(() => topics.filter(t => t.depth === 0), [topics]);
+
+  // Reverse lookup: child ID → parent IDs (for ancestor tracing in search)
+  const parentLookup = useMemo(() => {
+    const map = new Map<string, string[]>();
+    for (const t of topics) {
+      for (const childId of t.childIds) {
+        const existing = map.get(childId);
+        if (existing) existing.push(t.id);
+        else map.set(childId, [t.id]);
+      }
+    }
+    return map;
+  }, [topics]);
 
   const stats = useMemo(() => {
     const verified = topics.filter(t => ["locked", "stable", "consensus"].includes(t.status)).length;
@@ -169,17 +192,21 @@ export default function InteractiveTree({ topics }: { topics: TreeTopic[] }) {
     for (const t of topics) {
       if (t.title.toLowerCase().includes(q)) {
         matches.add(t.id);
-        let current = t;
-        while (current.depth > 0) {
-          const parent = topics.find(p => p.childIds.includes(current.id));
-          if (!parent) break;
-          ancestorsNeeded.add(parent.id);
-          current = parent;
+        // Trace ALL parent paths to roots using reverse lookup
+        const queue = parentLookup.get(t.id) || [];
+        const visited = new Set<string>();
+        for (let i = 0; i < queue.length; i++) {
+          const pid = queue[i];
+          if (visited.has(pid)) continue;
+          visited.add(pid);
+          ancestorsNeeded.add(pid);
+          const grandparents = parentLookup.get(pid);
+          if (grandparents) queue.push(...grandparents);
         }
       }
     }
     return { matches, ancestorsNeeded };
-  }, [search, topics]);
+  }, [search, topics, parentLookup]);
 
   const isVisible = useCallback((topic: TreeTopic): boolean => {
     if (tierFilter && topic.tier !== tierFilter) return false;
@@ -277,8 +304,8 @@ export default function InteractiveTree({ topics }: { topics: TreeTopic[] }) {
             <input
               type="text"
               placeholder="Search topics..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
               className="w-full bg-[#0d0d1a] border border-card-border rounded-lg pl-9 pr-3 py-1.5 text-sm text-foreground/90 placeholder:text-pact-dim/50 focus:outline-none focus:border-pact-cyan/40"
             />
             <span className="absolute left-3 top-1/2 -translate-y-1/2 text-pact-dim/40 text-sm">&#128269;</span>
@@ -328,9 +355,9 @@ export default function InteractiveTree({ topics }: { topics: TreeTopic[] }) {
               </button>
             );
           })}
-          {(tierFilter || statusFilter || search) && (
+          {(tierFilter || statusFilter || searchInput) && (
             <button
-              onClick={() => { setTierFilter(null); setStatusFilter(null); setSearch(""); }}
+              onClick={() => { setTierFilter(null); setStatusFilter(null); setSearchInput(""); setSearch(""); }}
               className="text-[10px] px-2 py-0.5 rounded-full text-pact-red/60 hover:text-pact-red border border-pact-red/20 transition-colors ml-1"
             >
               Clear
@@ -360,7 +387,7 @@ export default function InteractiveTree({ topics }: { topics: TreeTopic[] }) {
 
               return (
                 <div
-                  key={`${topic.id}-${idx}`}
+                  key={topic.id}
                   className={`flex items-center group hover:bg-white/[0.02] transition-colors ${
                     isSearchMatch ? "bg-pact-cyan/5" : ""
                   }`}
