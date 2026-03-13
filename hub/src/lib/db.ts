@@ -274,6 +274,10 @@ async function initSchema(db: DbClient) {
     "ALTER TABLE topics ADD COLUMN tier_migrated_from TEXT",
     // Civic duty: track which dependency topic a need_info vote created/linked
     "ALTER TABLE topic_votes ADD COLUMN need_info_topic_id TEXT",
+    // Axiom API: email for key owners (optional, for paid tier notifications)
+    "ALTER TABLE api_keys ADD COLUMN email TEXT",
+    // Axiom API: tier label (free, starter, pro)
+    "ALTER TABLE api_keys ADD COLUMN tier TEXT NOT NULL DEFAULT 'free'",
   ];
   for (const m of migrations) {
     try { await db.execute(m); } catch { /* Column already exists — ignore */ }

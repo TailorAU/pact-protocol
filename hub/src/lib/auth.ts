@@ -1,5 +1,6 @@
 import { getDb } from "./db";
 import { NextRequest } from "next/server";
+import { createHash } from "crypto";
 
 export async function authenticateAgent(req: NextRequest): Promise<{ id: string; name: string } | null> {
   let apiKey = req.headers.get("x-api-key");
@@ -118,6 +119,69 @@ export async function checkReviewDuty(agentId: string): Promise<{
     proposalsMade,
     reviewsCast,
   };
+}
+
+// ─── Axiom API Key Auth ──────────────────────────────────────────────
+// Authenticates commercial API keys (pact_ax_* keys) from the api_keys table.
+// Returns the key record if valid and has remaining credits, or null.
+
+export async function authenticateApiKey(req: NextRequest): Promise<{
+  id: string;
+  ownerName: string;
+  creditBalance: number;
+} | null> {
+  let secret = req.headers.get("x-api-key");
+  if (!secret) {
+    const authHeader = req.headers.get("authorization");
+    if (authHeader?.startsWith("Bearer ")) {
+      secret = authHeader.slice(7);
+    }
+  }
+  if (!secret || !secret.startsWith("pact_ax_")) return null;
+
+  const secretHash = createHash("sha256").update(secret).digest("hex");
+  const db = await getDb();
+  const result = await db.execute({
+    sql: "SELECT id, owner_name, credit_balance FROM api_keys WHERE secret_hash = ?",
+    args: [secretHash],
+  });
+
+  if (result.rows.length === 0) return null;
+  const row = result.rows[0];
+  return {
+    id: row.id as string,
+    ownerName: row.owner_name as string,
+    creditBalance: row.credit_balance as number,
+  };
+}
+
+export async function requireApiKey(req: NextRequest): Promise<{
+  id: string;
+  ownerName: string;
+  creditBalance: number;
+}> {
+  const key = await authenticateApiKey(req);
+  if (!key) {
+    throw new Error("Invalid or missing API key. Get one at POST /api/axiom/keys");
+  }
+  if (key.creditBalance <= 0) {
+    throw new Error("No credits remaining. Top up at POST /api/axiom/keys/topup");
+  }
+  return key;
+}
+
+// Deduct 1 credit from an API key and log the usage
+export async function deductApiCredit(keyId: string, topicId: string): Promise<void> {
+  const db = await getDb();
+  const { v4: uuid } = await import("uuid");
+  await db.execute({
+    sql: "UPDATE api_keys SET credit_balance = credit_balance - 1 WHERE id = ? AND credit_balance > 0",
+    args: [keyId],
+  });
+  await db.execute({
+    sql: "INSERT INTO axiom_usage_logs (id, topic_id, api_key_id) VALUES (?, ?, ?)",
+    args: [uuid(), topicId, keyId],
+  });
 }
 
 // ─── Civic Duty ───────────────────────────────────────────────────────
