@@ -145,7 +145,7 @@ export async function POST(
   const isLocked = topicStatus === "locked";
 
   // Verify section exists (skip for canonicalize proposals which target topics.canonical_claim)
-  const effectiveSectionId = isCanonicalize ? null : sectionId;
+  const effectiveSectionId = isCanonicalize ? `sec:canonical-${topicId}` : sectionId;
   if (!isCanonicalize) {
     const sectionResult = await db.execute({ sql: "SELECT id FROM sections WHERE id = ? AND topic_id = ?", args: [sectionId, topicId] });
     if (!sectionResult.rows[0]) {

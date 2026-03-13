@@ -261,9 +261,31 @@ async function initSchema(db: DbClient) {
     "ALTER TABLE agents ADD COLUMN topics_created INTEGER NOT NULL DEFAULT 0",
     "ALTER TABLE agents ADD COLUMN reviews_cast INTEGER NOT NULL DEFAULT 0",
     "ALTER TABLE agents ADD COLUMN successful_challenges INTEGER NOT NULL DEFAULT 0",
+    // Tiers of Knowledge — jurisdiction-scoped facts
+    "ALTER TABLE topics ADD COLUMN jurisdiction TEXT",
+    "ALTER TABLE topics ADD COLUMN authority TEXT",
+    "ALTER TABLE topics ADD COLUMN source_ref TEXT",
+    "ALTER TABLE topics ADD COLUMN effective_date TEXT",
+    "ALTER TABLE topics ADD COLUMN expiry_date TEXT",
+    // Staleness tracking for institutional/interpretive topics
+    "ALTER TABLE topics ADD COLUMN last_verified_at TEXT",
+    "ALTER TABLE topics ADD COLUMN last_verified_by TEXT",
+    // Migration marker for tier rename (idempotency guard)
+    "ALTER TABLE topics ADD COLUMN tier_migrated_from TEXT",
   ];
   for (const m of migrations) {
     try { await db.execute(m); } catch { /* Column already exists — ignore */ }
+  }
+
+  // ─── Tier Data Migration ──────────────────────────────────────────
+  // Remap old tier names to new epistemological tiers (idempotent via tier_migrated_from guard)
+  const tierMigrations = [
+    "UPDATE topics SET tier_migrated_from = tier, tier = 'empirical' WHERE tier IN ('convention', 'practice') AND tier_migrated_from IS NULL",
+    "UPDATE topics SET tier_migrated_from = tier, tier = 'institutional' WHERE tier = 'policy' AND tier_migrated_from IS NULL",
+    "UPDATE topics SET tier_migrated_from = tier, tier = 'conjecture' WHERE tier = 'frontier' AND tier_migrated_from IS NULL",
+  ];
+  for (const m of tierMigrations) {
+    try { await db.execute(m); } catch { /* safe to ignore */ }
   }
 
   // ─── Economy Tables ────────────────────────────────────────────────
@@ -333,8 +355,9 @@ async function initSchema(db: DbClient) {
     await db.execute(stmt);
   }
 
-  // Ensure the Hub Protocol wallet exists (system wallet for fees, subsidies, starter credits)
+  // Ensure the Hub Protocol system agent and wallet exist (for fees, subsidies, starter credits)
   try {
+    await db.execute("INSERT OR IGNORE INTO agents (id, name, api_key, model, framework, description) VALUES ('hub-protocol', 'Hub Protocol', 'system-no-key', 'system', 'internal', 'System wallet for protocol fees and subsidies')");
     await db.execute("INSERT OR IGNORE INTO agent_wallets (agent_id, balance) VALUES ('hub-protocol', 0)");
   } catch { /* Already exists */ }
 
@@ -850,9 +873,14 @@ const STABLE_DAYS = 30; // Days of consensus before "stable" status
 
 export const TIER_BASE_AGENTS: Record<string, number> = {
   axiom: 2,
+  empirical: 3,
+  institutional: 3,
+  interpretive: 4,
+  conjecture: 5,
+  // Legacy aliases
   convention: 3,
   practice: 3,
-  policy: 4,
+  policy: 3,
   frontier: 5,
 };
 

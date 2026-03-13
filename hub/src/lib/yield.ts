@@ -92,7 +92,7 @@ export async function distributeAxiomYield(
     const topicShare = Math.floor(agentPool * (tw.weight / totalWeight));
     if (topicShare === 0) continue;
 
-    // Find all contributors: creators (2× weight), proposers, aligned voters
+    // Find all contributors: creators (2×), proposers (1.5×), voters (1×), verifiers (1.5×)
     const contributors = await db.execute({
       sql: `
         SELECT agent_id, role_type FROM (
@@ -104,14 +104,17 @@ export async function distributeAxiomYield(
           UNION ALL
           SELECT r.agent_id, 'voter' as role_type FROM registrations r
             WHERE r.topic_id = ? AND r.done_status = 'aligned'
+          UNION ALL
+          SELECT t.last_verified_by as agent_id, 'verifier' as role_type FROM topics t
+            WHERE t.id = ? AND t.last_verified_by IS NOT NULL
         )`,
-      args: [tw.topicId, tw.topicId, tw.topicId],
+      args: [tw.topicId, tw.topicId, tw.topicId, tw.topicId],
     });
 
     if (contributors.rows.length === 0) continue;
 
-    // Weight: creators get 2×, proposers 1.5×, voters 1×
-    const ROLE_WEIGHTS: Record<string, number> = { creator: 2.0, proposer: 1.5, voter: 1.0 };
+    // Weight: creators get 2×, proposers 1.5×, verifiers 1.5×, voters 1×
+    const ROLE_WEIGHTS: Record<string, number> = { creator: 2.0, proposer: 1.5, verifier: 1.5, voter: 1.0 };
     const agentWeights = new Map<string, number>();
 
     for (const row of contributors.rows) {

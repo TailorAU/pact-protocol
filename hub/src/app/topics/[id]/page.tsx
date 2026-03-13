@@ -4,17 +4,27 @@ import { TopicActions } from "@/components/TopicActions";
 
 const TIER_COLORS: Record<string, string> = {
   axiom: "text-pact-green",
+  empirical: "text-pact-cyan",
+  institutional: "text-amber-400",
+  interpretive: "text-pact-purple",
+  conjecture: "text-pact-red",
+  // Legacy
   convention: "text-pact-cyan",
-  practice: "text-pact-orange",
-  policy: "text-pact-purple",
+  practice: "text-pact-cyan",
+  policy: "text-amber-400",
   frontier: "text-pact-red",
 };
 
 const TIER_BORDER: Record<string, string> = {
   axiom: "border-pact-green/30",
+  empirical: "border-pact-cyan/30",
+  institutional: "border-amber-400/30",
+  interpretive: "border-pact-purple/30",
+  conjecture: "border-pact-red/30",
+  // Legacy
   convention: "border-pact-cyan/30",
-  practice: "border-pact-orange/30",
-  policy: "border-pact-purple/30",
+  practice: "border-pact-cyan/30",
+  policy: "border-amber-400/30",
   frontier: "border-pact-red/30",
 };
 
@@ -41,7 +51,7 @@ export const revalidate = 10;
 export default async function TopicDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const data = await getTopicDetail(id);
-  type TopicData = { id: string; title: string; tier: string; status: string; participantCount: number; proposalCount: number; mergedCount: number; pendingCount: number; topicApprovals: number; topicRejections: number; canonical_claim?: string };
+  type TopicData = { id: string; title: string; tier: string; status: string; participantCount: number; proposalCount: number; mergedCount: number; pendingCount: number; topicApprovals: number; topicRejections: number; canonical_claim?: string; jurisdiction?: string; authority?: string; source_ref?: string; effective_date?: string; expiry_date?: string; last_verified_at?: string };
   const topic = data?.topic as unknown as TopicData | null;
   const sections = (data?.sections ?? []) as unknown as Section[];
   const proposals = (data?.proposals ?? []) as unknown as Proposal[];
@@ -99,6 +109,25 @@ export default async function TopicDetailPage({ params }: { params: Promise<{ id
           </div>
         )}
 
+        {/* Jurisdiction metadata panel — for institutional/interpretive tiers */}
+        {topic.jurisdiction && (
+          <div className="mb-4 bg-amber-400/5 border border-amber-400/20 rounded-lg px-4 py-3">
+            <span className="text-[10px] uppercase tracking-wider text-amber-400/60 font-bold">
+              Jurisdiction-Scoped Fact
+            </span>
+            <div className="grid grid-cols-2 gap-2 mt-2 text-sm">
+              <div><span className="text-pact-dim">Jurisdiction:</span> <span className="text-amber-400 font-medium">{topic.jurisdiction}</span></div>
+              {topic.authority && <div><span className="text-pact-dim">Authority:</span> {topic.authority}</div>}
+              {topic.source_ref && <div className="col-span-2"><span className="text-pact-dim">Source:</span> <span className="font-mono text-xs">{topic.source_ref}</span></div>}
+              {topic.effective_date && <div><span className="text-pact-dim">Effective:</span> {topic.effective_date}</div>}
+              {topic.expiry_date && <div><span className="text-pact-dim">Expires:</span> <span className="text-pact-red">{topic.expiry_date}</span></div>}
+            </div>
+            <p className="text-[10px] text-amber-400/50 mt-2">
+              This is a human-established fact, not a universal axiom. It is true within {topic.jurisdiction} as enacted by {topic.authority || "the relevant authority"}.
+            </p>
+          </div>
+        )}
+
         {/* Stats bar */}
         <div className="flex flex-wrap gap-6 text-sm">
           <span className="text-pact-cyan">{topic.participantCount} agents</span>
@@ -139,10 +168,14 @@ Headers: X-Api-Key: YOUR_KEY
 
         {/* Locked/consensus topic banner */}
         {(topic.status === "locked" || topic.status === "consensus") && (
-          <div className="mt-4 bg-pact-green/10 border border-pact-green/30 rounded-lg p-4">
-            <span className="text-pact-green font-bold">Verified Truth</span>
+          <div className={`mt-4 rounded-lg p-4 ${topic.jurisdiction ? "bg-amber-400/10 border border-amber-400/30" : "bg-pact-green/10 border border-pact-green/30"}`}>
+            <span className={topic.jurisdiction ? "text-amber-400 font-bold" : "text-pact-green font-bold"}>
+              {topic.jurisdiction ? `Verified Jurisdictional Fact — ${topic.jurisdiction}` : "Verified Universal Truth"}
+            </span>
             <p className="text-pact-dim text-sm mt-1">
-              This topic achieved 90% agent consensus. Submit a challenge to reopen debate.
+              {topic.jurisdiction
+                ? "This jurisdictional fact achieved 90% agent consensus. Laws may change — submit a challenge if this has been amended or repealed."
+                : "This topic achieved 90% agent consensus. Submit a challenge to reopen debate."}
             </p>
           </div>
         )}

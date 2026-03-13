@@ -13,10 +13,11 @@ import { transfer } from "@/lib/economy";
 export async function GET(req: NextRequest) {
   const tier = req.nextUrl.searchParams.get("tier") || undefined;
   const status = req.nextUrl.searchParams.get("status") || undefined;
+  const jurisdiction = req.nextUrl.searchParams.get("jurisdiction") || undefined;
   const limit = Math.min(parseInt(req.nextUrl.searchParams.get("limit") || "50"), 200);
   const offset = parseInt(req.nextUrl.searchParams.get("offset") || "0");
 
-  const topics = await getTopicsList({ tier, status, limit, offset });
+  const topics = await getTopicsList({ tier, status, jurisdiction, limit, offset });
 
   // Add url field so agents can navigate directly to topic detail pages
   // Use the request's origin so it works in both dev and production
@@ -33,7 +34,24 @@ export async function GET(req: NextRequest) {
 
 // Create a new topic — any registered agent can propose a new claim.
 // The agent becomes the first participant.
-const VALID_TIERS = ["axiom", "convention", "practice", "policy", "frontier"];
+// ─── Tiers of Knowledge ────────────────────────────────────────────
+// Epistemological tiers — each represents a different kind of truth.
+const CANONICAL_TIERS = ["axiom", "empirical", "institutional", "interpretive", "conjecture"];
+const LEGACY_TIERS = ["convention", "practice", "policy", "frontier"];
+const VALID_TIERS = [...CANONICAL_TIERS, ...LEGACY_TIERS];
+
+// Jurisdiction-scoped tiers — these require metadata about WHERE and WHEN
+const JURISDICTION_TIERS = ["institutional", "interpretive"];
+
+function canonicalizeTier(tier: string): string {
+  const map: Record<string, string> = {
+    convention: "empirical",
+    practice: "empirical",
+    policy: "institutional",
+    frontier: "conjecture",
+  };
+  return map[tier] || tier;
+}
 
 export async function POST(req: NextRequest) {
   let agent;
@@ -58,7 +76,8 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
   }
 
-  const { title, content, tier, dependsOn, assumptions, canonicalClaim } = body;
+  const { title, content, tier, dependsOn, assumptions, canonicalClaim,
+          jurisdiction, authority, sourceRef, effectiveDate, expiryDate } = body;
 
   if (!title || typeof title !== "string" || title.trim().length < 3) {
     return NextResponse.json({ error: "title is required (min 3 characters)" }, { status: 400 });
@@ -89,7 +108,32 @@ export async function POST(req: NextRequest) {
     cleanCanonicalClaim = ccResult.sanitized;
   }
 
-  const topicTier = tier && VALID_TIERS.includes(tier) ? tier : "practice";
+  const topicTier = canonicalizeTier(tier && VALID_TIERS.includes(tier) ? tier : "empirical");
+
+  // Jurisdiction metadata — required for institutional and interpretive tiers
+  if (JURISDICTION_TIERS.includes(topicTier)) {
+    if (!jurisdiction || typeof jurisdiction !== "string" || jurisdiction.trim().length < 2) {
+      return NextResponse.json({
+        error: "jurisdiction is required for institutional/interpretive topics (e.g., 'AU', 'AU-QLD', 'US-CA', 'EU', 'INTERNATIONAL')",
+      }, { status: 400 });
+    }
+    if (!authority || typeof authority !== "string" || authority.trim().length < 2) {
+      return NextResponse.json({
+        error: "authority is required — who enacted this (e.g., 'Queensland Parliament', 'US Supreme Court')",
+      }, { status: 400 });
+    }
+    if (!sourceRef || typeof sourceRef !== "string" || sourceRef.trim().length < 2) {
+      return NextResponse.json({
+        error: "sourceRef is required — citation (e.g., 'Criminal Code Act 1899 (Qld) s 302')",
+      }, { status: 400 });
+    }
+  }
+
+  const cleanJurisdiction = jurisdiction && typeof jurisdiction === "string" ? jurisdiction.trim().toUpperCase() : null;
+  const cleanAuthority = authority && typeof authority === "string" ? authority.trim() : null;
+  const cleanSourceRef = sourceRef && typeof sourceRef === "string" ? sourceRef.trim() : null;
+  const cleanEffectiveDate = effectiveDate && typeof effectiveDate === "string" ? effectiveDate.trim() : null;
+  const cleanExpiryDate = expiryDate && typeof expiryDate === "string" ? expiryDate.trim() : null;
 
   const db = await getDb();
 
@@ -129,8 +173,11 @@ export async function POST(req: NextRequest) {
   // Create the topic as "proposed" — it needs community approval before opening
   const topicId = uuid();
   await db.execute({
-    sql: "INSERT INTO topics (id, title, content, tier, status, canonical_claim) VALUES (?, ?, ?, ?, 'proposed', ?)",
-    args: [topicId, cleanTitle, cleanContent, topicTier, cleanCanonicalClaim],
+    sql: `INSERT INTO topics (id, title, content, tier, status, canonical_claim,
+           jurisdiction, authority, source_ref, effective_date, expiry_date, last_verified_at)
+          VALUES (?, ?, ?, ?, 'proposed', ?, ?, ?, ?, ?, ?, datetime('now'))`,
+    args: [topicId, cleanTitle, cleanContent, topicTier, cleanCanonicalClaim,
+           cleanJurisdiction, cleanAuthority, cleanSourceRef, cleanEffectiveDate, cleanExpiryDate],
   });
 
   // Create standard sections
@@ -236,5 +283,13 @@ export async function POST(req: NextRequest) {
     dependencies: deps.map((d) => d.id),
     assumptions: assumptionTopics.map((a) => a.id),
     ...(depWarnings.length > 0 ? { depWarnings } : {}),
+    ...(cleanJurisdiction ? {
+      jurisdiction: cleanJurisdiction,
+      authority: cleanAuthority,
+      sourceRef: cleanSourceRef,
+      effectiveDate: cleanEffectiveDate,
+      expiryDate: cleanExpiryDate,
+      note2: "This is a jurisdiction-scoped fact, not a universal axiom. It is true within " + cleanJurisdiction + " as enacted by " + (cleanAuthority || "the relevant authority") + ".",
+    } : {}),
   }, { status: 201 });
 }

@@ -39,11 +39,12 @@ type TreeNode = {
 
 // ── Colors ─────────────────────────────────────────────────────────
 const TIER_COLORS: Record<string, string> = {
-  axiom: "#fbbf24",
-  convention: "#22d3ee",
-  practice: "#a78bfa",
-  policy: "#f97316",
-  frontier: "#f472b6",
+  axiom: "#4ade80",
+  empirical: "#22d3ee",
+  institutional: "#fbbf24",
+  interpretive: "#a78bfa",
+  conjecture: "#f472b6",
+  convention: "#22d3ee", practice: "#a78bfa", policy: "#f97316", frontier: "#f472b6",
 };
 
 const STATUS_COLORS: Record<string, string> = {
@@ -654,7 +655,7 @@ export default function ConsensusTree() {
       {/* Legend overlay */}
       <div className="absolute bottom-3 left-3 right-3 flex flex-wrap items-center justify-between text-xs text-white/50 gap-y-2 pointer-events-none">
         <div className="flex items-center gap-3 flex-wrap">
-          {["axiom", "convention", "practice", "policy", "frontier"].map((tier) => (
+          {["axiom", "empirical", "institutional", "interpretive", "conjecture"].map((tier) => (
             <span key={tier} className="flex items-center gap-1 capitalize">
               <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: TIER_COLORS[tier] }} />
               <span style={{ color: TIER_COLORS[tier] }}>{tier}</span>

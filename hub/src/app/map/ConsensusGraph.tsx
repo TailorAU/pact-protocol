@@ -79,16 +79,21 @@ type GraphLink = {
 
 // ── Color maps ─────────────────────────────────────────────────────
 const TIER_COLORS: Record<string, string> = {
-  axiom: "#fbbf24",
-  convention: "#22d3ee",
-  practice: "#a78bfa",
-  policy: "#f97316",
-  frontier: "#f472b6",
+  axiom: "#4ade80",
+  empirical: "#22d3ee",
+  institutional: "#fbbf24",
+  interpretive: "#a78bfa",
+  conjecture: "#f472b6",
+  convention: "#22d3ee", practice: "#a78bfa", policy: "#f97316", frontier: "#f472b6",
 };
 
-const TIER_ORDER = ["axiom", "convention", "practice", "policy", "frontier"];
+const TIER_ORDER = ["axiom", "empirical", "institutional", "interpretive", "conjecture"];
 const TIER_RADIUS: Record<string, number> = {
   axiom: 20,
+  empirical: 60,
+  institutional: 100,
+  interpretive: 140,
+  conjecture: 180,
   convention: 60,
   practice: 100,
   policy: 140,

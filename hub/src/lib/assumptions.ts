@@ -6,7 +6,19 @@ import { transfer } from "./economy";
 // ─── Topic Creation Helper ──────────────────────────────────────────
 // Extracted from topics/route.ts for reuse by the assumption QA gate.
 
-const VALID_TIERS = ["axiom", "convention", "practice", "policy", "frontier"];
+const CANONICAL_TIERS = ["axiom", "empirical", "institutional", "interpretive", "conjecture"];
+const LEGACY_TIERS = ["convention", "practice", "policy", "frontier"];
+const VALID_TIERS = [...CANONICAL_TIERS, ...LEGACY_TIERS];
+
+function canonicalizeTier(tier: string): string {
+  const map: Record<string, string> = {
+    convention: "empirical",
+    practice: "empirical",
+    policy: "institutional",
+    frontier: "conjecture",
+  };
+  return map[tier] || tier;
+}
 
 export interface CreateTopicResult {
   topicId: string;
@@ -24,7 +36,7 @@ export async function createTopicRecord(
   db: DbClient,
   opts: { title: string; content: string; tier: string; canonicalClaim?: string }
 ): Promise<CreateTopicResult> {
-  const topicTier = VALID_TIERS.includes(opts.tier) ? opts.tier : "axiom";
+  const topicTier = canonicalizeTier(VALID_TIERS.includes(opts.tier) ? opts.tier : "axiom");
 
   const topicId = uuid();
   await db.execute({
@@ -158,7 +170,7 @@ export async function processAssumptions(
         assumptionTitle = dup.rows[0].title as string;
       } else {
         // Create new assumption topic
-        const tier = entry.tier && VALID_TIERS.includes(entry.tier) ? entry.tier : "axiom";
+        const tier = canonicalizeTier(entry.tier && VALID_TIERS.includes(entry.tier) ? entry.tier : "axiom");
         const created = await createTopicRecord(db, {
           title: cleanTitle,
           content: `This assumption was identified during consensus on a parent topic and needs independent verification.`,

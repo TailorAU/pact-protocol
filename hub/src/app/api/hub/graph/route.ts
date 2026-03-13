@@ -9,6 +9,7 @@ export async function GET() {
   // Get all topics with stats + consensus metadata
   const topics = await db.execute(`
     SELECT t.id, t.title, t.tier, t.status, t.locked_at, t.consensus_ratio, t.consensus_voters,
+      t.jurisdiction, t.authority, t.source_ref, t.last_verified_at,
       (SELECT COUNT(DISTINCT r.agent_id) FROM registrations r WHERE r.topic_id = t.id AND r.left_at IS NULL) as participantCount,
       (SELECT COUNT(*) FROM proposals p WHERE p.topic_id = t.id AND p.status = 'merged') as mergedCount,
       (SELECT COUNT(*) FROM proposals p WHERE p.topic_id = t.id AND p.status = 'pending') as pendingCount,

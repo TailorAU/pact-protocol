@@ -3,18 +3,28 @@ import { getTopicsList } from "@/lib/queries";
 
 const TIER_COLORS: Record<string, string> = {
   axiom: "text-pact-green border-pact-green/30",
+  empirical: "text-pact-cyan border-pact-cyan/30",
+  institutional: "text-amber-400 border-amber-400/30",
+  interpretive: "text-pact-purple border-pact-purple/30",
+  conjecture: "text-pact-red border-pact-red/30",
+  // Legacy fallbacks
   convention: "text-pact-cyan border-pact-cyan/30",
-  practice: "text-pact-orange border-pact-orange/30",
-  policy: "text-pact-purple border-pact-purple/30",
+  practice: "text-pact-cyan border-pact-cyan/30",
+  policy: "text-amber-400 border-amber-400/30",
   frontier: "text-pact-red border-pact-red/30",
 };
 
 const TIER_DESCRIPTIONS: Record<string, string> = {
-  axiom: "Fundamental facts — mathematical and physical constants",
-  convention: "Widely accepted standards and best practices",
-  practice: "Established patterns in software and AI engineering",
-  policy: "Governance rules requiring broader agreement",
-  frontier: "Open questions where consensus hasn't been reached yet",
+  axiom: "Universal, self-evident truths — math, logic, physics constants. True everywhere, always.",
+  empirical: "Scientific findings verified by experiment. True everywhere but refinable with new evidence.",
+  institutional: "Human-established facts — laws, regulations, standards. Scoped to jurisdiction and time.",
+  interpretive: "Court interpretations, policy opinions, contested readings. Multiple valid positions possible.",
+  conjecture: "Proposed but unverified claims. Open questions where consensus hasn't been reached.",
+  // Legacy fallbacks
+  convention: "Scientific findings verified by experiment.",
+  practice: "Established patterns verified by experiment.",
+  policy: "Human-established facts scoped to jurisdiction.",
+  frontier: "Proposed but unverified claims.",
 };
 
 type Topic = {
@@ -35,6 +45,12 @@ type Topic = {
   canonical_claim: string | null;
   blockingAssumptions: number;
   created_at: string;
+  jurisdiction: string | null;
+  authority: string | null;
+  source_ref: string | null;
+  effective_date: string | null;
+  expiry_date: string | null;
+  last_verified_at: string | null;
 };
 
 function statusLabel(topic: Topic): { text: string; className: string } {
@@ -96,7 +112,7 @@ export const revalidate = 15;
 export default async function TopicsPage() {
   const topics = (await getTopicsList({ limit: 200 })) as unknown as Topic[];
 
-  const tiers = ["axiom", "convention", "practice", "policy", "frontier"];
+  const tiers = ["axiom", "empirical", "institutional", "interpretive", "conjecture"];
 
   return (
     <div className="max-w-6xl mx-auto px-6 py-12">
@@ -139,6 +155,11 @@ export default async function TopicsPage() {
                         <span className={`text-xs px-2 py-0.5 rounded border shrink-0 ${TIER_COLORS[tier]}`}>
                           {tier}
                         </span>
+                        {topic.jurisdiction && (
+                          <span className="text-[10px] px-1.5 py-0.5 rounded border border-amber-400/30 text-amber-400 shrink-0">
+                            {topic.jurisdiction}
+                          </span>
+                        )}
                         <span className="font-medium truncate">{topic.title}</span>
                       </div>
                       <div className="flex items-center gap-4 text-pact-dim text-sm shrink-0">
@@ -156,6 +177,12 @@ export default async function TopicsPage() {
                           <span className="text-pact-red text-xs font-bold">&#9888; {topic.blockingAssumptions} blocking</span>
                         )}
                         <span className={status.className}>{status.text}</span>
+                        {topic.last_verified_at && (() => {
+                          const daysSince = Math.floor((Date.now() - new Date(topic.last_verified_at!).getTime()) / 86400000);
+                          return daysSince > 90 ? (
+                            <span className="text-pact-orange text-xs">⚠ Needs verification</span>
+                          ) : null;
+                        })()}
                         <span className="text-pact-dim/40 group-hover:text-pact-cyan transition-colors">&rarr;</span>
                       </div>
                     </div>

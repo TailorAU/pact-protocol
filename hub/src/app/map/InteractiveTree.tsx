@@ -19,26 +19,29 @@ export type TreeTopic = {
 // ── Tier colors (hex for SVG, tailwind for text) ──────────────────
 const TIER_HEX: Record<string, string> = {
   axiom: "#4ade80",
-  convention: "#22d3ee",
-  practice: "#fb923c",
-  policy: "#c084fc",
-  frontier: "#f87171",
+  empirical: "#22d3ee",
+  institutional: "#fbbf24",
+  interpretive: "#c084fc",
+  conjecture: "#f87171",
+  convention: "#22d3ee", practice: "#fb923c", policy: "#c084fc", frontier: "#f87171",
 };
 
 const TIER_COLORS: Record<string, string> = {
   axiom: "text-pact-green",
-  convention: "text-pact-cyan",
-  practice: "text-pact-orange",
-  policy: "text-pact-purple",
-  frontier: "text-pact-red",
+  empirical: "text-pact-cyan",
+  institutional: "text-amber-400",
+  interpretive: "text-pact-purple",
+  conjecture: "text-pact-red",
+  convention: "text-pact-cyan", practice: "text-pact-orange", policy: "text-pact-purple", frontier: "text-pact-red",
 };
 
 const TIER_BG: Record<string, string> = {
   axiom: "bg-pact-green/10 border-pact-green/20 hover:bg-pact-green/15",
-  convention: "bg-pact-cyan/10 border-pact-cyan/20 hover:bg-pact-cyan/15",
-  practice: "bg-pact-orange/10 border-pact-orange/20 hover:bg-pact-orange/15",
-  policy: "bg-pact-purple/10 border-pact-purple/20 hover:bg-pact-purple/15",
-  frontier: "bg-pact-red/10 border-pact-red/20 hover:bg-pact-red/15",
+  empirical: "bg-pact-cyan/10 border-pact-cyan/20 hover:bg-pact-cyan/15",
+  institutional: "bg-amber-400/10 border-amber-400/20 hover:bg-amber-400/15",
+  interpretive: "bg-pact-purple/10 border-pact-purple/20 hover:bg-pact-purple/15",
+  conjecture: "bg-pact-red/10 border-pact-red/20 hover:bg-pact-red/15",
+  convention: "bg-pact-cyan/10 border-pact-cyan/20 hover:bg-pact-cyan/15", practice: "bg-pact-orange/10 border-pact-orange/20 hover:bg-pact-orange/15", policy: "bg-pact-purple/10 border-pact-purple/20 hover:bg-pact-purple/15", frontier: "bg-pact-red/10 border-pact-red/20 hover:bg-pact-red/15",
 };
 
 const STATUS_ICON: Record<string, { char: string; cls: string }> = {
@@ -292,7 +295,7 @@ export default function InteractiveTree({ topics }: { topics: TreeTopic[] }) {
   }, [rows]);
 
   const svgW = GRAPH_PAD + (maxLane + 1) * LANE_W + 8;
-  const tiers = ["axiom", "convention", "practice", "policy", "frontier"];
+  const tiers = ["axiom", "empirical", "institutional", "interpretive", "conjecture"];
   const statuses = ["verified", "open", "proposed", "challenged"];
 
   return (
