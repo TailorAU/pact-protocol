@@ -1104,7 +1104,9 @@ export async function updateConsensusStatuses(db: DbClient) {
     const depsOkForBreaking = true; // TODO: Re-enable: tier === "axiom" || unmetDeps === 0;
 
     // Check if consensus has broken (alignment dropped, new pending proposals, or dependency lost)
-    if (alignmentRatio < CONSENSUS_RATIO || aligned < requiredAgents || pending > 0 || !depsOkForBreaking) {
+    // Skip break check if this was a bootstrap-forced consensus (no actual voters yet)
+    const wasForced = totalVoters === 0;
+    if (!wasForced && (alignmentRatio < CONSENSUS_RATIO || aligned < requiredAgents || pending > 0 || !depsOkForBreaking)) {
       // Consensus lost — reopen for debate
       await db.execute({
         sql: "UPDATE topics SET status = 'open', consensus_since = NULL, consensus_ratio = NULL, consensus_voters = NULL WHERE id = ?",
