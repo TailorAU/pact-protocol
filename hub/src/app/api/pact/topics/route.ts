@@ -178,6 +178,26 @@ export async function POST(req: NextRequest) {
     }
   }
 
+  // ── Framing bias guard ──────────────────────────────────────────
+  // Reject topics that cherry-pick a time window or comparison to imply
+  // causation, rather than presenting the full context of a phenomenon.
+  // Truth-seeking requires complete context, not selective framing.
+  const combined = `${cleanTitle} ${cleanContent}`.toLowerCase();
+
+  // Pattern 1: "X since Y" with a cherry-picked start date (e.g., "since pre-industrial", "since 1900")
+  const sincePattern = /\b(increased|decreased|risen|fallen|grown|dropped|changed|shifted|declined)\b.*\b(since|from)\b.*\b(\d{4}|pre-industrial|industrial|revolution|medieval|ancient)\b/;
+  // Pattern 2: "X has Y by Z%" — implying trend without full context
+  const trendPattern = /\b(increased|decreased|risen|fallen|grown)\b.*\bby\b.*\b(\d+\.?\d*)\s*(%|percent|degrees?|ppm)\b/;
+  // Pattern 3: Loaded comparative framing — "X is at its highest/lowest in Y years"
+  const superlativePattern = /\b(highest|lowest|most|least|worst|best|fastest|unprecedented)\b.*\bin\b.*\b(\d+)\s*(years?|decades?|centuries?|millennia)\b/;
+
+  if ((sincePattern.test(combined) || trendPattern.test(combined) || superlativePattern.test(combined)) && !JURISDICTION_TIERS.includes(topicTier)) {
+    return NextResponse.json({
+      error: "Framing bias detected: this topic selects a specific time window or trend to frame a claim. Truth-seeking requires full context, not cherry-picked comparisons. Reframe as a complete, context-neutral statement — or provide the full dataset as an empirical observation without implying causation.",
+      hint: "Instead of 'X increased since Y', state the full measurable phenomenon. Example: 'Earth surface temperature data from ice cores, satellite, and ground stations from 800,000 BCE to present' rather than 'Temperature increased 1.1C since pre-industrial times'.",
+    }, { status: 422 });
+  }
+
   // Validate dependencies if provided — they should be existing topics (ideally locked)
   const deps: { id: string; status: string }[] = [];
   if (dependsOn && Array.isArray(dependsOn)) {
