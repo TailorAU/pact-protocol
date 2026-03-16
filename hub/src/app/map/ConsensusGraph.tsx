@@ -55,6 +55,7 @@ type GraphNode = {
   label: string;
   tier?: string;
   status?: string;
+  domain?: string;
   val: number;
   color: string;
   emissive: string;
@@ -63,6 +64,9 @@ type GraphNode = {
   x?: number;
   y?: number;
   z?: number;
+  fx?: number;
+  fy?: number;
+  fz?: number;
 };
 
 type GraphLink = {
@@ -88,17 +92,59 @@ const TIER_COLORS: Record<string, string> = {
 };
 
 const TIER_ORDER = ["axiom", "empirical", "institutional", "interpretive", "conjecture"];
-const TIER_RADIUS: Record<string, number> = {
-  axiom: 40,
-  empirical: 100,
-  institutional: 160,
-  interpretive: 220,
-  conjecture: 280,
-  convention: 100,
-  practice: 160,
-  policy: 220,
-  frontier: 280,
+
+// Y axis: tier → vertical position (axioms at top, conjectures at bottom)
+const TIER_Y: Record<string, number> = {
+  axiom: 120,
+  empirical: 60,
+  institutional: 0,
+  interpretive: -60,
+  conjecture: -120,
+  convention: 60, practice: 0, policy: -60, frontier: -120,
 };
+
+// Domain detection: keyword → domain cluster
+const DOMAIN_KEYWORDS: Record<string, string[]> = {
+  mathematics: ["math", "theorem", "axiom", "proof", "algebra", "calculus", "geometry", "number", "set theory", "zfc", "induction", "hilbert", "godel", "goedel", "incompleteness", "excluded middle", "modus ponens", "non-contradiction", "identity", "probability", "variations", "prime", "collatz", "completeness"],
+  physics: ["relativity", "quantum", "energy", "light", "gravity", "gravitational", "thermodynamic", "conservation", "speed of light", "spacetime", "newton", "noether", "symmetr", "cosmolog", "big bang", "microwave background", "atomic", "covalent", "molecule"],
+  computing: ["turing", "halting", "computational", "algorithm", "cap theorem", "http", "tls", "quic", "church-turing", "machine learning", "language model", "prompt injection", "rlhf", "ai-generated", "ai system", "ai act", "owasp", "pci dss", "iso 27001", "nist", "cybersecurity"],
+  biology: ["dna", "mrna", "vaccine", "genome", "molecular biology", "human body", "temperature", "thermoregulation", "physiology", "clinical trial", "randomized controlled"],
+  law: ["constitution", "amendment", "article", "gdpr", "hipaa", "ccpa", "section 230", "sox", "fcra", "privacy", "charter", "refugee", "treaty", "parliamentary", "criminal code", "right to", "data protection", "human rights", "renounce", "war"],
+  economics: ["inflation", "currency", "purchasing power", "bitcoin", "ethereum", "proof-of-work", "proof-of-stake", "pricing", "price-fixing", "basel", "fatf", "fed", "reserve"],
+  standards: ["iso", "wcag", "accessibility", "si system", "units", "measurement", "pci", "soc"],
+  environment: ["co2", "carbon", "climate", "atmospheric", "surface temperature"],
+};
+
+// X-Z positions for each domain (spread in a meaningful ring)
+const DOMAIN_POSITIONS: Record<string, { x: number; z: number }> = {
+  mathematics: { x: -120, z: 0 },
+  physics: { x: -70, z: -100 },
+  computing: { x: 70, z: -100 },
+  biology: { x: 120, z: 0 },
+  law: { x: 70, z: 100 },
+  economics: { x: -70, z: 100 },
+  standards: { x: 0, z: -130 },
+  environment: { x: 0, z: 130 },
+  other: { x: 0, z: 0 },
+};
+
+function detectDomain(title: string): string {
+  const lower = title.toLowerCase();
+  let bestDomain = "other";
+  let bestScore = 0;
+
+  for (const [domain, keywords] of Object.entries(DOMAIN_KEYWORDS)) {
+    let score = 0;
+    for (const kw of keywords) {
+      if (lower.includes(kw)) score++;
+    }
+    if (score > bestScore) {
+      bestScore = score;
+      bestDomain = domain;
+    }
+  }
+  return bestDomain;
+}
 
 const AGENT_COLOR = "#6366f1";
 const LOCKED_GOLD = "#fbbf24";
@@ -112,6 +158,18 @@ const THRESHOLDS: Record<string, { ratio: number; minVoters: number }> = {
   practice: { ratio: 90, minVoters: 3 },
   policy: { ratio: 90, minVoters: 4 },
   frontier: { ratio: 90, minVoters: 5 },
+};
+
+const DOMAIN_COLORS: Record<string, string> = {
+  mathematics: "#4ade80",
+  physics: "#22d3ee",
+  computing: "#60a5fa",
+  biology: "#f472b6",
+  law: "#fbbf24",
+  economics: "#f97316",
+  standards: "#a78bfa",
+  environment: "#34d399",
+  other: "#6b7280",
 };
 
 // ── Component ──────────────────────────────────────────────────────
@@ -151,13 +209,29 @@ export default function ConsensusGraph() {
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const data = await res.json();
 
+        // Count topics per domain for offset within cluster
+        const domainCounts: Record<string, number> = {};
+
         const topicNodes: GraphNode[] = (data.topics as TopicNode[]).map((t) => {
           const isVerified = ["locked", "stable", "consensus"].includes(t.status);
           const isChallenged = t.status === "challenged";
           const tierColor = TIER_COLORS[t.tier] ?? "#6b7280";
-          // Always use tier color so the graph shows knowledge diversity; verified status shown via halo
           const baseColor = isChallenged ? CHALLENGED_RED : tierColor;
           const hasBounty = (t.bountyEscrow ?? 0) > 0;
+          const domain = detectDomain(t.title);
+
+          // Calculate deterministic position within domain cluster
+          const domainIdx = domainCounts[domain] ?? 0;
+          domainCounts[domain] = domainIdx + 1;
+          const domainPos = DOMAIN_POSITIONS[domain] ?? DOMAIN_POSITIONS.other;
+
+          // Spread within cluster: spiral pattern
+          const angle = domainIdx * 2.4; // golden angle in radians
+          const spread = 15 + domainIdx * 4;
+          const tierY = TIER_Y[t.tier] ?? 0;
+
+          // Consensus strength pushes nodes slightly forward (Z)
+          const consensusZ = isVerified ? 10 : 0;
 
           return {
             id: `topic-${t.id}`,
@@ -165,24 +239,18 @@ export default function ConsensusGraph() {
             label: t.title,
             tier: t.tier,
             status: t.status,
+            domain,
             val: 3 + Math.min(t.participantCount * 1.5, 12) + (hasBounty ? 3 : 0),
             color: baseColor,
             emissive: baseColor,
             emissiveIntensity: isVerified ? 0.4 : isChallenged ? 0.35 : hasBounty ? 0.3 : 0.2,
             data: t,
+            // Set initial positions — force sim will nudge from here
+            x: domainPos.x + Math.cos(angle) * spread,
+            y: tierY + Math.sin(angle) * spread * 0.5,
+            z: domainPos.z + Math.sin(angle) * spread + consensusZ,
           };
         });
-
-        const agentNodes: GraphNode[] = (data.agents as AgentNode[]).map((a) => ({
-          id: `agent-${a.id}`,
-          type: "agent" as const,
-          label: a.name,
-          val: 0.8,
-          color: AGENT_COLOR,
-          emissive: AGENT_COLOR,
-          emissiveIntensity: 0.2,
-          data: a,
-        }));
 
         const depLinks: GraphLink[] = ((data.dependencies ?? []) as DepData[]).map((d) => {
           const isAssumes = d.relationship === "assumes";
@@ -198,11 +266,6 @@ export default function ConsensusGraph() {
             curvature: isAssumes ? 0.2 : 0,
           };
         });
-
-        // Skip registration links — with 68 agents × 97 topics = 1460 links,
-        // they overwhelm the force simulation and clump everything together.
-        // Only show dependency links which reveal the knowledge structure.
-        const regLinks: GraphLink[] = [];
 
         setGraphData({
           nodes: [...topicNodes],
@@ -231,9 +294,9 @@ export default function ConsensusGraph() {
         if (bloomAdded.current) return;
         const bloomPass = new UnrealBloomPass(
           new THREE.Vector2(dimensions.width, dimensions.height),
-          0.6,  // strength (was 1.8 — way too bright with many verified nodes)
+          0.6,  // strength
           0.4,  // radius
-          0.3   // threshold (was 0.05 — now only bright nodes bloom)
+          0.3   // threshold
         );
         fg.postProcessingComposer().addPass(bloomPass);
         bloomAdded.current = true;
@@ -242,48 +305,77 @@ export default function ConsensusGraph() {
       console.warn("Bloom postprocessing not available");
     }
 
-    // Camera zoom-in animation
-    fg.cameraPosition({ z: 900 }, undefined, 0);
+    // Camera: start from above-right, looking toward center, showing the tier layers
+    fg.cameraPosition({ x: 200, y: 180, z: 350 }, { x: 0, y: 0, z: 0 }, 0);
     setTimeout(() => {
-      fg.cameraPosition({ z: 600 }, undefined, 2000);
+      fg.cameraPosition({ x: 150, y: 100, z: 280 }, { x: 0, y: 0, z: 0 }, 2000);
     }, 300);
 
-    // Add ambient + point lights for emissive materials
+    // Lighting
     const scene = fg.scene();
     if (scene) {
       const ambientLight = new THREE.AmbientLight(0x404040, 2);
       scene.add(ambientLight);
-      const pointLight = new THREE.PointLight(0xffffff, 1.5, 600);
-      pointLight.position.set(0, 0, 200);
+      const pointLight = new THREE.PointLight(0xffffff, 1.5, 800);
+      pointLight.position.set(100, 200, 300);
       scene.add(pointLight);
+
+      // Add faint grid lines to show tier planes
+      const gridMaterial = new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.03 });
+      for (const [tier, y] of Object.entries(TIER_Y)) {
+        if (["convention", "practice", "policy", "frontier"].includes(tier)) continue;
+        const points = [];
+        const size = 200;
+        // Circular ring at each tier level
+        for (let i = 0; i <= 64; i++) {
+          const a = (i / 64) * Math.PI * 2;
+          points.push(new THREE.Vector3(Math.cos(a) * size, y, Math.sin(a) * size));
+        }
+        const geometry = new THREE.BufferGeometry().setFromPoints(points);
+        scene.add(new THREE.Line(geometry, gridMaterial));
+      }
     }
   }, [graphData, dimensions]);
 
-  // Custom d3 forces — radial per tier
+  // Custom d3 forces — structured layout
   useEffect(() => {
     if (!fgRef.current || !graphData || graphData.nodes.length === 0) return;
     const fg = fgRef.current;
 
-    // Charge: topics repel strongly, agents weakly
+    // Gentle charge — don't blow nodes apart
     fg.d3Force("charge")?.strength((node: GraphNode) =>
-      node.type === "topic" ? -400 : -20
+      node.type === "topic" ? -80 : -10
     );
 
-    // Link distance: dependencies further apart, registrations closer
+    // Link distance: dependencies create visible arcs
     fg.d3Force("link")?.distance((link: GraphLink) =>
-      link.type === "dependency" ? 120 : 50
+      link.type === "dependency" ? 80 : 40
     );
 
-    // Radial force: pull topics toward their tier orbit
-    import("d3-force-3d").then((d3) => {
-      if (d3.forceRadial) {
-        fg.d3Force("radial", d3.forceRadial(
-          (node: GraphNode) => node.type === "topic" ? (TIER_RADIUS[node.tier ?? "practice"] ?? 160) : 340,
-          0, 0, 0
-        ).strength((node: GraphNode) => node.type === "topic" ? 0.3 : 0.05));
-      }
+    // Custom Y force: pull nodes toward their tier's Y level
+    import("d3-force-3d").then((d3: any) => { // eslint-disable-line @typescript-eslint/no-explicit-any
+      // Y force: tier stratification (axioms top, conjectures bottom)
+      fg.d3Force("y", d3.forceY((node: GraphNode) => {
+        if (node.type !== "topic") return 0;
+        return TIER_Y[node.tier ?? "empirical"] ?? 0;
+      }).strength(0.15));
+
+      // X force: domain clustering
+      fg.d3Force("x", d3.forceX((node: GraphNode) => {
+        if (node.type !== "topic" || !node.domain) return 0;
+        return (DOMAIN_POSITIONS[node.domain] ?? DOMAIN_POSITIONS.other).x;
+      }).strength(0.08));
+
+      // Z force: domain clustering
+      fg.d3Force("z", d3.forceZ((node: GraphNode) => {
+        if (node.type !== "topic" || !node.domain) return 0;
+        return (DOMAIN_POSITIONS[node.domain] ?? DOMAIN_POSITIONS.other).z;
+      }).strength(0.08));
+
+      // Remove default center force — we want structured layout, not centering
+      fg.d3Force("center", null);
     }).catch(() => {
-      // d3-force-3d radial not available, skip
+      // d3-force-3d not available
     });
 
     fg.d3ReheatSimulation();
@@ -390,6 +482,7 @@ export default function ConsensusGraph() {
     const t = node.data as TopicNode;
     const ratio = t.totalProposals > 0 ? Math.round((t.mergedCount / t.totalProposals) * 100) : 0;
     const tierColor = TIER_COLORS[t.tier] ?? "#6b7280";
+    const domainColor = DOMAIN_COLORS[node.domain ?? "other"] ?? "#6b7280";
     const threshold = THRESHOLDS[t.tier] ?? THRESHOLDS.practice;
     const isVerified = ["locked", "stable", "consensus"].includes(t.status);
     const statusLabel = isVerified ? "VERIFIED" : t.status === "challenged" ? "CHALLENGED" : t.status.toUpperCase();
@@ -400,6 +493,7 @@ export default function ConsensusGraph() {
       <div style="font-weight:700;font-size:14px;margin-bottom:6px;color:${statusColor}">${t.title}</div>
       <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px">
         <span style="font-size:10px;padding:2px 6px;border-radius:4px;border:1px solid ${tierColor};color:${tierColor};text-transform:uppercase;font-weight:600">${t.tier}</span>
+        <span style="font-size:10px;padding:2px 6px;border-radius:4px;border:1px solid ${domainColor};color:${domainColor};text-transform:uppercase;font-weight:600">${node.domain ?? "other"}</span>
         <span style="font-size:11px;font-weight:700;color:${statusColor}">${statusLabel}</span>
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:2px 12px;font-size:11px">
@@ -425,8 +519,13 @@ export default function ConsensusGraph() {
 
   // Computed stats
   const stats = useMemo(() => {
-    if (!graphData) return { topics: 0, agents: 0, verified: 0, challenged: 0, open: 0, deps: 0 };
+    if (!graphData) return { topics: 0, agents: 0, verified: 0, challenged: 0, open: 0, deps: 0, domains: {} as Record<string, number> };
     const topics = graphData.nodes.filter(n => n.type === "topic");
+    const domains: Record<string, number> = {};
+    topics.forEach(n => {
+      const d = n.domain ?? "other";
+      domains[d] = (domains[d] ?? 0) + 1;
+    });
     return {
       topics: topics.length,
       agents: graphData.nodes.filter(n => n.type === "agent").length,
@@ -434,6 +533,7 @@ export default function ConsensusGraph() {
       challenged: topics.filter(n => n.status === "challenged").length,
       open: topics.filter(n => n.status === "open").length,
       deps: graphData.links.filter(l => l.type === "dependency").length,
+      domains,
     };
   }, [graphData]);
 
@@ -464,7 +564,6 @@ export default function ConsensusGraph() {
           <div className="w-32 h-32 rounded-full bg-gradient-to-br from-amber-500/20 via-cyan-500/10 to-purple-500/20 animate-pulse" />
           <div className="absolute inset-4 rounded-full bg-gradient-to-br from-amber-500/30 via-transparent to-cyan-500/20 animate-[pulse_3s_ease-in-out_infinite]" />
           <div className="absolute inset-8 rounded-full bg-gradient-to-br from-amber-500/40 via-transparent to-transparent animate-[pulse_2s_ease-in-out_infinite]" />
-          {/* Center dot */}
           <div className="absolute inset-[52px] rounded-full bg-amber-400/60" />
         </div>
 
@@ -529,18 +628,41 @@ export default function ConsensusGraph() {
         linkDirectionalParticleColor={((link: any) => link.particleColor) as any}
 
         // Performance
-        warmupTicks={150}
-        cooldownTicks={300}
+        warmupTicks={200}
+        cooldownTicks={400}
       />
       {/* eslint-enable @typescript-eslint/no-explicit-any */}
+
+      {/* ── Axis labels (floating) ── */}
+      <div className="absolute top-3 left-3 flex flex-col gap-1 text-[10px] text-white/30 pointer-events-none">
+        <div className="flex items-center gap-1.5">
+          <span className="text-white/50 font-semibold">Y</span>
+          <span>Axioms (top) → Conjectures (bottom)</span>
+        </div>
+        <div className="flex items-center gap-1.5">
+          <span className="text-white/50 font-semibold">XZ</span>
+          <span>Domain clusters</span>
+        </div>
+      </div>
+
+      {/* ── Tier labels on the right ── */}
+      <div className="absolute top-1/2 right-3 -translate-y-1/2 flex flex-col gap-6 text-[10px] pointer-events-none">
+        {TIER_ORDER.map((tier) => (
+          <div key={tier} className="flex items-center gap-1.5 capitalize">
+            <span className="w-2 h-2 rounded-full" style={{ backgroundColor: TIER_COLORS[tier] }} />
+            <span style={{ color: TIER_COLORS[tier], opacity: 0.7 }}>{tier}</span>
+          </div>
+        ))}
+      </div>
 
       {/* ── Legend overlay ── */}
       <div className="absolute bottom-3 left-3 right-3 flex flex-wrap items-center justify-between text-xs text-white/50 gap-y-2 pointer-events-none">
         <div className="flex items-center gap-3 flex-wrap">
-          {TIER_ORDER.map((tier) => (
-            <span key={tier} className="flex items-center gap-1 capitalize">
-              <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: TIER_COLORS[tier] }} />
-              <span style={{ color: TIER_COLORS[tier] }}>{tier}</span>
+          {Object.entries(stats.domains).sort((a, b) => b[1] - a[1]).slice(0, 6).map(([domain, count]) => (
+            <span key={domain} className="flex items-center gap-1 capitalize">
+              <span className="w-2 h-2 rounded-full" style={{ backgroundColor: DOMAIN_COLORS[domain] ?? "#6b7280" }} />
+              <span style={{ color: DOMAIN_COLORS[domain] ?? "#6b7280" }}>{domain}</span>
+              <span className="text-white/30">{count}</span>
             </span>
           ))}
           {stats.verified > 0 && (
@@ -552,36 +674,18 @@ export default function ConsensusGraph() {
               </span>
             </>
           )}
-          {stats.challenged > 0 && (
-            <>
-              <span className="text-white/20">|</span>
-              <span className="flex items-center gap-1 text-red-400">
-                <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: CHALLENGED_RED }} />
-                {stats.challenged} challenged
-              </span>
-            </>
-          )}
-          {stats.agents > 0 && (
-            <>
-              <span className="text-white/20">|</span>
-              <span className="flex items-center gap-1">
-                <span className="w-2 h-2 rounded-full" style={{ backgroundColor: AGENT_COLOR }} />
-                {stats.agents} agents
-              </span>
-            </>
-          )}
           {stats.deps > 0 && (
             <>
               <span className="text-white/20">|</span>
               <span className="flex items-center gap-1">
                 <span className="w-4 h-0.5 inline-block" style={{ backgroundColor: DEPENDENCY_GOLD }} />
-                {stats.deps} dependencies
+                {stats.deps} deps
               </span>
             </>
           )}
         </div>
         <div className="text-white/30">
-          Orbit · Zoom · Click nodes to explore
+          Orbit · Zoom · Click nodes
         </div>
       </div>
     </div>
