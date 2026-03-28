@@ -1,7 +1,0 @@
-{
-  "permissions": {
-    "allow": [
-      "Bash(ls -lh /c/Users/knoxh/pact/hub/*.db*)"
-    ]
-  }
-}
