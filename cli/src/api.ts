@@ -58,7 +58,7 @@ async function request<T = unknown>(
   return JSON.parse(text) as T;
 }
 
-// ── Core ────────────────────────────────────────────────────────
+// ── Agent Lifecycle ──────────────────────────────────────────────
 
 export async function join(
   docId: string,
@@ -88,80 +88,11 @@ export async function leave(docId: string): Promise<void> {
   await request(`/api/pact/${docId}/leave`, { method: 'DELETE' });
 }
 
-export async function getContent(
-  docId: string,
-): Promise<{ content: string; version: number }> {
-  return request(`/api/pact/${docId}/content`);
-}
-
-export async function getSections(docId: string): Promise<unknown[]> {
-  return request(`/api/pact/${docId}/sections`);
-}
-
-export async function createProposal(
-  docId: string,
-  sectionId: string,
-  newContent: string,
-  summary?: string,
-  reasoning?: string,
-): Promise<unknown> {
-  const body: Record<string, unknown> = { sectionId, newContent };
-  if (summary) body.summary = summary;
-  if (reasoning) body.reasoning = reasoning;
-  return request(`/api/pact/${docId}/proposals`, {
-    method: 'POST',
-    body: JSON.stringify(body),
-  });
-}
-
-export async function listProposals(
-  docId: string,
-  sectionId?: string,
-  status?: string,
-): Promise<unknown[]> {
-  const params = new URLSearchParams();
-  if (sectionId) params.set('sectionId', sectionId);
-  if (status) params.set('status', status);
-  const qs = params.toString() ? `?${params}` : '';
-  return request(`/api/pact/${docId}/proposals${qs}`);
-}
-
-export async function approveProposal(
-  docId: string,
-  proposalId: string,
-): Promise<void> {
-  await request(`/api/pact/${docId}/proposals/${proposalId}/approve`, { method: 'POST' });
-}
-
-export async function rejectProposal(
-  docId: string,
-  proposalId: string,
-  reason?: string,
-): Promise<void> {
-  await request(`/api/pact/${docId}/proposals/${proposalId}/reject`, {
-    method: 'POST',
-    body: reason ? JSON.stringify({ reason }) : undefined,
-  });
-}
-
-export async function objectToProposal(
-  docId: string,
-  proposalId: string,
-  reason: string,
-): Promise<void> {
-  await request(`/api/pact/${docId}/proposals/${proposalId}/object`, {
-    method: 'POST',
-    body: JSON.stringify({ reason }),
-  });
-}
-
-export async function listAgents(
-  docId: string,
-): Promise<unknown[]> {
+export async function listAgents(docId: string): Promise<unknown[]> {
   return request(`/api/pact/${docId}/agents`);
 }
 
-// ── ICS ─────────────────────────────────────────────────────────
+// ── Intent-Constraint-Salience ───────────────────────────────────
 
 export async function declareIntent(
   docId: string,
@@ -222,7 +153,20 @@ export async function getSalienceMap(docId: string): Promise<unknown> {
   return request(`/api/pact/${docId}/salience`);
 }
 
-// ── Polling & Events ────────────────────────────────────────────
+// ── Objection (silence = acceptance; only speak up to block) ─────
+
+export async function objectToProposal(
+  docId: string,
+  proposalId: string,
+  reason: string,
+): Promise<void> {
+  await request(`/api/pact/${docId}/proposals/${proposalId}/object`, {
+    method: 'POST',
+    body: JSON.stringify({ reason }),
+  });
+}
+
+// ── Polling & Events ─────────────────────────────────────────────
 
 export async function poll(
   docId: string,
@@ -250,7 +194,7 @@ export async function getEvents(
   return request(`/api/pact/${docId}/events${qs}`);
 }
 
-// ── Completion ──────────────────────────────────────────────────
+// ── Completion ───────────────────────────────────────────────────
 
 export async function signalDone(
   docId: string,
@@ -267,7 +211,7 @@ export async function listCompletions(docId: string): Promise<unknown[]> {
   return request(`/api/pact/${docId}/completions`);
 }
 
-// ── Locking ─────────────────────────────────────────────────────
+// ── Locking ──────────────────────────────────────────────────────
 
 export async function lockSection(
   docId: string,
@@ -289,7 +233,7 @@ export async function unlockSection(
   await request(`/api/pact/${docId}/sections/${sectionId}/lock`, { method: 'DELETE' });
 }
 
-// ── Escalation ──────────────────────────────────────────────────
+// ── Escalation ───────────────────────────────────────────────────
 
 export async function escalate(
   docId: string,

@@ -14,10 +14,10 @@ function errorResult(err: unknown) {
 
 const server = new McpServer({
   name: 'PACT Protocol',
-  version: '0.1.0',
+  version: '0.2.0',
 });
 
-// ── Agent Lifecycle ─────────────────────────────────────────────
+// ── Agent Lifecycle ──────────────────────────────────────────────
 
 server.tool(
   'pact_join',
@@ -72,132 +72,7 @@ server.tool(
   },
 );
 
-// ── Content ─────────────────────────────────────────────────────
-
-server.tool(
-  'pact_get',
-  'Read document content as Markdown.',
-  { documentId: z.string().describe('Document ID') },
-  async ({ documentId }) => {
-    try {
-      const result = await request(`/api/pact/${documentId}/content`);
-      return jsonResult(result);
-    } catch (err) { return errorResult(err); }
-  },
-);
-
-server.tool(
-  'pact_sections',
-  'List the document section tree with IDs.',
-  { documentId: z.string().describe('Document ID') },
-  async ({ documentId }) => {
-    try {
-      const result = await request(`/api/pact/${documentId}/sections`);
-      return jsonResult(result);
-    } catch (err) { return errorResult(err); }
-  },
-);
-
-// ── Proposals & Voting ──────────────────────────────────────────
-
-server.tool(
-  'pact_propose',
-  'Propose an edit to a document section.',
-  {
-    documentId: z.string().describe('Document ID'),
-    sectionId: z.string().describe('Target section ID'),
-    newContent: z.string().describe('New content for the section'),
-    summary: z.string().optional().describe('Summary of the change'),
-    reasoning: z.string().optional().describe('Detailed reasoning'),
-  },
-  async ({ documentId, sectionId, newContent, summary, reasoning }) => {
-    try {
-      const body: Record<string, unknown> = { sectionId, newContent };
-      if (summary) body.summary = summary;
-      if (reasoning) body.reasoning = reasoning;
-      const result = await request(`/api/pact/${documentId}/proposals`, {
-        method: 'POST',
-        body: JSON.stringify(body),
-      });
-      return jsonResult(result);
-    } catch (err) { return errorResult(err); }
-  },
-);
-
-server.tool(
-  'pact_proposals',
-  'List proposals for a document.',
-  {
-    documentId: z.string().describe('Document ID'),
-    sectionId: z.string().optional().describe('Filter by section'),
-    status: z.string().optional().describe('Filter by status'),
-  },
-  async ({ documentId, sectionId, status }) => {
-    try {
-      const params = new URLSearchParams();
-      if (sectionId) params.set('sectionId', sectionId);
-      if (status) params.set('status', status);
-      const qs = params.toString() ? `?${params}` : '';
-      const result = await request(`/api/pact/${documentId}/proposals${qs}`);
-      return jsonResult(result);
-    } catch (err) { return errorResult(err); }
-  },
-);
-
-server.tool(
-  'pact_approve',
-  'Approve a proposal.',
-  {
-    documentId: z.string().describe('Document ID'),
-    proposalId: z.string().describe('Proposal ID'),
-  },
-  async ({ documentId, proposalId }) => {
-    try {
-      await request(`/api/pact/${documentId}/proposals/${proposalId}/approve`, { method: 'POST' });
-      return jsonResult({ status: 'approved', proposalId });
-    } catch (err) { return errorResult(err); }
-  },
-);
-
-server.tool(
-  'pact_reject',
-  'Reject a proposal.',
-  {
-    documentId: z.string().describe('Document ID'),
-    proposalId: z.string().describe('Proposal ID'),
-    reason: z.string().optional().describe('Reason for rejection'),
-  },
-  async ({ documentId, proposalId, reason }) => {
-    try {
-      await request(`/api/pact/${documentId}/proposals/${proposalId}/reject`, {
-        method: 'POST',
-        body: reason ? JSON.stringify({ reason }) : undefined,
-      });
-      return jsonResult({ status: 'rejected', proposalId });
-    } catch (err) { return errorResult(err); }
-  },
-);
-
-server.tool(
-  'pact_object',
-  'Object to a proposal with a reason.',
-  {
-    documentId: z.string().describe('Document ID'),
-    proposalId: z.string().describe('Proposal ID'),
-    reason: z.string().describe('Reason for objection'),
-  },
-  async ({ documentId, proposalId, reason }) => {
-    try {
-      await request(`/api/pact/${documentId}/proposals/${proposalId}/object`, {
-        method: 'POST',
-        body: JSON.stringify({ reason }),
-      });
-      return jsonResult({ status: 'objected', proposalId });
-    } catch (err) { return errorResult(err); }
-  },
-);
-
-// ── Intent-Constraint-Salience ──────────────────────────────────
+// ── Intent-Constraint-Salience ───────────────────────────────────
 
 server.tool(
   'pact_intent',
@@ -262,11 +137,32 @@ server.tool(
   },
 );
 
-// ── Polling & Events ────────────────────────────────────────────
+// ── Objection (silence = acceptance; only speak up to block) ─────
+
+server.tool(
+  'pact_object',
+  'Object to a proposal — blocks auto-merge, forces renegotiation. Silence = acceptance; only call this when a proposal violates your constraints.',
+  {
+    documentId: z.string().describe('Document ID'),
+    proposalId: z.string().describe('Proposal ID'),
+    reason: z.string().describe('Why this violates your constraints'),
+  },
+  async ({ documentId, proposalId, reason }) => {
+    try {
+      await request(`/api/pact/${documentId}/proposals/${proposalId}/object`, {
+        method: 'POST',
+        body: JSON.stringify({ reason }),
+      });
+      return jsonResult({ status: 'objected', proposalId });
+    } catch (err) { return errorResult(err); }
+  },
+);
+
+// ── Polling & Events ─────────────────────────────────────────────
 
 server.tool(
   'pact_poll',
-  'Poll for new events since a cursor (stateless).',
+  'Poll for new events since a cursor (stateless). Returns proposals, objections, escalations, and completions.',
   {
     documentId: z.string().describe('Document ID'),
     since: z.string().optional().describe('Cursor to poll from'),
@@ -286,14 +182,14 @@ server.tool(
   },
 );
 
-// ── Completion ──────────────────────────────────────────────────
+// ── Completion ───────────────────────────────────────────────────
 
 server.tool(
   'pact_done',
   'Signal that this agent has completed its work.',
   {
     documentId: z.string().describe('Document ID'),
-    status: z.string().describe('Completion status (aligned, blocked, withdrawn)'),
+    status: z.string().describe('Completion status: aligned, blocked, or withdrawn'),
     summary: z.string().optional().describe('Summary of what was accomplished'),
   },
   async ({ documentId, status, summary }) => {
@@ -307,11 +203,11 @@ server.tool(
   },
 );
 
-// ── Locking ─────────────────────────────────────────────────────
+// ── Locking ──────────────────────────────────────────────────────
 
 server.tool(
   'pact_lock',
-  'Lock a document section for exclusive editing.',
+  'Lock a section for exclusive coordination.',
   {
     documentId: z.string().describe('Document ID'),
     sectionId: z.string().describe('Section ID to lock'),
@@ -332,7 +228,7 @@ server.tool(
 
 server.tool(
   'pact_unlock',
-  'Unlock a document section.',
+  'Unlock a section.',
   {
     documentId: z.string().describe('Document ID'),
     sectionId: z.string().describe('Section ID to unlock'),
@@ -345,11 +241,11 @@ server.tool(
   },
 );
 
-// ── Escalation ──────────────────────────────────────────────────
+// ── Escalation ───────────────────────────────────────────────────
 
 server.tool(
   'pact_escalate',
-  'Escalate an issue to human reviewers.',
+  'Escalate an issue to human reviewers. Use when agents cannot reach consensus.',
   {
     documentId: z.string().describe('Document ID'),
     message: z.string().describe('Reason for escalation'),
@@ -368,7 +264,7 @@ server.tool(
   },
 );
 
-// ── Start ───────────────────────────────────────────────────────
+// ── Start ────────────────────────────────────────────────────────
 
 async function main(): Promise<void> {
   const transport = new StdioServerTransport();
