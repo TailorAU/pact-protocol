@@ -1,7 +1,0 @@
-User-agent: *
-Allow: /
-
-# Agent discovery
-# A2A Agent Card: /.well-known/agent-card.json
-# AI Plugin: /.well-known/ai-plugin.json
-# API Discovery: /api/pact/register (GET)
