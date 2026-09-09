@@ -1,0 +1,229 @@
+# Grid registry — Australia. Class-A structural records. See ../../schemas/grid.schema.json
+records:
+  - grid_id: grid:au-nem
+    name: National Electricity Market
+    kind: iso_rto
+    parent_grid: null
+    countries: [au]
+    frequency_hz: 50
+    timezone: Australia/Brisbane
+    operators:
+      - { name: Australian Energy Market Operator, role: market_operator }
+      - { name: Australian Energy Market Operator, role: system_operator }
+      - { name: Australian Energy Regulator, role: regulator }
+    market:
+      structure: gross pool, energy-only
+      price_mechanism: regional reference price, 5-minute settlement
+      dispatch_interval: 5min
+    interconnections: []
+    live_data:
+      availability: rich
+      notes: 5-minute public dispatch, price, demand and interconnector flow via NEMWEB
+      source_ids: [source:aemo:nemweb-dispatchis, source:aemo:nemweb-dispatch-scada, source:aemo:vis-nem-summary, source:openelectricity:api]
+    demand_range_mw: { min: 15000, max: 35000 }
+    sources: [source:aemo:vis-nem-summary, source:aemo:nem-registration-and-exemption-list]
+    notes: "Five regions (QLD1, NSW1, VIC1, SA1, TAS1); mainland is one of the world's longest synchronous systems; Tasmania is a synchronous island joined via Basslink HVDC; electrically isolated from the WEM/SWIS and NWIS."
+
+  - grid_id: grid:au-nem-qld1
+    name: NEM Queensland region (QLD1)
+    kind: regional_grid
+    parent_grid: grid:au-nem
+    countries: [au]
+    frequency_hz: 50
+    timezone: Australia/Brisbane
+    operators:
+      - { name: Powerlink Queensland, role: transmission_owner }
+    market: null
+    interconnections:
+      - { to_grid: grid:au-nem-nsw1, name: "Queensland-NSW Interconnector (QNI)", capacity_mw: 1200 }
+      - { to_grid: grid:au-nem-nsw1, name: "Terranora (Directlink) HVDC", capacity_mw: 210 }
+    live_data:
+      availability: rich
+      notes: per-region 5-minute dispatch, price and demand via NEMWEB
+      source_ids: [source:aemo:nemweb-dispatchis, source:openelectricity:api]
+    demand_range_mw: { min: 4500, max: 11000 }
+    sources: [source:aemo:vis-nem-summary]
+    notes: "Coal-heavy but fast-growing rooftop solar; CopperString will extend this region to Mount Isa in the 2030s."
+
+  - grid_id: grid:au-nem-nsw1
+    name: NEM New South Wales region (NSW1)
+    kind: regional_grid
+    parent_grid: grid:au-nem
+    countries: [au]
+    frequency_hz: 50
+    timezone: Australia/Sydney
+    operators:
+      - { name: Transgrid, role: transmission_owner }
+    market: null
+    interconnections:
+      - { to_grid: grid:au-nem-qld1, name: "Queensland-NSW Interconnector (QNI)", capacity_mw: 1200 }
+      - { to_grid: grid:au-nem-vic1, name: "Victoria-NSW Interconnector (VNI)", capacity_mw: 1600 }
+      - { to_grid: grid:au-nem-sa1, name: "Project EnergyConnect stage 1", capacity_mw: 150 }
+    live_data:
+      availability: rich
+      notes: per-region 5-minute dispatch, price and demand via NEMWEB
+      source_ids: [source:aemo:nemweb-dispatchis, source:openelectricity:api]
+    demand_range_mw: { min: 5500, max: 15000 }
+    sources: [source:aemo:vis-nem-summary]
+    notes: "Largest NEM region by demand; Snowy Hydro pumped storage; Project EnergyConnect to reach 800 MW when complete."
+
+  - grid_id: grid:au-nem-vic1
+    name: NEM Victoria region (VIC1)
+    kind: regional_grid
+    parent_grid: grid:au-nem
+    countries: [au]
+    frequency_hz: 50
+    timezone: Australia/Melbourne
+    operators:
+      - { name: AusNet Services, role: transmission_owner }
+    market: null
+    interconnections:
+      - { to_grid: grid:au-nem-nsw1, name: "Victoria-NSW Interconnector (VNI)", capacity_mw: 1600 }
+      - { to_grid: grid:au-nem-sa1, name: "Heywood Interconnector", capacity_mw: 650 }
+      - { to_grid: grid:au-nem-sa1, name: "Murraylink HVDC", capacity_mw: 220 }
+      - { to_grid: grid:au-nem-tas1, name: "Basslink HVDC", capacity_mw: 500 }
+    live_data:
+      availability: rich
+      notes: per-region 5-minute dispatch, price and demand via NEMWEB
+      source_ids: [source:aemo:nemweb-dispatchis, source:openelectricity:api]
+    demand_range_mw: { min: 3800, max: 10500 }
+    sources: [source:aemo:vis-nem-summary]
+    notes: "Brown-coal Latrobe Valley fleet retiring; hub for Basslink and planned Marinus Link to Tasmania."
+
+  - grid_id: grid:au-nem-sa1
+    name: NEM South Australia region (SA1)
+    kind: regional_grid
+    parent_grid: grid:au-nem
+    countries: [au]
+    frequency_hz: 50
+    timezone: Australia/Adelaide
+    operators:
+      - { name: ElectraNet, role: transmission_owner }
+    market: null
+    interconnections:
+      - { to_grid: grid:au-nem-vic1, name: "Heywood Interconnector", capacity_mw: 650 }
+      - { to_grid: grid:au-nem-vic1, name: "Murraylink HVDC", capacity_mw: 220 }
+      - { to_grid: grid:au-nem-nsw1, name: "Project EnergyConnect stage 1", capacity_mw: 150 }
+    live_data:
+      availability: rich
+      notes: per-region 5-minute dispatch, price and demand via NEMWEB
+      source_ids: [source:aemo:nemweb-dispatchis, source:openelectricity:api]
+    demand_range_mw: { min: 900, max: 3300 }
+    sources: [source:aemo:vis-nem-summary]
+    notes: "World-leading wind and solar share; regularly runs at very high instantaneous renewables; grid-forming batteries and synchronous condensers for strength."
+
+  - grid_id: grid:au-nem-tas1
+    name: NEM Tasmania region (TAS1)
+    kind: regional_grid
+    parent_grid: grid:au-nem
+    countries: [au]
+    frequency_hz: 50
+    timezone: Australia/Hobart
+    operators:
+      - { name: TasNetworks, role: transmission_owner }
+    market: null
+    interconnections:
+      - { to_grid: grid:au-nem-vic1, name: "Basslink HVDC", capacity_mw: 500 }
+    live_data:
+      availability: rich
+      notes: per-region 5-minute dispatch, price and demand via NEMWEB
+      source_ids: [source:aemo:nemweb-dispatchis, source:openelectricity:api]
+    demand_range_mw: { min: 900, max: 1900 }
+    sources: [source:aemo:vis-nem-summary]
+    notes: "Hydro-dominated synchronous island within the NEM, joined to Victoria only by Basslink HVDC; Marinus Link (750 MW stage 1) planned."
+
+  - grid_id: grid:au-wem
+    name: South West Interconnected System (WEM)
+    kind: isolated_grid
+    parent_grid: null
+    countries: [au]
+    frequency_hz: 50
+    timezone: Australia/Perth
+    operators:
+      - { name: Australian Energy Market Operator, role: market_operator }
+      - { name: Australian Energy Market Operator, role: system_operator }
+      - { name: Western Power, role: transmission_owner }
+      - { name: Economic Regulation Authority of WA, role: regulator }
+    market:
+      structure: energy market plus reserve capacity mechanism; security-constrained economic dispatch since the 2023 reforms
+      price_mechanism: marginal energy pricing with capacity credits
+      dispatch_interval: 5min
+    interconnections: []
+    live_data:
+      availability: rich
+      notes: 5-minute facility SCADA, prices, load and outage data published on the public WEM data portal
+      source_ids: [source:aemo:wem-data-portal, source:openelectricity:api]
+    demand_range_mw: { min: 1100, max: 4300 }
+    sources: [source:aemo:wem-data-portal]
+    notes: "The Wholesale Electricity Market runs on the SWIS serving Perth and south-west WA; electrically isolated from every other grid (nearest, the NEM, is ~2000 km away)."
+
+  - grid_id: grid:au-nwis
+    name: North West Interconnected System
+    kind: isolated_grid
+    parent_grid: null
+    countries: [au]
+    frequency_hz: 50
+    timezone: Australia/Perth
+    operators:
+      - { name: Pilbara ISOCo, role: system_operator }
+      - { name: Horizon Power, role: transmission_owner }
+      - { name: Alinta Energy, role: transmission_owner }
+      - { name: Rio Tinto, role: transmission_owner }
+    market:
+      structure: bilateral contracts under the light-handed Pilbara networks access regime; no pool
+      price_mechanism: null
+      dispatch_interval: null
+    interconnections: []
+    live_data:
+      availability: minimal
+      notes: no public operational feed; periodic Pilbara ISOCo and WA regulator reports only
+      source_ids: [source:wikidata:sparql]
+    demand_range_mw: null
+    sources: [source:wikidata:sparql]
+    notes: "Pilbara mining grid of interconnected private and state-owned networks (Horizon, Alinta, Rio Tinto, plus BHP/FMG assets nearby); Pilbara ISOCo is the appointed ISO with real-time coordination performed by Horizon Power; isolated from the SWIS."
+
+  - grid_id: grid:au-dkis
+    name: Darwin-Katherine Interconnected System
+    kind: isolated_grid
+    parent_grid: null
+    countries: [au]
+    frequency_hz: 50
+    timezone: Australia/Darwin
+    operators:
+      - { name: Power and Water Corporation, role: system_operator }
+      - { name: Northern Territory Electricity System and Market Operator, role: market_operator }
+      - { name: Utilities Commission of the Northern Territory, role: regulator }
+    market:
+      structure: interim NT wholesale market administered by NTESMO; Territory Generation dominant
+      price_mechanism: daily published market prices
+      dispatch_interval: null
+    interconnections: []
+    live_data:
+      availability: partial
+      notes: daily price, demand and trading publications from NTESMO; no real-time API
+      source_ids: [source:wikidata:sparql]
+    demand_range_mw: { min: 130, max: 300 }
+    sources: [source:wikidata:sparql]
+    notes: "Largest of the three regulated NT systems (others are Alice Springs and Tennant Creek); very high rooftop solar penetration; gas-fired backbone."
+
+  - grid_id: grid:au-mtisa
+    name: North West Power System (Mount Isa)
+    kind: isolated_grid
+    parent_grid: null
+    countries: [au]
+    frequency_hz: 50
+    timezone: Australia/Brisbane
+    operators:
+      - { name: Ergon Energy (Energy Queensland), role: transmission_owner }
+    market:
+      structure: bilateral contracts with mining loads; no organized market
+      price_mechanism: null
+      dispatch_interval: null
+    interconnections: []
+    live_data:
+      availability: none
+      notes: no public operational data; the real portal is Queensland government and AER periodic reporting
+      source_ids: []
+    demand_range_mw: null
+    sources: [source:wikidata:sparql]
+    notes: "Supplies the Mount Isa-Cloncurry mining district; generation dominated by APA Group's Diamantina gas-fired power station; CopperString transmission project (under construction, target early 2030s) will connect it to the NEM."

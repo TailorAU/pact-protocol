@@ -1,0 +1,129 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pact.tailor.au/intelligence/schemas/entity.schema.json",
+  "title": "Entity (class A structural)",
+  "description": "Structural entity envelope for the PACT.TAILOR intelligence graph.",
+  "type": "object",
+  "required": ["entity_id", "entity_type", "name", "data_class", "observability", "sources"],
+  "properties": {
+    "entity_id": { "$ref": "defs.schema.json#/$defs/entityId" },
+    "entity_type": { "$ref": "defs.schema.json#/$defs/entityType" },
+    "name": { "type": "string" },
+    "aliases": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "data_class": { "const": "structural" },
+    "observability": { "$ref": "defs.schema.json#/$defs/observability" },
+    "geometry": {
+      "anyOf": [
+        { "$ref": "geojson.schema.json#/$defs/geometry" },
+        { "type": "null" }
+      ]
+    },
+    "country": {
+      "anyOf": [
+        { "$ref": "defs.schema.json#/$defs/countryCode" },
+        { "type": "null" }
+      ]
+    },
+    "admin": {
+      "type": "object",
+      "properties": {
+        "region": { "type": "string" },
+        "locality": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "grid_id": {
+      "anyOf": [
+        { "$ref": "defs.schema.json#/$defs/entityId" },
+        { "type": "null" }
+      ]
+    },
+    "properties": {
+      "type": "object",
+      "description": "Per-entity-type properties; typed sub-schemas apply via the allOf conditionals below."
+    },
+    "external_ids": {
+      "type": "object",
+      "properties": {
+        "aemo_duid": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "aemo_station_id": { "type": "string" },
+        "aemo_region_id": { "type": "string" },
+        "entsoe_eic": { "type": "string" },
+        "eia_plant_code": { "type": "string" },
+        "gem_id": { "type": "string" },
+        "imo": { "type": "string" },
+        "mmsi": { "type": "string" },
+        "callsign": { "type": "string" },
+        "unlocode": { "type": "string" },
+        "abn": { "type": "string" },
+        "lei": { "type": "string" },
+        "wikidata_qid": { "type": "string" },
+        "osm_id": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "sources": {
+      "type": "array",
+      "items": { "$ref": "defs.schema.json#/$defs/sourceId" },
+      "minItems": 1
+    },
+    "valid_from": { "$ref": "defs.schema.json#/$defs/nullableTimestamp" },
+    "valid_to": { "$ref": "defs.schema.json#/$defs/nullableTimestamp" },
+    "notes": { "type": "string" },
+    "same_as": {
+      "anyOf": [
+        { "$ref": "defs.schema.json#/$defs/entityId" },
+        { "type": "null" }
+      ]
+    }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "entity_type": { "const": "Generator" } }, "required": ["entity_type"] },
+      "then": { "properties": { "properties": { "$ref": "entity-types/generator.properties.json" } } }
+    },
+    {
+      "if": { "properties": { "entity_type": { "const": "Interconnector" } }, "required": ["entity_type"] },
+      "then": { "properties": { "properties": { "$ref": "entity-types/interconnector.properties.json" } } }
+    },
+    {
+      "if": { "properties": { "entity_type": { "const": "Vessel" } }, "required": ["entity_type"] },
+      "then": { "properties": { "properties": { "$ref": "entity-types/vessel.properties.json" } } }
+    },
+    {
+      "if": { "properties": { "entity_type": { "const": "Port" } }, "required": ["entity_type"] },
+      "then": { "properties": { "properties": { "$ref": "entity-types/port.properties.json" } } }
+    },
+    {
+      "if": { "properties": { "entity_type": { "const": "Terminal" } }, "required": ["entity_type"] },
+      "then": { "properties": { "properties": { "$ref": "entity-types/terminal.properties.json" } } }
+    },
+    {
+      "if": { "properties": { "entity_type": { "const": "Smelter" } }, "required": ["entity_type"] },
+      "then": { "properties": { "properties": { "$ref": "entity-types/smelter.properties.json" } } }
+    },
+    {
+      "if": { "properties": { "entity_type": { "const": "Mine" } }, "required": ["entity_type"] },
+      "then": { "properties": { "properties": { "$ref": "entity-types/mine.properties.json" } } }
+    },
+    {
+      "if": { "properties": { "entity_type": { "const": "CoalMine" } }, "required": ["entity_type"] },
+      "then": { "properties": { "properties": { "$ref": "entity-types/mine.properties.json" } } }
+    },
+    {
+      "if": { "properties": { "entity_type": { "const": "Pipeline" } }, "required": ["entity_type"] },
+      "then": { "properties": { "properties": { "$ref": "entity-types/pipeline.properties.json" } } }
+    },
+    {
+      "if": { "properties": { "entity_type": { "const": "Grid" } }, "required": ["entity_type"] },
+      "then": { "properties": { "properties": { "$ref": "entity-types/grid.properties.json" } } }
+    }
+  ],
+  "additionalProperties": false
+}

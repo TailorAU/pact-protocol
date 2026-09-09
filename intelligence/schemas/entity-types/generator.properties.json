@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pact.tailor.au/intelligence/schemas/entity-types/generator.properties.json",
+  "title": "Generator properties",
+  "type": "object",
+  "properties": {
+    "fuel": {
+      "enum": ["coal", "gas", "hydro", "wind", "solar", "battery", "pumped-hydro", "diesel", "biomass", "nuclear", "other"]
+    },
+    "capacity_mw": { "type": "number" },
+    "technology": { "type": "string" },
+    "commissioned": { "type": "integer", "minimum": 1800, "maximum": 2200 },
+    "unit_count": { "type": "integer" },
+    "status": {
+      "enum": ["operating", "mothballed", "retired", "announced", "construction"]
+    }
+  },
+  "additionalProperties": true
+}

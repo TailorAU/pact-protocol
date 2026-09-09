@@ -1,0 +1,272 @@
+# Structural relationships — grid topology: regions, interconnectors, major loads.
+# See ../../../schemas/relationship.schema.json
+records:
+  - rel_id: rel:qld1-part-of-nem
+    rel_type: PART_OF
+    from_id: region:au-nem:qld1
+    to_id: grid:au-nem
+    confidence: 1.0
+    source: source:aemo:nem-registration-and-exemption-list
+    method: declared
+    valid_from: "1998-12-13T00:00:00Z"
+    valid_to: null
+    properties: {}
+
+  - rel_id: rel:nsw1-part-of-nem
+    rel_type: PART_OF
+    from_id: region:au-nem:nsw1
+    to_id: grid:au-nem
+    confidence: 1.0
+    source: source:aemo:nem-registration-and-exemption-list
+    method: declared
+    valid_from: "1998-12-13T00:00:00Z"
+    valid_to: null
+    properties: {}
+
+  - rel_id: rel:vic1-part-of-nem
+    rel_type: PART_OF
+    from_id: region:au-nem:vic1
+    to_id: grid:au-nem
+    confidence: 1.0
+    source: source:aemo:nem-registration-and-exemption-list
+    method: declared
+    valid_from: "1998-12-13T00:00:00Z"
+    valid_to: null
+    properties: {}
+
+  - rel_id: rel:sa1-part-of-nem
+    rel_type: PART_OF
+    from_id: region:au-nem:sa1
+    to_id: grid:au-nem
+    confidence: 1.0
+    source: source:aemo:nem-registration-and-exemption-list
+    method: declared
+    valid_from: "1998-12-13T00:00:00Z"
+    valid_to: null
+    properties: {}
+
+  - rel_id: rel:tas1-part-of-nem
+    rel_type: PART_OF
+    from_id: region:au-nem:tas1
+    to_id: grid:au-nem
+    confidence: 1.0
+    source: source:aemo:nem-registration-and-exemption-list
+    method: declared
+    valid_from: "2005-05-29T00:00:00Z"
+    valid_to: null
+    properties: { note: Tasmania joined the NEM in 2005, physically linked from 2006 via Basslink }
+
+  - rel_id: rel:qni-interconnects-nsw1
+    rel_type: INTERCONNECTED_WITH
+    from_id: intercon:au-nem:qni
+    to_id: region:au-nem:nsw1
+    confidence: 1.0
+    source: source:aemo:nem-registration-and-exemption-list
+    method: declared
+    valid_from: "2001-02-01T00:00:00Z"
+    valid_to: null
+    properties: { capacity_mw_into_region: 1078, capacity_mw_out_of_region: 600 }
+
+  - rel_id: rel:qni-interconnects-qld1
+    rel_type: INTERCONNECTED_WITH
+    from_id: intercon:au-nem:qni
+    to_id: region:au-nem:qld1
+    confidence: 1.0
+    source: source:aemo:nem-registration-and-exemption-list
+    method: declared
+    valid_from: "2001-02-01T00:00:00Z"
+    valid_to: null
+    properties: { capacity_mw_into_region: 600, capacity_mw_out_of_region: 1078 }
+
+  - rel_id: rel:terranora-interconnects-nsw1
+    rel_type: INTERCONNECTED_WITH
+    from_id: intercon:au-nem:terranora
+    to_id: region:au-nem:nsw1
+    confidence: 1.0
+    source: source:aemo:nem-registration-and-exemption-list
+    method: declared
+    valid_from: "2000-07-01T00:00:00Z"
+    valid_to: null
+    properties: { capacity_mw_into_region: 180, capacity_mw_out_of_region: 180 }
+
+  - rel_id: rel:terranora-interconnects-qld1
+    rel_type: INTERCONNECTED_WITH
+    from_id: intercon:au-nem:terranora
+    to_id: region:au-nem:qld1
+    confidence: 1.0
+    source: source:aemo:nem-registration-and-exemption-list
+    method: declared
+    valid_from: "2000-07-01T00:00:00Z"
+    valid_to: null
+    properties: { capacity_mw_into_region: 180, capacity_mw_out_of_region: 180 }
+
+  - rel_id: rel:vni-interconnects-vic1
+    rel_type: INTERCONNECTED_WITH
+    from_id: intercon:au-nem:vni
+    to_id: region:au-nem:vic1
+    confidence: 1.0
+    source: source:aemo:nem-registration-and-exemption-list
+    method: declared
+    valid_from: "1998-12-13T00:00:00Z"
+    valid_to: null
+    properties: { capacity_mw_into_region: 1350, capacity_mw_out_of_region: 1600 }
+
+  - rel_id: rel:vni-interconnects-nsw1
+    rel_type: INTERCONNECTED_WITH
+    from_id: intercon:au-nem:vni
+    to_id: region:au-nem:nsw1
+    confidence: 1.0
+    source: source:aemo:nem-registration-and-exemption-list
+    method: declared
+    valid_from: "1998-12-13T00:00:00Z"
+    valid_to: null
+    properties: { capacity_mw_into_region: 1600, capacity_mw_out_of_region: 1350 }
+
+  - rel_id: rel:murraylink-interconnects-vic1
+    rel_type: INTERCONNECTED_WITH
+    from_id: intercon:au-nem:murraylink
+    to_id: region:au-nem:vic1
+    confidence: 1.0
+    source: source:aemo:nem-registration-and-exemption-list
+    method: declared
+    valid_from: "2002-10-01T00:00:00Z"
+    valid_to: null
+    properties: { capacity_mw_into_region: 200, capacity_mw_out_of_region: 220 }
+
+  - rel_id: rel:murraylink-interconnects-sa1
+    rel_type: INTERCONNECTED_WITH
+    from_id: intercon:au-nem:murraylink
+    to_id: region:au-nem:sa1
+    confidence: 1.0
+    source: source:aemo:nem-registration-and-exemption-list
+    method: declared
+    valid_from: "2002-10-01T00:00:00Z"
+    valid_to: null
+    properties: { capacity_mw_into_region: 220, capacity_mw_out_of_region: 200 }
+
+  - rel_id: rel:heywood-interconnects-vic1
+    rel_type: INTERCONNECTED_WITH
+    from_id: intercon:au-nem:heywood
+    to_id: region:au-nem:vic1
+    confidence: 1.0
+    source: source:aemo:nem-registration-and-exemption-list
+    method: declared
+    valid_from: "1998-12-13T00:00:00Z"
+    valid_to: null
+    properties: { capacity_mw_into_region: 650, capacity_mw_out_of_region: 650 }
+
+  - rel_id: rel:heywood-interconnects-sa1
+    rel_type: INTERCONNECTED_WITH
+    from_id: intercon:au-nem:heywood
+    to_id: region:au-nem:sa1
+    confidence: 1.0
+    source: source:aemo:nem-registration-and-exemption-list
+    method: declared
+    valid_from: "1998-12-13T00:00:00Z"
+    valid_to: null
+    properties: { capacity_mw_into_region: 650, capacity_mw_out_of_region: 650 }
+
+  - rel_id: rel:basslink-interconnects-tas1
+    rel_type: INTERCONNECTED_WITH
+    from_id: intercon:au-nem:basslink
+    to_id: region:au-nem:tas1
+    confidence: 1.0
+    source: source:aemo:nem-registration-and-exemption-list
+    method: declared
+    valid_from: "2006-04-29T00:00:00Z"
+    valid_to: null
+    properties:
+      capacity_mw_into_region: 478
+      capacity_mw_out_of_region: 500
+      note: APA-owned; converted from market network service to regulated (prescribed) transmission service, regulated operation from July 2026 (AER final decision June 2025)
+
+  - rel_id: rel:basslink-interconnects-vic1
+    rel_type: INTERCONNECTED_WITH
+    from_id: intercon:au-nem:basslink
+    to_id: region:au-nem:vic1
+    confidence: 1.0
+    source: source:aemo:nem-registration-and-exemption-list
+    method: declared
+    valid_from: "2006-04-29T00:00:00Z"
+    valid_to: null
+    properties:
+      capacity_mw_into_region: 500
+      capacity_mw_out_of_region: 478
+      note: up to ~630 MW short-term TAS->VIC
+
+  - rel_id: rel:boyne-island-consumes-qld1
+    rel_type: CONSUMES
+    from_id: smelter:au-qld:boyne-island
+    to_id: region:au-nem:qld1
+    confidence: 0.95
+    source: source:wikidata:sparql
+    method: derived
+    valid_from: "1982-01-01T00:00:00Z"
+    valid_to: null
+    properties: { load_mw: 950, note: largest single load in QLD1; supplied predominantly via Gladstone PS contracts to March 2029 }
+
+  - rel_id: rel:tomago-consumes-nsw1
+    rel_type: CONSUMES
+    from_id: smelter:au-nsw:tomago
+    to_id: region:au-nem:nsw1
+    confidence: 0.95
+    source: source:wikidata:sparql
+    method: derived
+    valid_from: "1983-01-01T00:00:00Z"
+    valid_to: null
+    properties: { load_mw: 950, note: about 10% of NSW demand; AGL is the current contracted supplier }
+
+  - rel_id: rel:qal-consumes-qld1
+    rel_type: CONSUMES
+    from_id: refinery:au-qld:qal
+    to_id: region:au-nem:qld1
+    confidence: 0.9
+    source: source:wikidata:sparql
+    method: derived
+    valid_from: "1967-01-01T00:00:00Z"
+    valid_to: null
+    properties: { note: large steam/electricity demand; partly self-supplied on site }
+
+  - rel_id: rel:yarwun-consumes-qld1
+    rel_type: CONSUMES
+    from_id: refinery:au-qld:yarwun
+    to_id: region:au-nem:qld1
+    confidence: 0.9
+    source: source:wikidata:sparql
+    method: derived
+    valid_from: "2004-01-01T00:00:00Z"
+    valid_to: null
+    properties: { note: has on-site gas cogeneration; net grid position varies }
+
+  - rel_id: rel:orica-yarwun-consumes-qld1
+    rel_type: CONSUMES
+    from_id: chem:au-qld:orica-yarwun
+    to_id: region:au-nem:qld1
+    confidence: 0.85
+    source: source:wikidata:sparql
+    method: derived
+    valid_from: "1990-01-01T00:00:00Z"
+    valid_to: null
+    properties: {}
+
+  - rel_id: rel:port-kembla-consumes-nsw1
+    rel_type: CONSUMES
+    from_id: steel:au-nsw:port-kembla
+    to_id: region:au-nem:nsw1
+    confidence: 0.9
+    source: source:wikidata:sparql
+    method: derived
+    valid_from: null
+    valid_to: null
+    properties: { note: integrated steelworks; significant on-site generation from process gases }
+
+  - rel_id: rel:sydney-dc-cluster-consumes-nsw1
+    rel_type: CONSUMES
+    from_id: dc:au-nsw:sydney-metro-cluster
+    to_id: region:au-nem:nsw1
+    confidence: 0.9
+    source: source:wikidata:sparql
+    method: derived
+    valid_from: null
+    valid_to: null
+    properties: { load_mw: 1100, note: aggregate estimate; fastest-growing large load in NSW1 }

@@ -1,0 +1,174 @@
+# Structural seed — commodities, export destinations and demand markets.
+# See ../../../schemas/entity.schema.json
+records:
+  - entity_id: commodity:coal-thermal
+    entity_type: Commodity
+    name: Thermal Coal
+    aliases: [steam coal]
+    data_class: structural
+    observability: UNCLASSIFIED
+    geometry: null
+    country: null
+    grid_id: null
+    properties: { benchmark: Newcastle 6000 kcal (GCNewc), unit: tonne }
+    external_ids: {}
+    sources: [source:wikidata:sparql]
+    notes: Power-station coal; Australian benchmark is the Newcastle 6,000 kcal/kg spot assessment.
+
+  - entity_id: commodity:coal-metallurgical
+    entity_type: Commodity
+    name: Metallurgical Coal
+    aliases: [coking coal, met coal]
+    data_class: structural
+    observability: UNCLASSIFIED
+    geometry: null
+    country: null
+    grid_id: null
+    properties: { benchmark: Premium Low-Vol HCC FOB Australia, unit: tonne }
+    external_ids: {}
+    sources: [source:wikidata:sparql]
+    notes: Steelmaking coal (hard coking, semi-soft, PCI); Bowen Basin is the world's dominant seaborne source.
+
+  - entity_id: commodity:lng
+    entity_type: Commodity
+    name: Liquefied Natural Gas
+    aliases: [LNG]
+    data_class: structural
+    observability: UNCLASSIFIED
+    geometry: null
+    country: null
+    grid_id: null
+    properties: { benchmark: JKM / oil-linked term contracts, unit: tonne }
+    external_ids: {}
+    sources: [source:wikidata:sparql]
+    notes: Curtis Island exports are mostly oil-linked term volumes with spot cargoes at the margin.
+
+  - entity_id: commodity:alumina
+    entity_type: Commodity
+    name: Alumina
+    aliases: [aluminium oxide]
+    data_class: structural
+    observability: UNCLASSIFIED
+    geometry: null
+    country: null
+    grid_id: null
+    properties: { benchmark: Platts Alumina Index FOB Australia, unit: tonne }
+    external_ids: {}
+    sources: [source:wikidata:sparql]
+    notes: Intermediate refined from bauxite; ~2 t alumina per tonne of aluminium.
+
+  - entity_id: commodity:aluminium
+    entity_type: Commodity
+    name: Aluminium
+    aliases: [primary aluminium]
+    data_class: structural
+    observability: UNCLASSIFIED
+    geometry: null
+    country: null
+    grid_id: null
+    properties: { benchmark: LME aluminium, unit: tonne }
+    external_ids: {}
+    sources: [source:wikidata:sparql]
+    notes: Electricity-intensive primary metal (~14 MWh/t); Boyne Island and Tomago are the NEM's two smelters.
+
+  - entity_id: commodity:bauxite
+    entity_type: Commodity
+    name: Bauxite
+    aliases: []
+    data_class: structural
+    observability: UNCLASSIFIED
+    geometry: null
+    country: null
+    grid_id: null
+    properties: { unit: tonne }
+    external_ids: {}
+    sources: [source:wikidata:sparql]
+    notes: Aluminium ore; Rio Tinto ships Weipa (Cape York) bauxite to the Gladstone refineries.
+
+  - entity_id: dest:jp
+    entity_type: Destination
+    name: Japan
+    aliases: []
+    data_class: structural
+    observability: UNCLASSIFIED
+    geometry: { type: Point, coordinates: [138.25, 36.2] }
+    country: jp
+    grid_id: null
+    properties: { role: export destination }
+    external_ids: {}
+    sources: [source:wikidata:sparql]
+    notes: Largest long-term buyer of Australian metallurgical coal and LNG; major aluminium importer.
+
+  - entity_id: dest:kr
+    entity_type: Destination
+    name: South Korea
+    aliases: [Republic of Korea]
+    data_class: structural
+    observability: UNCLASSIFIED
+    geometry: { type: Point, coordinates: [127.8, 36.5] }
+    country: kr
+    grid_id: null
+    properties: { role: export destination }
+    external_ids: {}
+    sources: [source:wikidata:sparql]
+    notes: Major buyer of Australian coal, LNG (KOGAS is a GLNG partner) and aluminium.
+
+  - entity_id: dest:cn
+    entity_type: Destination
+    name: China
+    aliases: [People's Republic of China]
+    data_class: structural
+    observability: UNCLASSIFIED
+    geometry: { type: Point, coordinates: [104.2, 35.9] }
+    country: cn
+    grid_id: null
+    properties: { role: export destination }
+    external_ids: {}
+    sources: [source:wikidata:sparql]
+    notes: Dominant LNG destination for QCLNG/APLNG term volumes (CNOOC, Sinopec); coal flows resumed after the 2020-23 informal ban.
+
+  - entity_id: dest:tw
+    entity_type: Destination
+    name: Taiwan
+    aliases: []
+    data_class: structural
+    observability: UNCLASSIFIED
+    geometry: { type: Point, coordinates: [121.0, 23.7] }
+    country: tw
+    grid_id: null
+    properties: { role: export destination }
+    external_ids: {}
+    sources: [source:wikidata:sparql]
+    notes: Steady buyer of Australian thermal and metallurgical coal.
+
+  - entity_id: dest:in
+    entity_type: Destination
+    name: India
+    aliases: []
+    data_class: structural
+    observability: UNCLASSIFIED
+    geometry: { type: Point, coordinates: [78.96, 20.59] }
+    country: in
+    grid_id: null
+    properties: { role: export destination }
+    external_ids: {}
+    sources: [source:wikidata:sparql]
+    notes: Largest growth buyer of Australian metallurgical coal for its expanding steel sector.
+
+  - entity_id: market:jp:steel
+    entity_type: Market
+    name: Japanese Steel Industry
+    aliases: [Japan steel market]
+    data_class: structural
+    observability: ESTIMATED
+    geometry: { type: Point, coordinates: [139.7, 35.7] }
+    country: jp
+    grid_id: null
+    properties:
+      demand_note: ~85 Mtpa crude steel (Nippon Steel, JFE, Kobe); blast-furnace route drives coking coal imports
+    external_ids: {}
+    sources: [source:wikidata:sparql]
+    notes: >-
+      Demand-side market entity for the metallurgical coal chain. Nippon Steel and JFE's 2025 equity entry
+      into the Blackwater mine makes the structural linkage explicit. Monthly output visible via public
+      steel statistics.

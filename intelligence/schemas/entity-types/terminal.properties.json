@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pact.tailor.au/intelligence/schemas/entity-types/terminal.properties.json",
+  "title": "Terminal properties",
+  "type": "object",
+  "properties": {
+    "commodities": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "nameplate_mtpa": { "type": "number" }
+  },
+  "additionalProperties": true
+}

@@ -1,0 +1,119 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pact.tailor.au/intelligence/schemas/defs.schema.json",
+  "title": "Shared definitions",
+  "description": "Common $defs shared by all PACT.TAILOR intelligence schemas.",
+  "$defs": {
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp"
+    },
+    "nullableTimestamp": {
+      "anyOf": [
+        { "$ref": "#/$defs/timestamp" },
+        { "type": "null" }
+      ]
+    },
+    "confidence": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1,
+      "description": "Confidence in [0, 1]"
+    },
+    "entityId": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9]*:[a-z0-9][a-z0-9-]*(:[a-z0-9][a-z0-9-]*)?$",
+      "description": "typeCode:namespace[:slug]"
+    },
+    "relId": {
+      "type": "string",
+      "pattern": "^rel:[a-z0-9][a-z0-9-]*$"
+    },
+    "sourceId": {
+      "type": "string",
+      "pattern": "^source:[a-z0-9-]+:[a-z0-9-]+$"
+    },
+    "gapId": {
+      "type": "string",
+      "pattern": "^gap:[a-z0-9-]+:[a-z0-9-]+$"
+    },
+    "feedId": {
+      "type": "string",
+      "pattern": "^feed:[a-z0-9-]+:[a-z0-9-]+(:[a-z0-9-]+)?$"
+    },
+    "inferenceId": {
+      "type": "string",
+      "pattern": "^infer:[0-9]{4}-[0-9]{2}-[0-9]{2}:[a-z0-9][a-z0-9-]*$"
+    },
+    "ulid": {
+      "type": "string",
+      "pattern": "^[0-7][0-9A-HJKMNP-TV-Z]{25}$",
+      "description": "ULID (Crockford base32, 26 chars)"
+    },
+    "metric": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]*(\\.[a-z0-9_]+)+$",
+      "description": "Dotted lowercase metric name, e.g. power.output.mw"
+    },
+    "countryCode": {
+      "type": "string",
+      "pattern": "^[a-z]{2}$",
+      "description": "ISO 3166-1 alpha-2, lowercase"
+    },
+    "entityType": {
+      "enum": [
+        "Grid",
+        "GridRegion",
+        "Operator",
+        "Generator",
+        "StorageAsset",
+        "TransmissionAsset",
+        "Interconnector",
+        "Substation",
+        "CoalBasin",
+        "CoalMine",
+        "GasBasin",
+        "GasField",
+        "GasProcessingPlant",
+        "Pipeline",
+        "HydroReservoir",
+        "IndustrialFacility",
+        "Smelter",
+        "SteelMill",
+        "Mine",
+        "Refinery",
+        "LNGPlant",
+        "ChemicalPlant",
+        "DataCentre",
+        "Port",
+        "Terminal",
+        "Berth",
+        "Railway",
+        "Train",
+        "Vessel",
+        "Company",
+        "Commodity",
+        "Product",
+        "Market",
+        "Destination",
+        "Sensor",
+        "TelemetryFeed",
+        "Observation",
+        "Source",
+        "Evidence",
+        "Inference",
+        "ObservabilityGap"
+      ]
+    },
+    "observability": {
+      "enum": [
+        "KNOWN_LIVE",
+        "ESTIMATED",
+        "NOT_OBSERVABLE",
+        "INSTRUMENTATION_OPPORTUNITY",
+        "UNCLASSIFIED"
+      ]
+    }
+  }
+}

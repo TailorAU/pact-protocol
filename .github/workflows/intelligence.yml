@@ -1,0 +1,82 @@
+# CI for the intelligence/ extension workspace only. Path-filtered so spec/CLI/MCP
+# work never waits on it (mirrors conformance.yml's approach).
+name: intelligence
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "intelligence/**"
+      - ".github/workflows/intelligence.yml"
+  pull_request:
+    paths:
+      - "intelligence/**"
+      - ".github/workflows/intelligence.yml"
+
+jobs:
+  build-test:
+    name: Build + unit tests
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: intelligence
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: intelligence/package-lock.json
+      - run: npm ci
+      - run: npm run build
+      - run: npm test
+
+  validate-data:
+    name: Validate registries + schemas
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: intelligence
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: intelligence/package-lock.json
+      - run: npm ci
+      - run: npm run build -w @pact-tailor/ontology && npm run build -w @pact-tailor/registry
+      - run: npm run validate:data
+
+  smoke:
+    name: End-to-end smoke (fixtures → API → SSE)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: intelligence
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: intelligence/package-lock.json
+      - run: npm ci
+      - run: npm run build
+      - run: bash scripts/smoke.sh
+
+  globe-build:
+    name: Globe bundle builds
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: intelligence
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: intelligence/package-lock.json
+      - run: npm ci
+      - run: npm run build:globe

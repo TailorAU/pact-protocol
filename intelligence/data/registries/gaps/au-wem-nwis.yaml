@@ -1,0 +1,80 @@
+# Observability-gap registry — WEM (SWIS) and NWIS, Western Australia. See ../../schemas/observability-gap.schema.json
+records:
+  - gap_id: gap:au-wem:facility-scada-latency
+    entity_id: grid:au-wem
+    desired_metric: power.generation.mw
+    current_source: source:aemo:wem-data-portal
+    best_available_proxy:
+      source_id: source:aemo:wem-data-portal
+      metric: facility.scada.mw
+      derivation: "The WEM data portal does publish per-facility SCADA for the SWIS (5-minute dispatch intervals since the new WEM commenced October 2023), but as batch files with hours-to-a-day publication lag and no streaming interface - the metric exists, the latency does not meet live-intelligence requirements."
+    required_resolution: 5min
+    required_accuracy: ±1%
+    commercial_value: medium
+    strategic_value: medium
+    instrumentation_options:
+      - { kind: power_quality_meter, notes: "one owned PQ meter anywhere on the SWIS gives real-time frequency and event detection (unit trips, load shedding) during the portal's publication lag", indicative_cost_band: low }
+      - { kind: partner_feed, notes: "market-participant data share for real-time dispatch targets ahead of publication", indicative_cost_band: medium }
+    estimated_complexity: low
+    priority: P3
+    status: proxied
+    notes: The SWIS (~4 GW-class peak) is well covered on a delay; this is a latency gap, not an existence gap, so it is accepted as proxied with a cheap event-detection overlay.
+
+  - gap_id: gap:au-nwis:system-visibility
+    entity_id: grid:au-nwis
+    desired_metric: power.demand.mw
+    current_source: null
+    best_available_proxy: null
+    required_resolution: 5min
+    required_accuracy: ±2%
+    commercial_value: medium
+    strategic_value: high
+    instrumentation_options:
+      - { kind: power_quality_meter, notes: "an owned PQ meter on the network at Karratha or Port Hedland gives real-time frequency, voltage events and system-stress signatures for the entire islanded grid - the only unilateral instrument available", indicative_cost_band: low }
+      - { kind: partner_feed, notes: "data agreement with Horizon Power or Pilbara ISOCo (independent system operator since 2022)", indicative_cost_band: medium }
+      - { kind: customer_api, notes: "data share with a connected miner (Rio Tinto, Alinta-supplied BHP loads) covering their offtake", indicative_cost_band: medium }
+    estimated_complexity: medium
+    priority: P2
+    status: open
+    notes: A pure gap - the NWIS publishes NO real-time operational data at all - no dispatch feed, no demand feed, no prices; Pilbara ISOCo releases only planning documents and a reduced-order model. The interconnected Horizon Power/Alinta/Rio Tinto networks meet roughly a fifth of Pilbara electricity needs (hundreds-of-MW scale), with the rest behind private islanded systems; it is the least observable strategically significant grid in Australia.
+
+  - gap_id: gap:au-nwis:mining-load
+    entity_id: grid:au-nwis
+    desired_metric: demand.industrial.mw
+    current_source: null
+    best_available_proxy:
+      source_id: source:aemo:gas-bulletin-board
+      metric: gas.consumption.tj
+      derivation: "AEMO's WA gas bulletin board publishes large-user and power-station gas consumption in the Pilbara (D+ days); gas burn at the NWIS-connected stations converted at ~7-9 GJ/MWh open-cycle and ~7 GJ/MWh CCGT approximates generation and hence mining load - an estimate that degrades as Pilbara solar/battery build-out (e.g. miners' renewable hubs) displaces gas."
+    required_resolution: 1h
+    required_accuracy: ±10%
+    commercial_value: medium
+    strategic_value: high
+    instrumentation_options:
+      - { kind: partner_feed, notes: "data agreements with the Pilbara miners (BHP, Rio Tinto, Fortescue) or their retailer Alinta for port/rail/plant loads", indicative_cost_band: medium }
+      - { kind: customer_api, notes: "single-miner pilot (port operations load is the most contractable slice)", indicative_cost_band: low }
+      - { kind: iot_gateway, notes: "owned gateways at partner substations if a miner hosts them", indicative_cost_band: high }
+    estimated_complexity: high
+    priority: P3
+    status: open
+    notes: Iron-ore port and rail electrical load is a direct physical correlate of export run-rate at Port Hedland and Dampier; observing it would give a power-side confirmation channel for AIS-derived iron-ore flow estimates.
+
+  - gap_id: gap:au-wem:industrial-load-mix
+    entity_id: grid:au-wem
+    desired_metric: demand.industrial.mw
+    current_source: null
+    best_available_proxy:
+      source_id: source:aemo:wem-data-portal
+      metric: operational.demand.mw
+      derivation: "SWIS operational demand decomposed against a temperature model and published facility SCADA for industrial cogeneration exports (Alcoa Pinjarra/Wagerup, Worsley) leaves an industrial band; large events are legible - e.g. the BHP Kwinana nickel refinery suspension (December 2024) - but the split of Kwinana-strip loads is modelled, not measured."
+    required_resolution: 30min
+    required_accuracy: ±10%
+    commercial_value: medium
+    strategic_value: medium
+    instrumentation_options:
+      - { kind: customer_api, notes: "data-sharing agreements with the 3-4 dominant industrial consumers (Alcoa, Worsley/South32, Kwinana strip operators)", indicative_cost_band: medium }
+      - { kind: substation_gateway, notes: "gateway at the Kwinana terminal substation", indicative_cost_band: high }
+    estimated_complexity: medium
+    priority: P4
+    status: open
+    notes: Lower priority than the QLD1 equivalent because SWIS industrial load is smaller and partially self-supplied by behind-the-fence cogeneration; tracked for WA alumina-chain intelligence.

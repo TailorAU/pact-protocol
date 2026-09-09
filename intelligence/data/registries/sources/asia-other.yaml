@@ -1,0 +1,163 @@
+# Source registry — Asia & other regions (Japan, India, Korea, Brazil, South Africa). See ../../schemas/source.schema.json
+records:
+  - source_id: source:occto:web
+    publisher: OCCTO (Organization for Cross-regional Coordination of Transmission Operators, Japan)
+    dataset: OCCTO wide-area supply-demand and interconnector data (system information service)
+    api_type: html
+    url: https://www.occto.or.jp/en/
+    docs_url: https://www.occto.or.jp/en/information_disclosure/
+    coverage:
+      grids: [grid:jp]
+      countries: [jp]
+    entity_types: [Grid, GridRegion, Interconnector]
+    metrics: [grid.demand.mw, grid.generation.mw, intercon.flow.mw, reserve.margin.pct]
+    data_class: both
+    latency: cross-regional reserve margin updated every ~30min; area supply-demand actuals published monthly
+    resolution: 30min supply-demand; 10 service areas
+    update_frequency: 30min for reserve-margin displays; monthly for consolidated demand/supply data files
+    history_depth: monthly publications archived for years
+    authentication: registration
+    licensing:
+      class: restricted
+      notes: Public pages free to view; the detailed system information service (keito joho) requires user registration, and terms are Japanese-language with no open licence. Per-area live demand is more accessibly published by each regional utility's denki yoho (demand forecast) pages.
+    cost: free
+    reliability: 3
+    quality_notes: The only cross-Japan coordinator view (10 areas + interconnector utilisation), but programmatic access is awkward (Japanese HTML/CSV, registration walls). Treat as reference/context; utility juyo-jisseki CSVs are the live path.
+    verification_status: documented_only
+    last_checked: "2026-08-12"
+    notes: English pages summarise; operational data is mostly on the Japanese site. Occtonet (occtonet.occto.or.jp) hosts the member data system.
+
+  - source_id: source:jepx:spot-market
+    publisher: Japan Electric Power Exchange (JEPX)
+    dataset: JEPX day-ahead (spot) and intraday market price/volume CSVs
+    api_type: bulk-download
+    url: https://www.jepx.jp/electricpower/market-data/spot/
+    docs_url: https://www.jepx.jp/en/
+    coverage:
+      grids: [grid:jp]
+      countries: [jp]
+    entity_types: [Grid, GridRegion]
+    metrics: [market.price.energy, market.volume.mwh]
+    data_class: both
+    latency: day-ahead results published ~10:00 JST daily for next-day delivery
+    resolution: 30min products, 9 price areas + system price
+    update_frequency: daily (spot); continuous session files (intraday)
+    history_depth: annual CSVs back to FY2005 (spot)
+    authentication: none
+    licensing:
+      class: open-attribution
+      notes: CSVs are freely downloadable from the JEPX site; JEPX terms request source attribution and prohibit commercial redistribution of the files as-is. No English machine interface - column headers are Japanese.
+    cost: free
+    reliability: 4
+    quality_notes: Authoritative Japanese wholesale spot prices (~30-40 percent of Japanese demand trades through JEPX). Simple stable CSV URLs (spot_YYYY.csv pattern) - no API needed.
+    verification_status: documented_only
+    last_checked: "2026-08-12"
+    notes: Area prices map to the 9 utility service areas (Hokkaido...Kyushu); Okinawa is not interconnected and has no JEPX area.
+
+  - source_id: source:gridindia:psp-reports
+    publisher: Grid Controller of India (Grid-India) / National Load Despatch Centre
+    dataset: Daily Power Supply Position (PSP) reports and NLDC operational reports
+    api_type: file-drop
+    url: https://report.grid-india.in/psp_report.php
+    docs_url: https://grid-india.in/en
+    coverage:
+      grids: [grid:in]
+      countries: [in]
+    entity_types: [Grid, GridRegion]
+    metrics: [grid.demand.mw, grid.demand.met.mu, energy.shortage.mu, grid.frequency.hz]
+    data_class: both
+    latency: daily report published next day
+    resolution: daily aggregates by state/region; peak demand met, energy met/shortage, frequency profile
+    update_frequency: daily (PSP); weekly/monthly consolidated reports
+    history_depth: archive back many years (posoco.in legacy + report.grid-india.in)
+    authentication: none
+    licensing:
+      class: open-attribution
+      notes: Government publication, free to download; no explicit open-data licence stated - cite Grid-India. Reports are PDF and XLS.
+    cost: free
+    reliability: 3
+    quality_notes: Authoritative all-India operational summary, but file-based (PDF/XLS parsing) and daily granularity only. Real-time all-India demand is visible on the Grid-India dashboard and via Merit/Vidyut Pravah portals.
+    verification_status: documented_only
+    last_checked: "2026-08-12"
+    notes: XLS variant of the daily PSP is machine-readable; formats have changed over the years - version the parser.
+
+  - source_id: source:kpx:epsis
+    publisher: Korea Power Exchange (KPX)
+    dataset: EPSIS - Electric Power Statistics Information System (plus data.go.kr open APIs)
+    api_type: html
+    url: https://epsis.kpx.or.kr/
+    docs_url: https://epsis.kpx.or.kr/epsisnew/selectEkccIntroEn.do?menuId=090101
+    coverage:
+      grids: [grid:kr]
+      countries: [kr]
+    entity_types: [Grid, Generator, Company]
+    metrics: [grid.demand.mw, grid.generation.mw, market.price.energy, asset.capacity.mw]
+    data_class: both
+    latency: statistics lag days-to-months; real-time SMP/demand on KPX site
+    resolution: hourly (SMP, demand) to annual statistics (~700 items, 7 categories)
+    update_frequency: hourly market series; monthly/annual statistics
+    history_depth: statistical series back to 1961
+    authentication: none
+    licensing:
+      class: open-registration
+      notes: EPSIS web access is free; downloadable tables free with attribution. Programmatic access is via Korea's public data portal (data.go.kr) open APIs, which require free registration and a service key.
+    cost: free
+    reliability: 3
+    quality_notes: Deep official statistics (KEPCO + KPX sourced); English UI exists but data labels are mixed-language. SMP and load are authoritative; site is form-driven (POST) rather than a clean API.
+    verification_status: documented_only
+    last_checked: "2026-08-12"
+    notes: For live use, prefer the data.go.kr OpenAPI endpoints for SMP/demand and treat EPSIS as the statistical archive.
+
+  - source_id: source:ons-brazil:open-data
+    publisher: ONS (Operador Nacional do Sistema Elétrico, Brazil)
+    dataset: ONS Dados Abertos - open data portal for the Brazilian interconnected system (SIN)
+    api_type: rest
+    url: https://dados.ons.org.br/
+    docs_url: https://dados.ons.org.br/dataset/
+    coverage:
+      grids: [grid:br-sin]
+      countries: [br]
+    entity_types: [Grid, GridRegion, Generator, Reservoir, Interconnector]
+    metrics: [grid.demand.mw, grid.generation.mw, power.output.mw, storage.level.pct, intercon.flow.mw]
+    data_class: both
+    latency: most datasets daily; verified load published D+1; some hourly series
+    resolution: hourly/half-hourly for load and generation; daily for reservoir levels (EAR)
+    update_frequency: daily for operational series; some near-real-time
+    history_depth: multi-year to multi-decade (hydrological series especially)
+    authentication: none
+    licensing:
+      class: open-attribution
+      notes: Open portal, no login required; datasets carry open licences (ODbL/CC-style per dataset) - attribute ONS. Also mirrored on the AWS Open Data Registry. The separate API Portal (portal-integra) is for SINtegre agents only.
+    cost: free
+    reliability: 4
+    quality_notes: Excellent coverage of a hydro-dominated system - reservoir stored energy (EAR/ENA) by subsystem, per-plant generation, verified load, interchange. CKAN with CSV/Parquet resources.
+    verification_status: documented_only
+    last_checked: "2026-08-12"
+    notes: Portuguese-language field names; subsystems SE/CO, S, NE, N are the regional keys.
+
+  - source_id: source:eskom:data-portal
+    publisher: Eskom Holdings SOC Ltd (South Africa)
+    dataset: Eskom Data Portal (system adequacy, demand, generation performance, renewables)
+    api_type: bulk-download
+    url: https://www.eskom.co.za/dataportal/
+    docs_url: https://www.eskom.co.za/dataportal/data-request-form/
+    coverage:
+      grids: [grid:za]
+      countries: [za]
+    entity_types: [Grid, Generator]
+    metrics: [grid.demand.mw, grid.generation.mw, capacity.available.mw, load_shedding.stage]
+    data_class: both
+    latency: short-term datasets updated several times per week; long-term dumps on request
+    resolution: hourly (system demand/available capacity); daily/weekly aggregates
+    update_frequency: several times per week for the live portal; weekly system status reports
+    history_depth: up to 5 years per download request
+    authentication: none
+    licensing:
+      class: open-attribution
+      notes: Free public portal; bulk historical downloads go through a data request form (select datasets, max 5 years). No formal open licence text - attribute Eskom.
+    cost: free
+    reliability: 3
+    quality_notes: The only substantive public feed for the South African grid (Eskom is a vertically integrated utility, not an ISO). Hourly demand, OCGT usage, EAF, renewables and load-shedding data; portal availability has historically been patchy.
+    verification_status: documented_only
+    last_checked: "2026-08-12"
+    notes: CSV downloads; 'Station_Build_Up' style files carry generation by source. No documented REST API.

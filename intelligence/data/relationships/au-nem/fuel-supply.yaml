@@ -1,0 +1,330 @@
+# Structural relationships — fuel supply: captive mines, coal contracts, CSG-to-LNG feed,
+# basin membership and commodity production. See ../../../schemas/relationship.schema.json
+records:
+  - rel_id: rel:callide-mine-supplies-callide-b
+    rel_type: SUPPLIES
+    from_id: mine:au-qld:callide
+    to_id: gen:au-nem:callide-b
+    confidence: 1.0
+    source: source:gem:global-coal-mine-tracker
+    method: declared
+    valid_from: "1988-01-01T00:00:00Z"
+    valid_to: null
+    properties: { commodity: commodity:coal-thermal, note: adjacent mine-mouth supply, long-term contract with CS Energy }
+
+  - rel_id: rel:callide-mine-supplies-callide-c
+    rel_type: SUPPLIES
+    from_id: mine:au-qld:callide
+    to_id: gen:au-nem:callide-c
+    confidence: 1.0
+    source: source:gem:global-coal-mine-tracker
+    method: declared
+    valid_from: "2001-01-01T00:00:00Z"
+    valid_to: null
+    properties: { commodity: commodity:coal-thermal, note: adjacent mine-mouth supply }
+
+  - rel_id: rel:meandu-supplies-tarong
+    rel_type: SUPPLIES
+    from_id: mine:au-qld:meandu
+    to_id: gen:au-nem:tarong
+    confidence: 1.0
+    source: source:gem:global-coal-mine-tracker
+    method: declared
+    valid_from: "1984-01-01T00:00:00Z"
+    valid_to: null
+    properties: { commodity: commodity:coal-thermal, note: captive mine owned by Stanwell Corporation }
+
+  - rel_id: rel:meandu-supplies-tarong-north
+    rel_type: SUPPLIES
+    from_id: mine:au-qld:meandu
+    to_id: gen:au-nem:tarong-north
+    confidence: 1.0
+    source: source:gem:global-coal-mine-tracker
+    method: declared
+    valid_from: "2003-01-01T00:00:00Z"
+    valid_to: null
+    properties: { commodity: commodity:coal-thermal, note: captive mine owned by Stanwell Corporation }
+
+  - rel_id: rel:kogan-creek-mine-supplies-kogan-creek-ps
+    rel_type: SUPPLIES
+    from_id: mine:au-qld:kogan-creek
+    to_id: gen:au-nem:kogan-creek
+    confidence: 1.0
+    source: source:gem:global-coal-mine-tracker
+    method: declared
+    valid_from: "2007-01-01T00:00:00Z"
+    valid_to: null
+    properties: { commodity: commodity:coal-thermal, note: CS Energy captive mine, conveyor-fed }
+
+  - rel_id: rel:curragh-supplies-stanwell
+    rel_type: SUPPLIES
+    from_id: mine:au-qld:curragh
+    to_id: gen:au-nem:stanwell
+    confidence: 0.95
+    source: source:gem:global-coal-mine-tracker
+    method: declared
+    valid_from: "1996-01-01T00:00:00Z"
+    valid_to: null
+    properties:
+      commodity: commodity:coal-thermal
+      note: >-
+        Public contract record (verified 2025): legacy amended coal supply agreement (~3 Mtpa) to early 2027,
+        replaced by a new agreement (~2 Mtpa) plus a June 2025 deal for up to 0.8 Mtpa over five years from
+        2027 tied to Stanwell prepayment support for Coronado.
+
+  - rel_id: rel:hvo-may-supply-bayswater
+    rel_type: MAY_SUPPLY
+    from_id: mine:au-nsw:hunter-valley-operations
+    to_id: gen:au-nem:bayswater
+    confidence: 0.5
+    source: source:gem:global-coal-mine-tracker
+    method: derived
+    valid_from: null
+    valid_to: null
+    properties:
+      commodity: commodity:coal-thermal
+      note: >-
+        Hunter Valley domestic coal flows to Bayswater are commercially plausible and historically reported,
+        but current contract volumes are not public - modelled as MAY_SUPPLY, not a contract assertion.
+
+  - rel_id: rel:surat-csg-supplies-qclng
+    rel_type: SUPPLIES
+    from_id: gasfield:au-qld:surat-csg
+    to_id: lng:au-qld:qclng
+    confidence: 1.0
+    source: source:aemo:gas-bulletin-board
+    method: declared
+    valid_from: "2014-12-01T00:00:00Z"
+    valid_to: null
+    properties: { commodity: coal-seam gas, note: QGC-operated Surat fields; flows visible daily on the Gas Bulletin Board }
+
+  - rel_id: rel:surat-csg-supplies-aplng
+    rel_type: SUPPLIES
+    from_id: gasfield:au-qld:surat-csg
+    to_id: lng:au-qld:aplng
+    confidence: 1.0
+    source: source:aemo:gas-bulletin-board
+    method: declared
+    valid_from: "2015-12-01T00:00:00Z"
+    valid_to: null
+    properties: { commodity: coal-seam gas, note: APLNG-operated Surat fields (Talinga, Orana, Combabula and others) }
+
+  - rel_id: rel:surat-csg-supplies-glng
+    rel_type: SUPPLIES
+    from_id: gasfield:au-qld:surat-csg
+    to_id: lng:au-qld:glng
+    confidence: 1.0
+    source: source:aemo:gas-bulletin-board
+    method: declared
+    valid_from: "2015-09-01T00:00:00Z"
+    valid_to: null
+    properties: { commodity: coal-seam gas, note: GLNG equity gas (Fairview, Roma, Scotia) plus significant third-party purchases }
+
+  - rel_id: rel:wgp-transports-to-qclng
+    rel_type: TRANSPORTS
+    from_id: pipe:au-qld:wallumbilla-gladstone
+    to_id: lng:au-qld:qclng
+    confidence: 1.0
+    source: source:gem:global-gas-infrastructure-tracker
+    method: declared
+    valid_from: "2014-12-01T00:00:00Z"
+    valid_to: null
+    properties: { commodity: coal-seam gas }
+
+  - rel_id: rel:aplng-pipeline-transports-to-aplng
+    rel_type: TRANSPORTS
+    from_id: pipe:au-qld:aplng-pipeline
+    to_id: lng:au-qld:aplng
+    confidence: 1.0
+    source: source:gem:global-gas-infrastructure-tracker
+    method: declared
+    valid_from: "2015-12-01T00:00:00Z"
+    valid_to: null
+    properties: { commodity: coal-seam gas }
+
+  - rel_id: rel:glng-gtp-transports-to-glng
+    rel_type: TRANSPORTS
+    from_id: pipe:au-qld:glng-gtp
+    to_id: lng:au-qld:glng
+    confidence: 1.0
+    source: source:gem:global-gas-infrastructure-tracker
+    method: declared
+    valid_from: "2015-09-01T00:00:00Z"
+    valid_to: null
+    properties: { commodity: coal-seam gas }
+
+  - rel_id: rel:blackwater-part-of-bowen
+    rel_type: PART_OF
+    from_id: mine:au-qld:blackwater
+    to_id: basin:au:bowen
+    confidence: 1.0
+    source: source:gem:global-coal-mine-tracker
+    method: declared
+    valid_from: null
+    valid_to: null
+    properties: {}
+
+  - rel_id: rel:goonyella-riverside-part-of-bowen
+    rel_type: PART_OF
+    from_id: mine:au-qld:goonyella-riverside
+    to_id: basin:au:bowen
+    confidence: 1.0
+    source: source:gem:global-coal-mine-tracker
+    method: declared
+    valid_from: null
+    valid_to: null
+    properties: {}
+
+  - rel_id: rel:peak-downs-part-of-bowen
+    rel_type: PART_OF
+    from_id: mine:au-qld:peak-downs
+    to_id: basin:au:bowen
+    confidence: 1.0
+    source: source:gem:global-coal-mine-tracker
+    method: declared
+    valid_from: null
+    valid_to: null
+    properties: {}
+
+  - rel_id: rel:curragh-part-of-bowen
+    rel_type: PART_OF
+    from_id: mine:au-qld:curragh
+    to_id: basin:au:bowen
+    confidence: 1.0
+    source: source:gem:global-coal-mine-tracker
+    method: declared
+    valid_from: null
+    valid_to: null
+    properties: {}
+
+  - rel_id: rel:kogan-creek-mine-part-of-surat
+    rel_type: PART_OF
+    from_id: mine:au-qld:kogan-creek
+    to_id: basin:au:surat
+    confidence: 1.0
+    source: source:gem:global-coal-mine-tracker
+    method: declared
+    valid_from: null
+    valid_to: null
+    properties: { note: Walloon coal measures }
+
+  - rel_id: rel:surat-csg-part-of-surat
+    rel_type: PART_OF
+    from_id: gasfield:au-qld:surat-csg
+    to_id: basin:au:surat
+    confidence: 1.0
+    source: source:gem:global-gas-infrastructure-tracker
+    method: declared
+    valid_from: null
+    valid_to: null
+    properties: { note: aggregate field entity; some GLNG fields (Fairview, Scotia) sit in the adjoining Bowen Basin }
+
+  - rel_id: rel:blackwater-produces-met-coal
+    rel_type: PRODUCES
+    from_id: mine:au-qld:blackwater
+    to_id: commodity:coal-metallurgical
+    confidence: 1.0
+    source: source:gem:global-coal-mine-tracker
+    method: declared
+    valid_from: null
+    valid_to: null
+    properties: {}
+
+  - rel_id: rel:blackwater-produces-thermal-coal
+    rel_type: PRODUCES
+    from_id: mine:au-qld:blackwater
+    to_id: commodity:coal-thermal
+    confidence: 1.0
+    source: source:gem:global-coal-mine-tracker
+    method: declared
+    valid_from: null
+    valid_to: null
+    properties: { note: secondary product stream }
+
+  - rel_id: rel:goonyella-riverside-produces-met-coal
+    rel_type: PRODUCES
+    from_id: mine:au-qld:goonyella-riverside
+    to_id: commodity:coal-metallurgical
+    confidence: 1.0
+    source: source:gem:global-coal-mine-tracker
+    method: declared
+    valid_from: null
+    valid_to: null
+    properties: {}
+
+  - rel_id: rel:peak-downs-produces-met-coal
+    rel_type: PRODUCES
+    from_id: mine:au-qld:peak-downs
+    to_id: commodity:coal-metallurgical
+    confidence: 1.0
+    source: source:gem:global-coal-mine-tracker
+    method: declared
+    valid_from: null
+    valid_to: null
+    properties: {}
+
+  - rel_id: rel:curragh-produces-met-coal
+    rel_type: PRODUCES
+    from_id: mine:au-qld:curragh
+    to_id: commodity:coal-metallurgical
+    confidence: 1.0
+    source: source:gem:global-coal-mine-tracker
+    method: declared
+    valid_from: null
+    valid_to: null
+    properties: {}
+
+  - rel_id: rel:curragh-produces-thermal-coal
+    rel_type: PRODUCES
+    from_id: mine:au-qld:curragh
+    to_id: commodity:coal-thermal
+    confidence: 1.0
+    source: source:gem:global-coal-mine-tracker
+    method: declared
+    valid_from: null
+    valid_to: null
+    properties: { note: domestic thermal stream to Stanwell }
+
+  - rel_id: rel:callide-mine-produces-thermal-coal
+    rel_type: PRODUCES
+    from_id: mine:au-qld:callide
+    to_id: commodity:coal-thermal
+    confidence: 1.0
+    source: source:gem:global-coal-mine-tracker
+    method: declared
+    valid_from: null
+    valid_to: null
+    properties: {}
+
+  - rel_id: rel:meandu-produces-thermal-coal
+    rel_type: PRODUCES
+    from_id: mine:au-qld:meandu
+    to_id: commodity:coal-thermal
+    confidence: 1.0
+    source: source:gem:global-coal-mine-tracker
+    method: declared
+    valid_from: null
+    valid_to: null
+    properties: {}
+
+  - rel_id: rel:kogan-creek-mine-produces-thermal-coal
+    rel_type: PRODUCES
+    from_id: mine:au-qld:kogan-creek
+    to_id: commodity:coal-thermal
+    confidence: 1.0
+    source: source:gem:global-coal-mine-tracker
+    method: declared
+    valid_from: null
+    valid_to: null
+    properties: {}
+
+  - rel_id: rel:hvo-produces-thermal-coal
+    rel_type: PRODUCES
+    from_id: mine:au-nsw:hunter-valley-operations
+    to_id: commodity:coal-thermal
+    confidence: 1.0
+    source: source:gem:global-coal-mine-tracker
+    method: declared
+    valid_from: null
+    valid_to: null
+    properties: { note: also produces semi-soft coking coal }

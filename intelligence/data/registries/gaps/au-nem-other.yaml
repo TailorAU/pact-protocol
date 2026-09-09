@@ -1,0 +1,350 @@
+# Observability-gap registry — NEM outside the Gladstone cluster (Bowen Basin, Hunter, Sydney, statewide QLD/NSW). See ../../schemas/observability-gap.schema.json
+records:
+  - gap_id: gap:au-nem:blackwater-mine-production
+    entity_id: mine:au-qld:blackwater
+    desired_metric: coal.production.tpd
+    current_source: null
+    best_available_proxy:
+      source_id: source:gpc:cargo-statistics
+      metric: cargo.tonnage.monthly
+      derivation: "Monthly GPC coal tonnages by terminal, allocated to Blackwater by known offtake/berth patterns and reconciled against Whitehaven quarterly production reports and the GEM tracker's 16 Mtpa capacity figure; AIS parcel-level data at RG Tanna/WICET sharpens timing to ~weekly. No public feed attributes cargoes to mines, so allocation error dominates."
+    required_resolution: 1d
+    required_accuracy: ±10%
+    commercial_value: high
+    strategic_value: high
+    instrumentation_options:
+      - { kind: partner_feed, notes: "Aurizon Network railings-by-load-point feed is the single dataset that closes every Bowen Basin mine gap at once", indicative_cost_band: medium }
+      - { kind: gnss, notes: "GNSS trackers on contracted rakes serving the mine's balloon loop count loaded services directly", indicative_cost_band: medium }
+      - { kind: camera_ocr, notes: "camera at the train load-out reading rake IDs and counting wagons", indicative_cost_band: low }
+      - { kind: customer_api, notes: "data-sharing agreement with Whitehaven (owner since April 2024 BHP/BMA divestment)", indicative_cost_band: low }
+    estimated_complexity: medium
+    priority: P2
+    status: open
+    notes: One of the southern hemisphere's largest open-cut coal mines (~12-14 Mt/yr recent, 16 Mtpa capacity, ~80 km strike); anchor tonnage of the Blackwater rail system and RG Tanna.
+
+  - gap_id: gap:au-nem:goonyella-riverside-production
+    entity_id: mine:au-qld:goonyella-riverside
+    desired_metric: coal.production.tpd
+    current_source: null
+    best_available_proxy:
+      source_id: source:aisstream:websocket
+      metric: vessel.draught.delta
+      derivation: "Exports via Hay Point/DBCT (outside GPC statistics); AIS draught-delta parcels at those terminals allocated to BMA berths, calibrated against BHP quarterly reports and the GEM tracker (~15-16 Mtpa met coal). Mine-level attribution is the weak link - Goonyella-system tonnage is observable, this mine's share is modelled."
+    required_resolution: 1d
+    required_accuracy: ±15%
+    commercial_value: high
+    strategic_value: high
+    instrumentation_options:
+      - { kind: partner_feed, notes: "Aurizon railings-by-load-point feed (same agreement as Blackwater)", indicative_cost_band: medium }
+      - { kind: gnss, notes: "trackers on rakes serving the Goonyella/Riverside load-outs", indicative_cost_band: medium }
+      - { kind: customer_api, notes: "data-sharing agreement with BMA (BHP Mitsubishi Alliance)", indicative_cost_band: low }
+    estimated_complexity: medium
+    priority: P2
+    status: open
+    notes: Flagship BMA metallurgical mine on the Goonyella system; with Peak Downs it sets the tempo of the world's largest seaborne met-coal artery.
+
+  - gap_id: gap:au-nem:peak-downs-production
+    entity_id: mine:au-qld:peak-downs
+    desired_metric: coal.production.tpd
+    current_source: null
+    best_available_proxy:
+      source_id: source:gem:global-coal-mine-tracker
+      metric: mine.capacity.mtpa
+      derivation: "Annual GEM capacity (~11-12 Mtpa hard coking) scaled by BHP quarterly actuals; intra-quarter state is inferred from the same Goonyella-system AIS/rail signals as Goonyella Riverside. Effectively quarterly observability today."
+    required_resolution: 1d
+    required_accuracy: ±15%
+    commercial_value: medium
+    strategic_value: high
+    instrumentation_options:
+      - { kind: partner_feed, notes: "Aurizon railings-by-load-point feed", indicative_cost_band: medium }
+      - { kind: gnss, notes: "rake trackers via haulage partner", indicative_cost_band: medium }
+      - { kind: customer_api, notes: "BMA data-sharing agreement", indicative_cost_band: low }
+    estimated_complexity: medium
+    priority: P3
+    status: open
+    notes: Premium hard-coking producer; same instrumentation pattern as Goonyella Riverside, one contract covers both.
+
+  - gap_id: gap:au-nem:curragh-production
+    entity_id: mine:au-qld:curragh
+    desired_metric: coal.production.tpd
+    current_source: null
+    best_available_proxy:
+      source_id: source:aemo:nemweb-dispatch-scada
+      metric: unit.generation.mw
+      derivation: "Curragh (Coronado, ~11-13 Mt/yr ROM) has a dual signature - export met coal via the Blackwater system to RG Tanna (GPC monthly + AIS parcels) and a long-term domestic thermal contract to Stanwell Power Station, whose STAN-1..4 dispatch SCADA converts at ~0.4-0.45 t/MWh into observed domestic offtake. Combining the two bounds total production to ~±10% monthly."
+    required_resolution: 1d
+    required_accuracy: ±10%
+    commercial_value: medium
+    strategic_value: high
+    instrumentation_options:
+      - { kind: partner_feed, notes: "Aurizon railings-by-load-point feed", indicative_cost_band: medium }
+      - { kind: camera_ocr, notes: "load-out camera at the Curragh balloon loop", indicative_cost_band: low }
+      - { kind: customer_api, notes: "Coronado data-sharing agreement", indicative_cost_band: low }
+    estimated_complexity: medium
+    priority: P2
+    status: open
+    notes: The Stanwell supply contract couples this mine directly into QLD1 generation adequacy, making its state relevant to both coal-market and power-market products.
+
+  - gap_id: gap:au-nem:callide-mine-production
+    entity_id: mine:au-qld:callide
+    desired_metric: coal.production.tpd
+    current_source: null
+    best_available_proxy:
+      source_id: source:aemo:nemweb-dispatch-scada
+      metric: unit.generation.mw
+      derivation: "Mine-mouth supplier to Callide B/C power stations plus exports via the Moura system; Callide unit dispatch SCADA at ~0.5 t/MWh gives the domestic draw in near-real-time, GPC monthly tonnage gives the export residual. Batchfire capacity ~10 Mtpa ROM."
+    required_resolution: 1d
+    required_accuracy: ±10%
+    commercial_value: medium
+    strategic_value: medium
+    instrumentation_options:
+      - { kind: partner_feed, notes: "Aurizon Moura-system railings feed", indicative_cost_band: medium }
+      - { kind: customer_api, notes: "Batchfire data-sharing agreement", indicative_cost_band: low }
+    estimated_complexity: low
+    priority: P3
+    status: open
+    notes: The mine-mouth coupling means Callide C outage/return schedules (post-2021 explosion rebuild) dominate this mine's demand profile; power-side SCADA already reveals most of its state.
+
+  - gap_id: gap:au-nem:blackwater-system-consists
+    entity_id: rail:au-qld:blackwater-system
+    desired_metric: rail.consist.positions
+    current_source: null
+    best_available_proxy:
+      source_id: source:aisstream:websocket
+      metric: vessel.loading.events
+      derivation: "No public feed carries Aurizon freight positions (QLD GTFS-Realtime covers passenger services only). Terminal-side shiploading at RG Tanna/WICET back-casts delivered railings through a ~2-5 day stockyard buffer; ~15-20 loaded electric services/day at ~8-10 kt payload on the electrified 25 kV system when running at its ~50-60 Mt/yr rate."
+    required_resolution: 5min
+    required_accuracy: ±1 consist
+    commercial_value: high
+    strategic_value: high
+    instrumentation_options:
+      - { kind: partner_feed, notes: "Aurizon Network operational feed - the definitive closure for all three system gaps", indicative_cost_band: high }
+      - { kind: gnss, notes: "GNSS units on rakes via a haulage or maintenance partner", indicative_cost_band: medium }
+      - { kind: camera_ocr, notes: "trackside cameras at Callemondah yard throat and the Rocklands junction counting and identifying consists", indicative_cost_band: medium }
+      - { kind: condition_sensor, notes: "trackside vibration/axle-counter nodes at 2-3 chokepoints give direction and consist length without imagery", indicative_cost_band: low }
+    estimated_complexity: high
+    priority: P2
+    status: open
+    notes: The Gladstone coal chain's velocity term; a derailment or flood closure here shows up in port data only days later, so direct consist observability buys the lead time.
+
+  - gap_id: gap:au-nem:moura-system-consists
+    entity_id: rail:au-qld:moura-system
+    desired_metric: rail.consist.positions
+    current_source: null
+    best_available_proxy:
+      source_id: source:gpc:cargo-statistics
+      metric: cargo.tonnage.monthly
+      derivation: "Diesel-hauled system, ~10-13 Mt/yr from Moura/Dawson and Baralaba to Gladstone; monthly GPC tonnage minus Blackwater-system attribution leaves the Moura share, a few loaded services/day."
+    required_resolution: 15min
+    required_accuracy: ±1 consist
+    commercial_value: low
+    strategic_value: medium
+    instrumentation_options:
+      - { kind: partner_feed, notes: "covered by the same Aurizon agreement", indicative_cost_band: high }
+      - { kind: condition_sensor, notes: "single trackside node near Callemondah suffices for a low-traffic system", indicative_cost_band: low }
+    estimated_complexity: medium
+    priority: P3
+    status: open
+    notes: Smallest of the three systems; monitored mainly because Orica AN and Callide export tonnage ride on it.
+
+  - gap_id: gap:au-nem:goonyella-system-consists
+    entity_id: rail:au-qld:goonyella-system
+    desired_metric: rail.consist.positions
+    current_source: null
+    best_available_proxy:
+      source_id: source:aisstream:websocket
+      metric: vessel.loading.events
+      derivation: "Hay Point and DBCT shiploading cadence back-casts system railings through the terminal stockyards; the electrified ~924 km Goonyella system serves ~30 mines and moves ~100-120 Mt/yr - the largest export met-coal artery in the world - at ~25-35 loaded services/day."
+    required_resolution: 5min
+    required_accuracy: ±1 consist
+    commercial_value: high
+    strategic_value: high
+    instrumentation_options:
+      - { kind: partner_feed, notes: "Aurizon Network operational feed", indicative_cost_band: high }
+      - { kind: gnss, notes: "rake trackers via haulage partner", indicative_cost_band: medium }
+      - { kind: camera_ocr, notes: "trackside cameras at the Coppabella junction and Jilalan yard", indicative_cost_band: medium }
+    estimated_complexity: high
+    priority: P2
+    status: open
+    notes: Weather (cyclone/flood) interruptions on this corridor move global met-coal prices; consist-level observability converts BoM rainfall into tonnage-at-risk within hours instead of weeks.
+
+  - gap_id: gap:au-nem:tomago-live-load
+    entity_id: smelter:au-nsw:tomago
+    desired_metric: power.load.mw
+    current_source: null
+    best_available_proxy:
+      source_id: source:aemo:nemweb-dispatch-scada
+      metric: grid.demand.mw
+      derivation: "NSW1 regional demand net of scheduled generation; Tomago draws a near-constant ~950 MW (~10-12% of NSW consumption, ~8300 GWh/yr) and its potline interruptions during price spikes (up to ~75 min per potline) appear as sharp ~300 MW residual-demand steps that identify it uniquely."
+    required_resolution: 1min
+    required_accuracy: ±1%
+    commercial_value: high
+    strategic_value: critical
+    instrumentation_options:
+      - { kind: substation_gateway, notes: "Tomago is fed by dedicated 330 kV circuits from the Tomago substation; a gateway there gives exact potline load", indicative_cost_band: high }
+      - { kind: revenue_meter, notes: "retailer/TNSP revenue-meter integration via customer API", indicative_cost_band: medium }
+      - { kind: customer_api, notes: "direct data-sharing agreement with Tomago Aluminium (Rio Tinto-majority JV)", indicative_cost_band: low }
+    estimated_complexity: medium
+    priority: P1
+    status: open
+    notes: Australia's largest single electricity consumer (590 kt/yr aluminium); the NSW1 analogue of Boyne, and the demand-response asset that most often sets NSW scarcity outcomes.
+
+  - gap_id: gap:au-nem:port-kembla-operating-state
+    entity_id: steel:au-nsw:port-kembla
+    desired_metric: plant.operating.state
+    current_source: null
+    best_available_proxy:
+      source_id: source:aisstream:websocket
+      metric: vessel.movement.events
+      derivation: "Raw-material vessel cadence at the Port Kembla ore berths - ~3.1 Mt/yr crude steel needs ~4.5 Mt/yr of imported iron ore and fluxes, roughly one Panamax-class arrival per 5-7 days - plus outbound slab/coil sailings; a widening arrival gap implies reduced blast-furnace burden within ~2 weeks."
+    required_resolution: 1d
+    required_accuracy: state-accurate (running/reduced/down)
+    commercial_value: medium
+    strategic_value: high
+    instrumentation_options:
+      - { kind: satellite_thermal, notes: "blast-furnace and coke-oven thermal signatures give a direct daily on/off/banked read - the canonical steel-plant instrument", indicative_cost_band: low }
+      - { kind: partner_feed, notes: "BlueScope data-sharing agreement", indicative_cost_band: medium }
+      - { kind: environmental_sensor, notes: "downwind particulate/SO2 sensing correlates with sinter and BF operation", indicative_cost_band: medium }
+    estimated_complexity: low
+    priority: P3
+    status: open
+    notes: Single-blast-furnace configuration (No.6 relined for ~$1.15b, replacing No.5 by mid-2026) means plant state is near-binary and any outage is nationally significant - Port Kembla is one of only two primary steelmaking sites in Australia.
+
+  - gap_id: gap:au-nem:newcastle-coal-chain-throughput
+    entity_id: port:au-nsw:newcastle
+    desired_metric: bulk.throughput.tpd
+    current_source: null
+    best_available_proxy:
+      source_id: source:aisstream:websocket
+      metric: vessel.draught.delta
+      derivation: "Departure draught deltas per vessel across the three terminals (PWCS Kooragang + Carrington 145 Mtpa, NCIG 79 Mtpa; combined ~224 Mtpa against ~135-150 Mt/yr actual exports) plus the famous Newcastle anchorage queue count give daily throughput to ~±5%; the AIS picture at Newcastle is unusually complete because all berths and anchorages sit inside dense terrestrial coverage."
+    required_resolution: 1d
+    required_accuracy: ±5%
+    commercial_value: high
+    strategic_value: high
+    instrumentation_options:
+      - { kind: ais_receiver, notes: "owned receiver at Newcastle removes aggregator dependency and gives sub-minute berth events", indicative_cost_band: low }
+      - { kind: partner_feed, notes: "PWCS/NCIG or HVCCC daily operational reports under agreement", indicative_cost_band: medium }
+    estimated_complexity: low
+    priority: P2
+    status: proxied
+    notes: The world's largest coal-export port; the AIS proxy is good enough that this gap is accepted as proxied, with owned instrumentation only hardening latency and provenance.
+
+  - gap_id: gap:au-nem:hvo-production
+    entity_id: mine:au-nsw:hunter-valley-operations
+    desired_metric: coal.production.tpd
+    current_source: null
+    best_available_proxy:
+      source_id: source:gem:global-coal-mine-tracker
+      metric: mine.capacity.mtpa
+      derivation: "GEM annual capacity (~13 Mtpa-class saleable thermal, Yancoal 51/Glencore 49 JV) scaled by owners' quarterly reports; intra-quarter state is inferred from Newcastle chain throughput, but ~35 mines share that signal so mine-level attribution is weak."
+    required_resolution: 1d
+    required_accuracy: ±15%
+    commercial_value: medium
+    strategic_value: medium
+    instrumentation_options:
+      - { kind: partner_feed, notes: "ARTC Hunter Valley network or HVCCC railings-by-load-point feed", indicative_cost_band: medium }
+      - { kind: gnss, notes: "rake trackers via haulage partner (Pacific National/Aurizon)", indicative_cost_band: medium }
+      - { kind: customer_api, notes: "Yancoal/Glencore data-sharing agreement", indicative_cost_band: low }
+    estimated_complexity: medium
+    priority: P3
+    status: open
+    notes: Representative Hunter mine record - the instrumentation pattern (rail partner feed) generalises to the whole Hunter Valley coal chain exactly as the Aurizon pattern does for the Bowen Basin.
+
+  - gap_id: gap:au-nem:sydney-dc-cluster-load
+    entity_id: dc:au-nsw:sydney-metro-cluster
+    desired_metric: power.load.mw
+    current_source: null
+    best_available_proxy: null
+    required_resolution: 5min
+    required_accuracy: ±5%
+    commercial_value: high
+    strategic_value: high
+    instrumentation_options:
+      - { kind: customer_api, notes: "data-sharing agreements with operators (NextDC, AirTrunk, CDC, Equinix and others) - even 2-3 anchor tenants would calibrate a cluster model", indicative_cost_band: medium }
+      - { kind: partner_feed, notes: "DNSP (Ausgrid/Endeavour) zone-substation feed under a data-services agreement; the public versions are annual and 12-18 months in arrears", indicative_cost_band: high }
+      - { kind: power_quality_meter, notes: "owned meters at a sample of campus connection points under host agreements", indicative_cost_band: high }
+    estimated_complexity: high
+    priority: P2
+    status: open
+    notes: A pure gap - no public source resolves data-centre load at any cadence. Sydney is Australia's largest DC market (~770 MW built 2025, >1 GW during 2026, ~1.4 GW by 2029) and the fastest-growing structural component of NSW1 demand; today it is invisible inside regional operational demand.
+
+  - gap_id: gap:au-nem:wivenhoe-storage-state
+    entity_id: gen:au-nem:wivenhoe
+    desired_metric: storage.energy.mwh
+    current_source: null
+    best_available_proxy:
+      source_id: source:aemo:nemweb-dispatch-scada
+      metric: unit.generation.mw
+      derivation: "Integrate Wivenhoe generation (2x285 MW units) minus pumping loads (both visible as scheduled DUIDs in dispatch SCADA) at ~70-75% round-trip efficiency to track Splityard Creek state-of-charge (~5 GWh-class usable, ~8-9 h at full output); re-anchor whenever sustained max-generation runs imply a full or empty reservoir. Drift ~5-10% per cycle."
+    required_resolution: 1h
+    required_accuracy: ±5%
+    commercial_value: medium
+    strategic_value: high
+    instrumentation_options:
+      - { kind: satellite_optical, notes: "shoreline waterline extraction on Splityard Creek per pass gives absolute level to ~0.5 m", indicative_cost_band: low }
+      - { kind: customer_api, notes: "CS Energy or Seqwater data share for reservoir level", indicative_cost_band: low }
+      - { kind: camera_ocr, notes: "fixed camera reading the reservoir staff gauge", indicative_cost_band: low }
+    estimated_complexity: low
+    priority: P3
+    status: proxied
+    notes: Queensland's only operating pumped storage until Borumba; its state-of-charge is the QLD1 evening-peak insurance variable, and the pump/generate pattern is a live signal of expected price spreads.
+
+  - gap_id: gap:au-nem:qld-rooftop-pv-output
+    entity_id: region:au-nem:qld1
+    desired_metric: solar.rooftop.mw
+    current_source: source:openelectricity:api
+    best_available_proxy:
+      source_id: source:openelectricity:api
+      metric: solar.rooftop.estimate.mw
+      derivation: "AEMO's half-hourly distributed-PV estimate (satellite-irradiance plus sample-meter methods, surfaced through the OpenElectricity API) for QLD1's >5 GW of installed rooftop capacity; it is a model, not a measurement - errors of ±5-10% during cloud-transient periods are exactly when the number matters for minimum-demand operations."
+    required_resolution: 5min
+    required_accuracy: ±2%
+    commercial_value: medium
+    strategic_value: high
+    instrumentation_options:
+      - { kind: iot_gateway, notes: "inverter-fleet telemetry via partnership with a retailer or monitoring platform - a ~1000-site stratified sample measures the fleet to ~1%", indicative_cost_band: medium }
+      - { kind: weather_station, notes: "owned irradiance stations at 5-6 QLD population centres tighten the satellite model's cloud-edge error", indicative_cost_band: low }
+    estimated_complexity: medium
+    priority: P3
+    status: proxied
+    notes: Behind-the-meter PV now sets QLD1 minimum operational demand records; the gap is accuracy and cadence, not existence, hence proxied status with an owned-sample upgrade path.
+
+  - gap_id: gap:au-nem:nem-frequency-4s
+    entity_id: grid:au-nem
+    desired_metric: grid.frequency.hz
+    current_source: null
+    best_available_proxy:
+      source_id: source:aemo:nemweb-dispatch-scada
+      metric: dispatch.interval.mw
+      derivation: "Nothing public is live - dispatch SCADA is 5-min MW with no frequency, and AEMO's 4-second FCAS/causer-pays files are published in periodic batches weeks in arrears; the proxy is therefore retrospective frequency-performance analysis only."
+    required_resolution: 4s
+    required_accuracy: ±10 mHz
+    commercial_value: medium
+    strategic_value: medium
+    instrumentation_options:
+      - { kind: power_quality_meter, notes: "frequency is uniform across a synchronous grid, so one owned PQ/PMU-class meter on any NEM-mainland socket closes the gap completely; a second unit in TAS covers the other synchronous island - the cheapest full gap closure in this registry", indicative_cost_band: low }
+    estimated_complexity: low
+    priority: P3
+    status: open
+    notes: Live frequency unlocks FCAS-event detection, contingency (unit-trip) inference within seconds, and independent verification of AEMO's delayed data - high analytic leverage for trivial capex.
+
+  - gap_id: gap:au-nem:qld1-industrial-load-mix
+    entity_id: region:au-nem:qld1
+    desired_metric: demand.industrial.mw
+    current_source: null
+    best_available_proxy:
+      source_id: source:aemo:nemweb-dispatchis
+      metric: region.demand.mw
+      derivation: "Decompose QLD1 operational demand (5-min) into a temperature-driven mass-market component (regressed on BoM observations), the AEMO rooftop-PV estimate, and a residual ~3.5-4 GW industrial baseload band (Boyne, QAL, Yarwun, rail traction, mines); step-changes in the residual attribute to specific facilities via the facility-level gap records above."
+    required_resolution: 30min
+    required_accuracy: ±5%
+    commercial_value: high
+    strategic_value: high
+    instrumentation_options:
+      - { kind: substation_gateway, notes: "gateways at the 3-4 dedicated industrial substations (Boyne, Gladstone South, Nebo) would convert the residual model into measurement", indicative_cost_band: high }
+      - { kind: customer_api, notes: "each facility-level customer agreement independently hardens one term of the decomposition", indicative_cost_band: medium }
+    estimated_complexity: medium
+    priority: P2
+    status: proxied
+    notes: The aggregate anchor for all QLD facility-level records - every individual gap closed tightens this decomposition, and the decomposition cross-checks every individual proxy.

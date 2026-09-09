@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pact.tailor.au/intelligence/schemas/entity-types/mine.properties.json",
+  "title": "Mine properties (Mine and CoalMine)",
+  "type": "object",
+  "properties": {
+    "commodities": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "mine_type": {
+      "enum": ["open-cut", "underground", "mixed"]
+    },
+    "capacity_mtpa": { "type": "number" },
+    "status": { "type": "string" }
+  },
+  "additionalProperties": true
+}

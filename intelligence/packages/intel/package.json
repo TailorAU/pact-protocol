@@ -1,0 +1,25 @@
+{
+  "name": "@pact-tailor/intel",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Rule-based derived intelligence — facility utilisation estimation, cargo inference, anomaly detection, gap synthesis. Every output is an evidence-linked Inference record",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": "./dist/index.js"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "test": "npm run build && node --test \"test/*.test.mjs\""
+  },
+  "dependencies": {
+    "@pact-tailor/graph": "*",
+    "@pact-tailor/ontology": "*",
+    "@pact-tailor/state": "*",
+    "@pact-tailor/store": "*"
+  }
+}

@@ -1,0 +1,105 @@
+# Source registry — Weather & environment. See ../../schemas/source.schema.json
+records:
+  - source_id: source:bom:observations
+    publisher: Australian Bureau of Meteorology
+    dataset: BOM station observations (JSON/XML data feeds) and warnings
+    api_type: file-drop
+    url: http://www.bom.gov.au/catalogue/data-feeds.shtml
+    docs_url: http://www.bom.gov.au/catalogue/data-feeds.shtml
+    coverage:
+      countries: [au]
+    entity_types: [WeatherStation]
+    metrics: [weather.temp.c, weather.wind.speed_ms, weather.wind.dir.deg, weather.pressure.hpa, weather.rain.mm, weather.humidity.pct]
+    data_class: live
+    latency: ~10-30min after observation time
+    resolution: station-level; observations typically half-hourly (10-min at some stations)
+    update_frequency: every 10-30 minutes per station product
+    history_depth: rolling 72h in the JSON/axf feeds; long climate archives via separate climate data services
+    authentication: none
+    licensing:
+      class: open-attribution
+      notes: BOM copyright permits use with attribution for most published products; feeds are free and 'not for commercial use' in the anonymous channel - a registered/paid channel exists for high-volume/commercial programmatic access. BOM's WAF blocks HTML screen-scraping; the XML/JSON/FTP data feeds are the sanctioned path.
+    cost: free (registered/paid channel for high-volume commercial use)
+    reliability: 4
+    quality_notes: Authoritative AU observations; product IDs per state/product (e.g. IDQ60801 QLD observations). Low-cadence station polling by design per this workspace's licensing posture.
+    verification_status: documented_only
+    last_checked: "2026-08-12"
+    notes: JSON per-station at www.bom.gov.au/fwo/{product}/{product}.{wmo-id}.json; bulk via ftp.bom.gov.au/anon/gen/fwo/. Set a proper User-Agent and modest cadence.
+
+  - source_id: source:noaa:nws-api
+    publisher: US National Weather Service (NOAA)
+    dataset: NWS API (api.weather.gov) - forecasts, observations, alerts
+    api_type: rest
+    url: https://api.weather.gov/
+    docs_url: https://www.weather.gov/documentation/services-web-api
+    coverage:
+      countries: [us]
+    entity_types: [WeatherStation]
+    metrics: [weather.temp.c, weather.wind.speed_ms, weather.pressure.hpa, weather.precip.mm]
+    data_class: live
+    latency: minutes for station observations and alerts
+    resolution: station observations (typically hourly METAR-based); 2.5km gridded forecasts
+    update_frequency: hourly observations; forecasts per NWS cycle; alerts near-instant
+    history_depth: recent observations only via API; deep archives via NCEI
+    authentication: none
+    licensing:
+      class: public-domain
+      notes: US government work - public domain. No API key; a descriptive User-Agent header is required and rate limits are enforced generously.
+    cost: free
+    reliability: 5
+    quality_notes: Clean JSON-LD REST API; relevant for US grid-region weather context (ERCOT/CAISO/PJM demand drivers).
+    verification_status: documented_only
+    last_checked: "2026-08-12"
+    notes: points/{lat},{lon} resolves to gridpoints and stations; alerts endpoint useful for extreme-weather event flags.
+
+  - source_id: source:openmeteo:forecast-api
+    publisher: Open-Meteo
+    dataset: Open-Meteo forecast and historical weather API (multi-model)
+    api_type: rest
+    url: https://api.open-meteo.com/v1/forecast
+    docs_url: https://open-meteo.com/en/docs
+    coverage:
+      global: true
+    entity_types: [Location]
+    metrics: [weather.temp.c, weather.wind.speed_ms, weather.solar.ghi.wm2, weather.precip.mm]
+    data_class: both
+    latency: models refreshed on their native cycles (hourly to 6-hourly)
+    resolution: hourly (15-min for some variables/regions); point queries by lat/lon
+    update_frequency: per underlying model run (ICON, GFS, ECMWF IFS/AIFS, ACCESS-G, etc.)
+    history_depth: historical weather API back to 1940 (ERA5); forecast archive since 2022
+    authentication: none
+    licensing:
+      class: open-noncommercial
+      notes: Free WITHOUT key for non-commercial use (fair-use ~10k calls/day); commercial use requires a paid API subscription. Data/API content under CC BY 4.0 attribution; underlying model data from open national providers.
+    cost: free non-commercial; paid commercial tiers
+    reliability: 4
+    quality_notes: Excellent developer ergonomics (single JSON call, model blending) - ideal for wind/solar generation context at plant coordinates. Not an observation network - model output.
+    verification_status: documented_only
+    last_checked: "2026-08-12"
+    notes: Dedicated endpoints for ECMWF, historical (archive-api), air quality, marine; solar radiation variables suit PV output modelling.
+
+  - source_id: source:ecmwf:open-data
+    publisher: European Centre for Medium-Range Weather Forecasts
+    dataset: ECMWF Open Data - real-time IFS and AIFS forecast products (0.25 deg)
+    api_type: bulk-download
+    url: https://data.ecmwf.int/forecasts/
+    docs_url: https://confluence.ecmwf.int/display/DAC/ECMWF+open+data%3A+real-time+forecasts+from+IFS+and+AIFS
+    coverage:
+      global: true
+    entity_types: [Location]
+    metrics: [weather.temp.c, weather.wind.speed_ms, weather.pressure.hpa, weather.precip.mm]
+    data_class: live
+    latency: published on the real-time dissemination schedule (~hours after synoptic time)
+    resolution: 0.25 degree grid, GRIB2; 3-6 hourly steps to 10+ days
+    update_frequency: 4 runs/day (00/06/12/18Z; AIFS as available)
+    history_depth: rolling recent runs on the open endpoint; archives via MARS/CDS
+    authentication: none
+    licensing:
+      class: open-attribution
+      notes: LICENCE CHANGE - formerly restricted, ECMWF real-time products moved to open data under CC BY 4.0 (resolution upgraded to 0.25 deg in 2024; ECMWF has since opened its entire real-time catalogue). Attribute ECMWF.
+    cost: free
+    reliability: 5
+    quality_notes: World-reference global NWP now genuinely open, including the AIFS ML model - the global forecast backbone for demand/renewables context outside AU/US national services.
+    verification_status: documented_only
+    last_checked: "2026-08-12"
+    notes: Also mirrored on AWS Open Data (registry.opendata.aws/ecmwf-forecasts); python client 'ecmwf-opendata' simplifies retrieval.

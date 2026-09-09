@@ -1,0 +1,219 @@
+# Structural seed — coal mines and resource basins. See ../../../schemas/entity.schema.json
+# Production figures are approximate recent-year rates (Mtpa saleable unless noted).
+records:
+  - entity_id: mine:au-qld:blackwater
+    entity_type: CoalMine
+    name: Blackwater Mine
+    aliases: [Blackwater]
+    data_class: structural
+    observability: ESTIMATED
+    geometry: { type: Point, coordinates: [148.88, -23.70] }
+    country: au
+    admin: { region: Queensland, locality: Blackwater }
+    grid_id: null
+    properties:
+      mine_type: open-cut
+      commodities: [metallurgical coal, thermal coal]
+      production_mtpa: 13
+      production_note: approximate; one of Australia's largest open-cut coal complexes (~80 km strike)
+    external_ids: {}
+    sources: [source:gem:global-coal-mine-tracker, source:wikidata:sparql]
+    notes: >-
+      Sold by BHP Mitsubishi Alliance to Whitehaven Coal (completed April 2024); Whitehaven sold 30% to
+      Nippon Steel (20%) and JFE Steel (10%) effective April 2025 (verified). Whitehaven operates. Exports
+      via the Blackwater rail system to Gladstone.
+
+  - entity_id: mine:au-qld:goonyella-riverside
+    entity_type: CoalMine
+    name: Goonyella Riverside Mine
+    aliases: [Goonyella]
+    data_class: structural
+    observability: ESTIMATED
+    geometry: { type: Point, coordinates: [147.976, -21.746] }
+    country: au
+    admin: { region: Queensland, locality: Moranbah }
+    grid_id: null
+    properties:
+      mine_type: open-cut
+      commodities: [metallurgical coal]
+      production_mtpa: 16
+      production_note: approximate; flagship BMA hard-coking-coal mine
+    external_ids: {}
+    sources: [source:gem:global-coal-mine-tracker, source:wikidata:sparql]
+    notes: BHP Mitsubishi Alliance (50/50); exports via the Goonyella rail system to Hay Point.
+
+  - entity_id: mine:au-qld:peak-downs
+    entity_type: CoalMine
+    name: Peak Downs Mine
+    aliases: [Peak Downs]
+    data_class: structural
+    observability: ESTIMATED
+    geometry: { type: Point, coordinates: [148.19, -22.26] }
+    country: au
+    admin: { region: Queensland, locality: Moranbah }
+    grid_id: null
+    properties:
+      mine_type: open-cut
+      commodities: [metallurgical coal]
+      production_mtpa: 11
+      production_note: approximate
+    external_ids: {}
+    sources: [source:gem:global-coal-mine-tracker, source:wikidata:sparql]
+    notes: BHP Mitsubishi Alliance (50/50) hard coking coal; exports via the Goonyella rail system to Hay Point.
+
+  - entity_id: mine:au-qld:curragh
+    entity_type: CoalMine
+    name: Curragh Mine
+    aliases: [Curragh]
+    data_class: structural
+    observability: ESTIMATED
+    geometry: { type: Point, coordinates: [148.83, -23.45] }
+    country: au
+    admin: { region: Queensland, locality: Blackwater }
+    grid_id: null
+    properties:
+      mine_type: open-cut
+      commodities: [metallurgical coal, thermal coal]
+      production_mtpa: 12
+      production_note: approximate; ~10 Mtpa export metallurgical plus ~2-3 Mtpa domestic thermal to Stanwell
+    external_ids: {}
+    sources: [source:gem:global-coal-mine-tracker, source:wikidata:sparql]
+    notes: >-
+      Coronado Global Resources. Supplies thermal coal to Stanwell Power Station under public contract
+      (legacy agreement to early 2027, replacement agreements from 2027 including a June 2025 deal - verified).
+      Exports via the Blackwater rail system to RG Tanna and WICET.
+
+  - entity_id: mine:au-qld:callide
+    entity_type: CoalMine
+    name: Callide Mine
+    aliases: [Callide]
+    data_class: structural
+    observability: ESTIMATED
+    geometry: { type: Point, coordinates: [150.63, -24.30] }
+    country: au
+    admin: { region: Queensland, locality: Biloela }
+    grid_id: null
+    properties:
+      mine_type: open-cut
+      commodities: [thermal coal]
+      production_mtpa: 8
+      production_note: approximate capacity ~10 Mtpa; substantially a captive supplier to the adjacent Callide B and C stations
+    external_ids: {}
+    sources: [source:gem:global-coal-mine-tracker, source:wikidata:sparql]
+    notes: >-
+      Batchfire Resources since October 2016 (previously Anglo American). Geologically in the small Callide
+      Basin rather than the Bowen Basin proper. Surplus coal exported through Gladstone via the Moura rail system.
+
+  - entity_id: mine:au-qld:meandu
+    entity_type: CoalMine
+    name: Meandu Mine
+    aliases: [Meandu]
+    data_class: structural
+    observability: ESTIMATED
+    geometry: { type: Point, coordinates: [151.85, -26.80] }
+    country: au
+    admin: { region: Queensland, locality: Nanango }
+    grid_id: null
+    properties:
+      mine_type: open-cut
+      commodities: [thermal coal]
+      production_mtpa: 7
+      production_note: approximate; captive supplier
+    external_ids: {}
+    sources: [source:gem:global-coal-mine-tracker, source:wikidata:sparql]
+    notes: Owned by Stanwell Corporation; dedicated fuel source for Tarong and Tarong North (conveyor/short haul). In the Tarong Basin.
+
+  - entity_id: mine:au-qld:kogan-creek
+    entity_type: CoalMine
+    name: Kogan Creek Mine
+    aliases: [Kogan Creek Coal Mine]
+    data_class: structural
+    observability: ESTIMATED
+    geometry: { type: Point, coordinates: [150.76, -26.95] }
+    country: au
+    admin: { region: Queensland, locality: Chinchilla }
+    grid_id: null
+    properties:
+      mine_type: open-cut
+      commodities: [thermal coal]
+      production_mtpa: 2.8
+      production_note: approximate; captive supplier
+    external_ids: {}
+    sources: [source:gem:global-coal-mine-tracker]
+    notes: CS Energy-owned captive mine feeding Kogan Creek Power Station by conveyor. Walloon coal measures, Surat Basin.
+
+  - entity_id: mine:au-nsw:hunter-valley-operations
+    entity_type: CoalMine
+    name: Hunter Valley Operations
+    aliases: [HVO]
+    data_class: structural
+    observability: ESTIMATED
+    geometry: { type: Point, coordinates: [151.06, -32.52] }
+    country: au
+    admin: { region: New South Wales, locality: Singleton }
+    grid_id: null
+    properties:
+      mine_type: open-cut
+      commodities: [thermal coal, semi-soft coking coal]
+      production_mtpa: 13
+      production_note: approximate saleable
+    external_ids: {}
+    sources: [source:gem:global-coal-mine-tracker, source:wikidata:sparql]
+    notes: Yancoal (51%, operator) / Glencore (49%) JV in the Hunter Valley (Sydney Basin); exports via the Port of Newcastle.
+
+  - entity_id: basin:au:bowen
+    entity_type: CoalBasin
+    name: Bowen Basin
+    aliases: []
+    data_class: structural
+    observability: ESTIMATED
+    geometry: { type: Point, coordinates: [148.0, -22.5] }
+    country: au
+    admin: { region: Queensland }
+    grid_id: null
+    properties:
+      area_km2: 60000
+      primary_commodity: metallurgical coal
+    external_ids: {}
+    sources: [source:gem:global-coal-mine-tracker, source:wikidata:sparql]
+    notes: >-
+      The world's premier seaborne metallurgical coal province, central Queensland; also hosts coal-seam gas
+      (Fairview/Scotia etc. feeding GLNG). Aggregate production visible via Queensland government and GEM data.
+
+  - entity_id: basin:au:surat
+    entity_type: GasBasin
+    name: Surat Basin
+    aliases: []
+    data_class: structural
+    observability: ESTIMATED
+    geometry: { type: Point, coordinates: [150.0, -27.0] }
+    country: au
+    admin: { region: Queensland }
+    grid_id: null
+    properties:
+      area_km2: 270000
+      primary_commodity: coal-seam gas
+    external_ids: {}
+    sources: [source:gem:global-gas-infrastructure-tracker, source:aemo:gas-bulletin-board]
+    notes: >-
+      Principal coal-seam gas province feeding the Curtis Island LNG projects; also hosts Walloon-measure
+      thermal coal (Kogan Creek, Cameby Downs). Gas production reported daily via the AEMO Gas Bulletin Board.
+
+  - entity_id: basin:au:galilee
+    entity_type: CoalBasin
+    name: Galilee Basin
+    aliases: []
+    data_class: structural
+    observability: NOT_OBSERVABLE
+    geometry: { type: Point, coordinates: [145.8, -22.8] }
+    country: au
+    admin: { region: Queensland }
+    grid_id: null
+    properties:
+      area_km2: 247000
+      primary_commodity: thermal coal
+    external_ids: {}
+    sources: [source:gem:global-coal-mine-tracker, source:wikidata:sparql]
+    notes: >-
+      Largely undeveloped inland thermal coal basin; the Bravus (Adani) Carmichael mine (exporting via Abbot
+      Point) is its only operating project and is not modelled in this seed. Included as strategic context.

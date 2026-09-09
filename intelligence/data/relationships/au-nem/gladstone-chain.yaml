@@ -1,0 +1,436 @@
+# Structural relationships — the Gladstone demo backbone: power -> smelter, bauxite -> alumina ->
+# aluminium -> export; coal rail -> terminals -> export; CSG -> LNG -> export; met coal -> steel demand.
+# See ../../../schemas/relationship.schema.json
+records:
+  - rel_id: rel:gladstone-ps-supplies-boyne-island
+    rel_type: SUPPLIES
+    from_id: gen:au-nem:gladstone-ps
+    to_id: smelter:au-qld:boyne-island
+    confidence: 1.0
+    source: source:wikidata:sparql
+    method: declared
+    valid_from: "1982-01-01T00:00:00Z"
+    valid_to: null
+    properties:
+      commodity: electricity
+      note: >-
+        Public JV arrangement - most GPS output is committed to Boyne Smelters via dedicated 275 kV supply;
+        contracts run to March 2029 (verified 2025), which drives the GPS potential-retirement notice.
+
+  - rel_id: rel:gladstone-ps-may-supply-qal
+    rel_type: MAY_SUPPLY
+    from_id: gen:au-nem:gladstone-ps
+    to_id: refinery:au-qld:qal
+    confidence: 0.5
+    source: source:wikidata:sparql
+    method: derived
+    valid_from: null
+    valid_to: null
+    properties: { commodity: electricity, note: historically associated supply within the Rio Tinto Gladstone system; current commercial arrangements not public }
+
+  - rel_id: rel:qal-produces-alumina
+    rel_type: PRODUCES
+    from_id: refinery:au-qld:qal
+    to_id: commodity:alumina
+    confidence: 1.0
+    source: source:wikidata:sparql
+    method: declared
+    valid_from: "1967-01-01T00:00:00Z"
+    valid_to: null
+    properties: { capacity_tpa: 3950000 }
+
+  - rel_id: rel:yarwun-produces-alumina
+    rel_type: PRODUCES
+    from_id: refinery:au-qld:yarwun
+    to_id: commodity:alumina
+    confidence: 1.0
+    source: source:wikidata:sparql
+    method: declared
+    valid_from: "2004-01-01T00:00:00Z"
+    valid_to: null
+    properties: { capacity_tpa: 3000000 }
+
+  - rel_id: rel:qal-consumes-bauxite
+    rel_type: CONSUMES
+    from_id: refinery:au-qld:qal
+    to_id: commodity:bauxite
+    confidence: 1.0
+    source: source:gpc:cargo-statistics
+    method: declared
+    valid_from: "1967-01-01T00:00:00Z"
+    valid_to: null
+    properties: { note: Weipa bauxite shipped down the Queensland coast; inbound tonnages visible in GPC statistics }
+
+  - rel_id: rel:yarwun-consumes-bauxite
+    rel_type: CONSUMES
+    from_id: refinery:au-qld:yarwun
+    to_id: commodity:bauxite
+    confidence: 1.0
+    source: source:gpc:cargo-statistics
+    method: declared
+    valid_from: "2004-01-01T00:00:00Z"
+    valid_to: null
+    properties: { note: Weipa bauxite feed }
+
+  - rel_id: rel:qal-supplies-boyne-island
+    rel_type: SUPPLIES
+    from_id: refinery:au-qld:qal
+    to_id: smelter:au-qld:boyne-island
+    confidence: 1.0
+    source: source:wikidata:sparql
+    method: declared
+    valid_from: "1982-01-01T00:00:00Z"
+    valid_to: null
+    properties: { commodity: commodity:alumina, note: alumina conveyed/shipped across Boyne estuary to the smelter; both plants sit in the Rio Tinto Gladstone system }
+
+  - rel_id: rel:boyne-island-consumes-alumina
+    rel_type: CONSUMES
+    from_id: smelter:au-qld:boyne-island
+    to_id: commodity:alumina
+    confidence: 1.0
+    source: source:wikidata:sparql
+    method: declared
+    valid_from: "1982-01-01T00:00:00Z"
+    valid_to: null
+    properties: { note: ~2 t alumina per tonne of metal }
+
+  - rel_id: rel:boyne-island-produces-aluminium
+    rel_type: PRODUCES
+    from_id: smelter:au-qld:boyne-island
+    to_id: commodity:aluminium
+    confidence: 1.0
+    source: source:wikidata:sparql
+    method: declared
+    valid_from: "1982-01-01T00:00:00Z"
+    valid_to: null
+    properties: { capacity_tpa: 500000, note: curtailed ~14% since 2017 }
+
+  - rel_id: rel:boyne-island-exports-jp
+    rel_type: EXPORTS_TO
+    from_id: smelter:au-qld:boyne-island
+    to_id: dest:jp
+    confidence: 0.7
+    source: source:gpc:cargo-statistics
+    method: derived
+    valid_from: null
+    valid_to: null
+    properties: { commodity: commodity:aluminium, note: public export-market reporting (JV partners include Japanese shareholders); not a contract assertion }
+
+  - rel_id: rel:boyne-island-exports-kr
+    rel_type: EXPORTS_TO
+    from_id: smelter:au-qld:boyne-island
+    to_id: dest:kr
+    confidence: 0.7
+    source: source:gpc:cargo-statistics
+    method: derived
+    valid_from: null
+    valid_to: null
+    properties: { commodity: commodity:aluminium, note: public export-market reporting; not a contract assertion }
+
+  - rel_id: rel:blackwater-transports-rg-tanna
+    rel_type: TRANSPORTS
+    from_id: mine:au-qld:blackwater
+    to_id: terminal:au-qld:rg-tanna
+    confidence: 0.9
+    source: source:gpc:cargo-statistics
+    method: derived
+    valid_from: null
+    valid_to: null
+    properties: { commodity: commodity:coal-metallurgical, via: rail:au-qld:blackwater-system }
+
+  - rel_id: rel:curragh-transports-rg-tanna
+    rel_type: TRANSPORTS
+    from_id: mine:au-qld:curragh
+    to_id: terminal:au-qld:rg-tanna
+    confidence: 0.9
+    source: source:gpc:cargo-statistics
+    method: derived
+    valid_from: null
+    valid_to: null
+    properties: { commodity: commodity:coal-metallurgical, via: rail:au-qld:blackwater-system }
+
+  - rel_id: rel:curragh-transports-wicet
+    rel_type: TRANSPORTS
+    from_id: mine:au-qld:curragh
+    to_id: terminal:au-qld:wicet
+    confidence: 0.9
+    source: source:gpc:cargo-statistics
+    method: derived
+    valid_from: "2015-01-01T00:00:00Z"
+    valid_to: null
+    properties: { commodity: commodity:coal-metallurgical, via: rail:au-qld:blackwater-system, note: Coronado Curragh is a WICET shareholder-shipper }
+
+  - rel_id: rel:callide-mine-transports-rg-tanna
+    rel_type: TRANSPORTS
+    from_id: mine:au-qld:callide
+    to_id: terminal:au-qld:rg-tanna
+    confidence: 0.8
+    source: source:gpc:cargo-statistics
+    method: derived
+    valid_from: null
+    valid_to: null
+    properties: { commodity: commodity:coal-thermal, via: rail:au-qld:moura-system, note: export surplus beyond mine-mouth power supply }
+
+  - rel_id: rel:goonyella-riverside-transports-hpct
+    rel_type: TRANSPORTS
+    from_id: mine:au-qld:goonyella-riverside
+    to_id: terminal:au-qld:hay-point
+    confidence: 0.95
+    source: source:wikidata:sparql
+    method: derived
+    valid_from: null
+    valid_to: null
+    properties: { commodity: commodity:coal-metallurgical, via: rail:au-qld:goonyella-system, note: BMA mine to BMA-owned terminal }
+
+  - rel_id: rel:peak-downs-transports-hpct
+    rel_type: TRANSPORTS
+    from_id: mine:au-qld:peak-downs
+    to_id: terminal:au-qld:hay-point
+    confidence: 0.95
+    source: source:wikidata:sparql
+    method: derived
+    valid_from: null
+    valid_to: null
+    properties: { commodity: commodity:coal-metallurgical, via: rail:au-qld:goonyella-system, note: BMA mine to BMA-owned terminal }
+
+  - rel_id: rel:rg-tanna-part-of-gladstone-port
+    rel_type: PART_OF
+    from_id: terminal:au-qld:rg-tanna
+    to_id: port:au-qld:gladstone
+    confidence: 1.0
+    source: source:gpc:cargo-statistics
+    method: declared
+    valid_from: null
+    valid_to: null
+    properties: {}
+
+  - rel_id: rel:wicet-part-of-gladstone-port
+    rel_type: PART_OF
+    from_id: terminal:au-qld:wicet
+    to_id: port:au-qld:gladstone
+    confidence: 1.0
+    source: source:gpc:cargo-statistics
+    method: declared
+    valid_from: "2015-01-01T00:00:00Z"
+    valid_to: null
+    properties: { note: within port limits but independently owned }
+
+  - rel_id: rel:barney-point-part-of-gladstone-port
+    rel_type: PART_OF
+    from_id: terminal:au-qld:barney-point
+    to_id: port:au-qld:gladstone
+    confidence: 1.0
+    source: source:gpc:cargo-statistics
+    method: declared
+    valid_from: null
+    valid_to: null
+    properties: {}
+
+  - rel_id: rel:hpct-part-of-hay-point-port
+    rel_type: PART_OF
+    from_id: terminal:au-qld:hay-point
+    to_id: port:au-qld:hay-point
+    confidence: 1.0
+    source: source:wikidata:sparql
+    method: declared
+    valid_from: null
+    valid_to: null
+    properties: {}
+
+  - rel_id: rel:dbct-part-of-hay-point-port
+    rel_type: PART_OF
+    from_id: terminal:au-qld:dbct
+    to_id: port:au-qld:hay-point
+    confidence: 1.0
+    source: source:wikidata:sparql
+    method: declared
+    valid_from: null
+    valid_to: null
+    properties: {}
+
+  - rel_id: rel:qclng-loads-at-gladstone
+    rel_type: LOADS_AT
+    from_id: lng:au-qld:qclng
+    to_id: port:au-qld:gladstone
+    confidence: 1.0
+    source: source:gpc:cargo-statistics
+    method: declared
+    valid_from: "2015-01-01T00:00:00Z"
+    valid_to: null
+    properties: { note: Curtis Island jetty within Port of Gladstone limits }
+
+  - rel_id: rel:aplng-loads-at-gladstone
+    rel_type: LOADS_AT
+    from_id: lng:au-qld:aplng
+    to_id: port:au-qld:gladstone
+    confidence: 1.0
+    source: source:gpc:cargo-statistics
+    method: declared
+    valid_from: "2016-01-01T00:00:00Z"
+    valid_to: null
+    properties: { note: Curtis Island jetty within Port of Gladstone limits }
+
+  - rel_id: rel:glng-loads-at-gladstone
+    rel_type: LOADS_AT
+    from_id: lng:au-qld:glng
+    to_id: port:au-qld:gladstone
+    confidence: 1.0
+    source: source:gpc:cargo-statistics
+    method: declared
+    valid_from: "2015-10-01T00:00:00Z"
+    valid_to: null
+    properties: { note: Curtis Island jetty within Port of Gladstone limits }
+
+  - rel_id: rel:qclng-produces-lng
+    rel_type: PRODUCES
+    from_id: lng:au-qld:qclng
+    to_id: commodity:lng
+    confidence: 1.0
+    source: source:gem:global-gas-infrastructure-tracker
+    method: declared
+    valid_from: "2014-12-01T00:00:00Z"
+    valid_to: null
+    properties: { capacity_mtpa: 8.5 }
+
+  - rel_id: rel:aplng-produces-lng
+    rel_type: PRODUCES
+    from_id: lng:au-qld:aplng
+    to_id: commodity:lng
+    confidence: 1.0
+    source: source:gem:global-gas-infrastructure-tracker
+    method: declared
+    valid_from: "2015-12-01T00:00:00Z"
+    valid_to: null
+    properties: { capacity_mtpa: 9.0 }
+
+  - rel_id: rel:glng-produces-lng
+    rel_type: PRODUCES
+    from_id: lng:au-qld:glng
+    to_id: commodity:lng
+    confidence: 1.0
+    source: source:gem:global-gas-infrastructure-tracker
+    method: declared
+    valid_from: "2015-09-01T00:00:00Z"
+    valid_to: null
+    properties: { capacity_mtpa: 7.8 }
+
+  - rel_id: rel:qclng-exports-cn
+    rel_type: EXPORTS_TO
+    from_id: lng:au-qld:qclng
+    to_id: dest:cn
+    confidence: 0.8
+    source: source:gpc:cargo-statistics
+    method: derived
+    valid_from: null
+    valid_to: null
+    properties: { commodity: commodity:lng, note: CNOOC anchor offtake; derived from public trade statistics }
+
+  - rel_id: rel:qclng-exports-jp
+    rel_type: EXPORTS_TO
+    from_id: lng:au-qld:qclng
+    to_id: dest:jp
+    confidence: 0.7
+    source: source:gpc:cargo-statistics
+    method: derived
+    valid_from: null
+    valid_to: null
+    properties: { commodity: commodity:lng, note: Tokyo Gas offtake plus portfolio cargoes }
+
+  - rel_id: rel:aplng-exports-cn
+    rel_type: EXPORTS_TO
+    from_id: lng:au-qld:aplng
+    to_id: dest:cn
+    confidence: 0.8
+    source: source:gpc:cargo-statistics
+    method: derived
+    valid_from: null
+    valid_to: null
+    properties: { commodity: commodity:lng, note: Sinopec anchor offtake }
+
+  - rel_id: rel:aplng-exports-jp
+    rel_type: EXPORTS_TO
+    from_id: lng:au-qld:aplng
+    to_id: dest:jp
+    confidence: 0.7
+    source: source:gpc:cargo-statistics
+    method: derived
+    valid_from: null
+    valid_to: null
+    properties: { commodity: commodity:lng, note: Kansai Electric and other Japanese buyers }
+
+  - rel_id: rel:glng-exports-kr
+    rel_type: EXPORTS_TO
+    from_id: lng:au-qld:glng
+    to_id: dest:kr
+    confidence: 0.8
+    source: source:gpc:cargo-statistics
+    method: derived
+    valid_from: null
+    valid_to: null
+    properties: { commodity: commodity:lng, note: KOGAS is a 15% partner and anchor offtaker (with PETRONAS to Malaysia, not modelled as a destination) }
+
+  - rel_id: rel:orica-yarwun-may-supply-blackwater
+    rel_type: MAY_SUPPLY
+    from_id: chem:au-qld:orica-yarwun
+    to_id: mine:au-qld:blackwater
+    confidence: 0.6
+    source: source:wikidata:sparql
+    method: derived
+    valid_from: null
+    valid_to: null
+    properties: { commodity: ammonium nitrate, note: Orica Yarwun is the principal AN source for Bowen Basin blasting; mine-level contracts not public }
+
+  - rel_id: rel:orica-yarwun-may-supply-curragh
+    rel_type: MAY_SUPPLY
+    from_id: chem:au-qld:orica-yarwun
+    to_id: mine:au-qld:curragh
+    confidence: 0.6
+    source: source:wikidata:sparql
+    method: derived
+    valid_from: null
+    valid_to: null
+    properties: { commodity: ammonium nitrate, note: mine-level contracts not public }
+
+  - rel_id: rel:jp-steel-consumes-met-coal
+    rel_type: CONSUMES
+    from_id: market:jp:steel
+    to_id: commodity:coal-metallurgical
+    confidence: 0.9
+    source: source:wikidata:sparql
+    method: derived
+    valid_from: null
+    valid_to: null
+    properties: { note: blast-furnace steelmaking; Australia supplies the majority of Japanese coking coal imports }
+
+  - rel_id: rel:jp-steel-part-of-jp
+    rel_type: PART_OF
+    from_id: market:jp:steel
+    to_id: dest:jp
+    confidence: 1.0
+    source: source:wikidata:sparql
+    method: declared
+    valid_from: null
+    valid_to: null
+    properties: {}
+
+  - rel_id: rel:goonyella-riverside-may-supply-jp-steel
+    rel_type: MAY_SUPPLY
+    from_id: mine:au-qld:goonyella-riverside
+    to_id: market:jp:steel
+    confidence: 0.6
+    source: source:wikidata:sparql
+    method: derived
+    valid_from: null
+    valid_to: null
+    properties: { commodity: commodity:coal-metallurgical, note: Mitsubishi JV alignment and long-run trade patterns; specific offtakes not public }
+
+  - rel_id: rel:port-kembla-consumes-met-coal
+    rel_type: CONSUMES
+    from_id: steel:au-nsw:port-kembla
+    to_id: commodity:coal-metallurgical
+    confidence: 0.9
+    source: source:wikidata:sparql
+    method: derived
+    valid_from: null
+    valid_to: null
+    properties: { note: primarily nearby Illawarra coking coal (mines not modelled in this seed) }

@@ -1,0 +1,241 @@
+# Source registry — Europe. See ../../schemas/source.schema.json
+records:
+  - source_id: source:entsoe:transparency-platform
+    publisher: ENTSO-E (European Network of Transmission System Operators for Electricity)
+    dataset: ENTSO-E Transparency Platform (pan-European generation, load, prices, cross-border flows)
+    api_type: rest
+    url: https://web-api.tp.entsoe.eu/api
+    docs_url: https://transparency.entsoe.eu/
+    coverage:
+      countries: [eu]
+    entity_types: [Grid, GridRegion, Generator, Interconnector]
+    metrics: [grid.demand.mw, grid.generation.mw, power.output.mw, market.price.energy, intercon.flow.mw]
+    data_class: both
+    latency: ~1h for actual generation/load (per Regulation 543/2013 deadlines); day-ahead data on publication
+    resolution: 15min/30min/60min depending on bidding zone
+    update_frequency: continuous as TSOs submit; hourly effective cadence for actuals
+    history_depth: since January 2015
+    authentication: registration
+    licensing:
+      class: open-registration
+      notes: Free registration; API access via security token requested by email after signup. Reuse permitted with attribution under the TP terms; some per-unit data carries redistribution caveats.
+    cost: free
+    reliability: 4
+    quality_notes: The single pan-European source (per-unit actual generation >=100MW, load, cross-border physical flows, day-ahead prices for most zones). TSO-submitted - completeness and timeliness vary notably by country.
+    verification_status: documented_only
+    last_checked: "2026-08-12"
+    notes: XML (IEC 62325-451) responses; EIC codes are the join keys - map to entity external_ids.entsoe_eic.
+
+  - source_id: source:elexon:bmrs
+    publisher: Elexon (GB Balancing and Settlement Code)
+    dataset: Elexon Insights Solution API (successor to BMRS - GB balancing mechanism and market data)
+    api_type: rest
+    url: https://data.elexon.co.uk/bmrs/api/v1/
+    docs_url: https://developer.data.elexon.co.uk/
+    coverage:
+      grids: [grid:gb]
+      countries: [gb]
+    entity_types: [Grid, Generator, Interconnector]
+    metrics: [grid.demand.mw, power.output.mw, grid.frequency.hz, market.price.energy, intercon.flow.mw]
+    data_class: both
+    latency: near-real-time (frequency seconds-scale; physical data minutes)
+    resolution: settlement period (30min) for most; per-BMU physical notifications; instantaneous frequency
+    update_frequency: continuous; per settlement period for market series
+    history_depth: multi-year via date-ranged queries; legacy BMRS history preserved
+    authentication: none
+    licensing:
+      class: open-attribution
+      notes: Insights Solution APIs are public with NO API key required (the legacy BMRS API key regime was retired with the platform). Elexon grants a limited licence to use BMRS data; attribution to Elexon expected.
+    cost: free
+    reliability: 4
+    quality_notes: Deep GB detail - per-BMU generation (B1610-equivalent), bid/offer acceptances, system prices, demand outturn, frequency. The mandatory ID keeps the familiar 'bmrs' name; the live service is Insights Solution.
+    verification_status: documented_only
+    last_checked: "2026-08-12"
+    notes: JSON/CSV responses; IRIS push service available for streaming delivery (free Azure-based subscription).
+
+  - source_id: source:nordpool:market-data
+    publisher: Nord Pool (Euronext)
+    dataset: Nord Pool Data Portal and Power Data Services (day-ahead/intraday prices, volumes, capacities, flows)
+    api_type: rest
+    url: https://data.nordpoolgroup.com/
+    docs_url: https://www.nordpoolgroup.com/en/services/power-market-data-services/
+    coverage:
+      countries: [no, se, fi, dk, ee, lv, lt, de, nl, be, fr, at, pl, gb]
+    entity_types: [Grid, GridRegion, Interconnector]
+    metrics: [market.price.energy, market.volume.mwh, intercon.flow.mw, intercon.capacity.mw]
+    data_class: both
+    latency: day-ahead prices published ~12:45-13:00 CET daily; delayed data on the free portal
+    resolution: hourly (15min products since 2025 MTU change in relevant zones)
+    update_frequency: daily auction cycle; intraday continuous
+    history_depth: multi-year on portal; full history via commercial data products
+    authentication: registration
+    licensing:
+      class: commercial
+      notes: Web Data Portal viewing is free (registration for some views) for personal/internal use, but programmatic API access and redistribution are PAID subscriptions (API accounts ~EUR 350/yr extra, redistribution licences from ~EUR 3500/yr). Academic terms available. Day-ahead prices for most zones are also available free via ENTSO-E TP.
+    cost: commercial (free delayed web viewing)
+    reliability: 4
+    quality_notes: Primary exchange for Nordic/Baltic day-ahead; authoritative auction results. Use ENTSO-E for a free programmatic path to the same zone prices.
+    verification_status: documented_only
+    last_checked: "2026-08-12"
+    notes: marketdata.nordpoolgroup.com hosts the JSON API for subscribers.
+
+  - source_id: source:neso:data-portal
+    publisher: National Energy System Operator (NESO, Great Britain)
+    dataset: NESO Data Portal (CKAN) - demand, forecasts, carbon intensity, balancing, system data
+    api_type: rest
+    url: https://www.neso.energy/data-portal
+    docs_url: https://www.neso.energy/data-portal/about-data-portal
+    coverage:
+      grids: [grid:gb]
+      countries: [gb]
+    entity_types: [Grid, GridRegion, Interconnector]
+    metrics: [grid.demand.mw, grid.demand.forecast.mw, emissions.intensity.gco2_kwh, intercon.flow.mw]
+    data_class: both
+    latency: minutes-to-hours depending on dataset
+    resolution: settlement period (30min) typical; some 1min/instantaneous datasets
+    update_frequency: per dataset - real-time to annual
+    history_depth: multi-year for most operational datasets
+    authentication: none
+    licensing:
+      class: open-attribution
+      notes: NESO Open Licence (based on OGL v3.0) on most datasets, applied per dataset - check each dataset's licence field; attribution to NESO required.
+    cost: free
+    reliability: 4
+    quality_notes: CKAN datastore SQL/API over hundreds of datasets (demand outturn, embedded wind/solar forecasts, carbon intensity, ancillary contracts). Complements Elexon (settlement view) with the operator view.
+    verification_status: documented_only
+    last_checked: "2026-08-12"
+    notes: Formerly National Grid ESO portal (data.nationalgrideso.com redirects); Carbon Intensity API (carbonintensity.org.uk) is a related NESO service.
+
+  - source_id: source:fingrid:open-data
+    publisher: Fingrid Oyj (Finnish TSO)
+    dataset: Fingrid Open Data (Finnish power system real-time and historical data)
+    api_type: rest
+    url: https://data.fingrid.fi/en
+    docs_url: https://developer-data.fingrid.fi/apis
+    coverage:
+      grids: [grid:fi]
+      countries: [fi]
+    entity_types: [Grid, Interconnector]
+    metrics: [grid.demand.mw, grid.generation.mw, grid.frequency.hz, intercon.flow.mw]
+    data_class: both
+    latency: ~3min for real-time datasets
+    resolution: 3min real-time series; 15min/hourly for market series
+    update_frequency: every 3 minutes for live datasets
+    history_depth: multi-year per dataset
+    authentication: api_key
+    licensing:
+      class: open-attribution
+      notes: CC BY 4.0; free API key on registration via the developer portal (x-api-key header).
+    cost: free
+    reliability: 5
+    quality_notes: Exceptionally clean open TSO data - real-time production by type, consumption, frequency, cross-border flows (SE/NO/EE/RU links).
+    verification_status: documented_only
+    last_checked: "2026-08-12"
+    notes: Dataset IDs are numeric (e.g. 193 = electricity production in Finland).
+
+  - source_id: source:rte:data-portal
+    publisher: RTE (Réseau de Transport d'Électricité, French TSO)
+    dataset: RTE Data Portal APIs + éCO2mix (French generation, consumption, exchanges, CO2)
+    api_type: rest
+    url: https://data.rte-france.com/
+    docs_url: https://data.rte-france.com/catalog
+    coverage:
+      grids: [grid:fr]
+      countries: [fr]
+    entity_types: [Grid, GridRegion, Generator, Interconnector]
+    metrics: [grid.demand.mw, grid.generation.mw, power.output.mw, intercon.flow.mw, emissions.intensity.gco2_kwh]
+    data_class: both
+    latency: éCO2mix real-time refreshed ~every 15min-1h; consolidated data later
+    resolution: 15min (éCO2mix); per-unit actual generation hourly
+    update_frequency: hourly for most live APIs
+    history_depth: éCO2mix consolidated history back to 2012 (bulk download); API history varies
+    authentication: oauth
+    licensing:
+      class: open-registration
+      notes: Free account + application registration; OAuth2 client-credentials token per API. Data reusable with attribution; éCO2mix also republished on ODRÉ (opendatasoft) without auth. API quotas apply (e.g. 50k calls/month for éCO2mix).
+    cost: free
+    reliability: 4
+    quality_notes: Rich per-unit ('Actual Generation') and national mix data; ODRÉ mirror (odre.opendatasoft.com, eco2mix-national-tr) is the low-friction unauthenticated path.
+    verification_status: documented_only
+    last_checked: "2026-08-12"
+    notes: OAuth2 token endpoint at digital.iservices.rte-france.com; each API subscribed per application.
+
+  - source_id: source:regelleistung:datacenter
+    publisher: German TSOs (50Hertz, Amprion, TenneT, TransnetBW) via regelleistung.net
+    dataset: regelleistung.net Datacenter - FCR/aFRR/mFRR balancing capacity and energy tenders
+    api_type: bulk-download
+    url: https://www.regelleistung.net/apps/datacenter/tendering-files/
+    docs_url: https://www.regelleistung.net/en-us/Data
+    coverage:
+      grids: [grid:de]
+      countries: [de, at]
+    entity_types: [Grid]
+    metrics: [reserve.capacity.mw, market.price.reserve, reserve.activation.mwh]
+    data_class: both
+    latency: tender results published per auction cycle (daily for FCR/aFRR/mFRR capacity)
+    resolution: 4h product slices (aFRR/mFRR), daily FCR
+    update_frequency: daily auction cycles
+    history_depth: multi-year tender archive
+    authentication: none
+    licensing:
+      class: open-attribution
+      notes: Public transparency publication of the German (and cooperating Austrian) balancing market; free CSV downloads. Activation/actual balancing data is on netztransparenz.de rather than here.
+    cost: free
+    reliability: 4
+    quality_notes: Authoritative for German reserve procurement (demand, marginal/average capacity+energy prices). 50Hertz-specific grid data (wind/solar infeed, vertical load) is on 50hertz.com/Transparency and netztransparenz.de.
+    verification_status: documented_only
+    last_checked: "2026-08-12"
+    notes: CSV tender files per product/date; anonymised bid lists included.
+
+  - source_id: source:epex:market-data
+    publisher: EPEX SPOT SE (EEX Group)
+    dataset: EPEX SPOT market data (day-ahead and intraday auction/continuous results, CWE + GB + Nordics)
+    api_type: rest
+    url: https://www.epexspot.com/en/marketdataservices
+    docs_url: https://www.epexspot.com/en/GCDataUse
+    coverage:
+      countries: [de, fr, at, be, nl, ch, gb, dk, fi, no, se, pl]
+    entity_types: [Grid, GridRegion]
+    metrics: [market.price.energy, market.volume.mwh]
+    data_class: both
+    latency: real-time/delayed/end-of-day tiers per subscription
+    resolution: hourly, 30min and 15min products
+    update_frequency: daily auction cycle; continuous intraday
+    history_depth: full exchange history via paid historical products
+    authentication: registration
+    licensing:
+      class: commercial
+      notes: COMMERCIAL - market data sold via EEX Group webshop (API/sFTP subscriptions invoiced annually); website day-ahead widgets are view-only under EPEX General Conditions and NOT licensed for systematic collection/redistribution. Day-ahead zone prices are available free via ENTSO-E TP instead.
+    cost: commercial
+    reliability: 4
+    quality_notes: Primary exchange for continental European short-term power; only needed directly if intraday continuous depth (order book, VWAP) matters - otherwise ENTSO-E/SMARD suffice.
+    verification_status: documented_only
+    last_checked: "2026-08-12"
+    notes: Recorded for completeness as the commercial upgrade path; no connector without a licence.
+
+  - source_id: source:smard:market-data
+    publisher: Bundesnetzagentur (German Federal Network Agency)
+    dataset: SMARD - Strommarktdaten (German/European electricity market data platform)
+    api_type: rest
+    url: https://www.smard.de/en
+    docs_url: https://www.smard.de/en/datennutzung
+    coverage:
+      grids: [grid:de]
+      countries: [de]
+    entity_types: [Grid, GridRegion, Generator, Interconnector]
+    metrics: [grid.demand.mw, grid.generation.mw, market.price.energy, intercon.flow.mw]
+    data_class: both
+    latency: typically ~1-2h behind for actuals (mirrors ENTSO-E submission deadlines)
+    resolution: 15min (generation/consumption), hourly (prices)
+    update_frequency: continuous
+    history_depth: since 2015
+    authentication: none
+    licensing:
+      class: open-attribution
+      notes: CC BY 4.0 - all published data free to download and reuse with credit to Bundesnetzagentur | SMARD.de.
+    cost: free
+    reliability: 4
+    quality_notes: Regulator-curated German market view (generation by source, consumption, wholesale prices, cross-border flows, power plant data). Simple undocumented-but-stable JSON chart API plus a CSV download centre.
+    verification_status: documented_only
+    last_checked: "2026-08-12"
+    notes: JSON series at smard.de/app/chart_data/{filter}/{region}/..._{timestamp}.json (community-documented at github.com/bundesAPI/smard-api).

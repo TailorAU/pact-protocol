@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pact.tailor.au/intelligence/schemas/entity-types/interconnector.properties.json",
+  "title": "Interconnector properties",
+  "type": "object",
+  "properties": {
+    "capacity_mw_forward": { "type": "number" },
+    "capacity_mw_reverse": { "type": "number" },
+    "from_region": { "type": "string" },
+    "to_region": { "type": "string" },
+    "hvdc": { "type": "boolean" }
+  },
+  "additionalProperties": true
+}

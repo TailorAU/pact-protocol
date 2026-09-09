@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pact.tailor.au/intelligence/schemas/entity-types/pipeline.properties.json",
+  "title": "Pipeline properties",
+  "type": "object",
+  "properties": {
+    "commodity": {
+      "enum": ["gas", "oil", "water", "slurry"]
+    },
+    "length_km": { "type": "number" },
+    "capacity_tj_day": { "type": "number" }
+  },
+  "additionalProperties": true
+}

@@ -1,0 +1,468 @@
+# Structural seed — companies and operators referenced by ownership/operation relationships.
+# See ../../../schemas/entity.schema.json. Companies are modelled as their Australian operating presence;
+# multinational parents noted in notes. Geometry null (non-spatial).
+records:
+  - entity_id: company:au:rio-tinto
+    entity_type: Company
+    name: Rio Tinto
+    aliases: [Rio Tinto Group]
+    data_class: structural
+    observability: NOT_OBSERVABLE
+    geometry: null
+    country: au
+    grid_id: null
+    properties: { sector: mining and metals, listed: true, ticker: RIO }
+    external_ids: { wikidata_qid: Q206423 }
+    sources: [source:wikidata:sparql]
+    notes: Dual-listed UK/Australian miner. Anchor of the Gladstone aluminium chain - Boyne Smelters ~73.5%, QAL 80%, Yarwun 100%, Gladstone PS 42.125%, Tomago ~51.55%, plus Weipa bauxite.
+
+  - entity_id: company:au:nrg-gladstone
+    entity_type: Company
+    name: NRG Gladstone Operating Services
+    aliases: [NRG Gladstone]
+    data_class: structural
+    observability: NOT_OBSERVABLE
+    geometry: null
+    country: au
+    grid_id: null
+    properties: { sector: power generation operations }
+    external_ids: {}
+    sources: [source:wikidata:sparql]
+    notes: Australian subsidiary of NRG Energy Inc (US); operator of Gladstone Power Station for the JV. NRG Energy also holds a 37.5% JV interest, represented on this entity.
+
+  - entity_id: company:au:cs-energy
+    entity_type: Company
+    name: CS Energy
+    aliases: []
+    data_class: structural
+    observability: NOT_OBSERVABLE
+    geometry: null
+    country: au
+    grid_id: null
+    properties: { sector: power generation, ownership: Queensland Government }
+    external_ids: {}
+    sources: [source:wikidata:sparql]
+    notes: Queensland government-owned generator - Callide B, 50% of Callide C (operator), Kogan Creek station and mine; also market intermediary for Gladstone PS output.
+
+  - entity_id: company:au:stanwell-corp
+    entity_type: Company
+    name: Stanwell Corporation
+    aliases: [Stanwell]
+    data_class: structural
+    observability: NOT_OBSERVABLE
+    geometry: null
+    country: au
+    grid_id: null
+    properties: { sector: power generation, ownership: Queensland Government }
+    external_ids: {}
+    sources: [source:wikidata:sparql]
+    notes: Queensland government-owned generator - Stanwell PS, Tarong, Tarong North and the Meandu mine.
+
+  - entity_id: company:au:cleanco-qld
+    entity_type: Company
+    name: CleanCo Queensland
+    aliases: [CleanCo]
+    data_class: structural
+    observability: NOT_OBSERVABLE
+    geometry: null
+    country: au
+    grid_id: null
+    properties: { sector: power generation, ownership: Queensland Government }
+    external_ids: {}
+    sources: [source:wikidata:sparql]
+    notes: Queensland's low-emissions government generator (est. 2019) - Wivenhoe pumped storage, Swanbank E, Barron Gorge, Kareeya, Karara wind.
+
+  - entity_id: company:au:origin-energy
+    entity_type: Company
+    name: Origin Energy
+    aliases: [Origin]
+    data_class: structural
+    observability: NOT_OBSERVABLE
+    geometry: null
+    country: au
+    grid_id: null
+    properties: { sector: integrated energy, listed: true, ticker: ORG }
+    external_ids: {}
+    sources: [source:wikidata:sparql]
+    notes: Gentailer - Eraring, Darling Downs, Mt Stuart, Uranquinty; 27.5% of APLNG (upstream operator).
+
+  - entity_id: company:au:agl-energy
+    entity_type: Company
+    name: AGL Energy
+    aliases: [AGL]
+    data_class: structural
+    observability: NOT_OBSERVABLE
+    geometry: null
+    country: au
+    grid_id: null
+    properties: { sector: integrated energy, listed: true, ticker: AGL }
+    external_ids: {}
+    sources: [source:wikidata:sparql]
+    notes: Australia's largest emitter and gentailer - Bayswater; operates Coopers Gap for the PARF partnership.
+
+  - entity_id: company:au:energyaustralia
+    entity_type: Company
+    name: EnergyAustralia
+    aliases: []
+    data_class: structural
+    observability: NOT_OBSERVABLE
+    geometry: null
+    country: au
+    grid_id: null
+    properties: { sector: integrated energy, parent: CLP Group (Hong Kong) }
+    external_ids: {}
+    sources: [source:wikidata:sparql]
+    notes: CLP Group subsidiary - Mt Piper, Tallawarra (and Yallourn in VIC, not modelled).
+
+  - entity_id: company:au:delta-electricity
+    entity_type: Company
+    name: Delta Electricity
+    aliases: []
+    data_class: structural
+    observability: NOT_OBSERVABLE
+    geometry: null
+    country: au
+    grid_id: null
+    properties: { sector: power generation, parent: Sev.en Global Investments }
+    external_ids: {}
+    sources: [source:wikidata:sparql]
+    notes: Owner of Vales Point B; acquired by Czech group Sev.en Global Investments in 2022.
+
+  - entity_id: company:au:sev-en-gi
+    entity_type: Company
+    name: Sev.en Global Investments (Australia)
+    aliases: [Sev.en GI]
+    data_class: structural
+    observability: NOT_OBSERVABLE
+    geometry: null
+    country: au
+    grid_id: null
+    properties: { sector: energy investments, parent: Sev.en Global Investments (Czech Republic) }
+    external_ids: {}
+    sources: [source:wikidata:sparql]
+    notes: Czech energy investor's Australian arm - parent of Delta Electricity and, since May 2025, owner of the non-CS Energy 50% of Callide C (verified).
+
+  - entity_id: company:au:snowy-hydro
+    entity_type: Company
+    name: Snowy Hydro
+    aliases: []
+    data_class: structural
+    observability: NOT_OBSERVABLE
+    geometry: null
+    country: au
+    grid_id: null
+    properties: { sector: power generation, ownership: Commonwealth Government }
+    external_ids: {}
+    sources: [source:wikidata:sparql]
+    notes: Commonwealth-owned hydro and gas generator - Colongra among its gas fleet; building Snowy 2.0.
+
+  - entity_id: company:au:alinta-energy
+    entity_type: Company
+    name: Alinta Energy
+    aliases: []
+    data_class: structural
+    observability: NOT_OBSERVABLE
+    geometry: null
+    country: au
+    grid_id: null
+    properties: { sector: integrated energy, parent: Chow Tai Fook Enterprises (Hong Kong) }
+    external_ids: {}
+    sources: [source:wikidata:sparql]
+    notes: Owner of Braemar 1 (verified ex-ERM Power 2008).
+
+  - entity_id: company:au:intergen-au
+    entity_type: Company
+    name: InterGen Australia
+    aliases: [InterGen]
+    data_class: structural
+    observability: NOT_OBSERVABLE
+    geometry: null
+    country: au
+    grid_id: null
+    properties: { sector: power generation operations }
+    external_ids: {}
+    sources: [source:wikidata:sparql]
+    notes: Operator of Millmerran Power Station for the Millmerran Power Partners consortium.
+
+  - entity_id: company:au:neoen
+    entity_type: Company
+    name: Neoen Australia
+    aliases: [Neoen]
+    data_class: structural
+    observability: NOT_OBSERVABLE
+    geometry: null
+    country: au
+    grid_id: null
+    properties: { sector: renewables IPP, parent: Brookfield }
+    external_ids: {}
+    sources: [source:wikidata:sparql]
+    notes: French-origin renewables developer (Western Downs GPH, Hornsdale battery); Neoen SA was acquired by Brookfield in 2025.
+
+  - entity_id: company:au:acciona-energia
+    entity_type: Company
+    name: Acciona Energia Australia
+    aliases: [Acciona]
+    data_class: structural
+    observability: NOT_OBSERVABLE
+    geometry: null
+    country: au
+    grid_id: null
+    properties: { sector: renewables IPP, parent: Acciona Energia (Spain) }
+    external_ids: {}
+    sources: [source:wikidata:sparql]
+    notes: Developer-owner of the MacIntyre wind precinct (with Ark Energy ~30%).
+
+  - entity_id: company:au:santos
+    entity_type: Company
+    name: Santos
+    aliases: []
+    data_class: structural
+    observability: NOT_OBSERVABLE
+    geometry: null
+    country: au
+    grid_id: null
+    properties: { sector: oil and gas, listed: true, ticker: STO }
+    external_ids: {}
+    sources: [source:wikidata:sparql]
+    notes: Adelaide-based producer; GLNG operator with 30%.
+
+  - entity_id: company:au:shell-qgc
+    entity_type: Company
+    name: Shell QGC
+    aliases: [QGC]
+    data_class: structural
+    observability: NOT_OBSERVABLE
+    geometry: null
+    country: au
+    grid_id: null
+    properties: { sector: oil and gas, parent: Shell plc }
+    external_ids: {}
+    sources: [source:wikidata:sparql]
+    notes: Shell's Queensland CSG-LNG business (ex BG Group, acquired 2016); owner-operator of QCLNG.
+
+  - entity_id: company:au:conocophillips
+    entity_type: Company
+    name: ConocoPhillips Australia
+    aliases: [ConocoPhillips]
+    data_class: structural
+    observability: NOT_OBSERVABLE
+    geometry: null
+    country: au
+    grid_id: null
+    properties: { sector: oil and gas, parent: ConocoPhillips (US) }
+    external_ids: {}
+    sources: [source:wikidata:sparql]
+    notes: Holds 47.5% of APLNG (raised from 37.5% in 2022) and operates the downstream LNG facility.
+
+  - entity_id: company:au:apa-group
+    entity_type: Company
+    name: APA Group
+    aliases: [APA]
+    data_class: structural
+    observability: NOT_OBSERVABLE
+    geometry: null
+    country: au
+    grid_id: null
+    properties: { sector: energy infrastructure, listed: true, ticker: APA }
+    external_ids: {}
+    sources: [source:wikidata:sparql]
+    notes: Australia's largest gas infrastructure owner - Wallumbilla Gladstone Pipeline, Murraylink, and Basslink (since 2022).
+
+  - entity_id: company:au:bhp-mitsubishi-alliance
+    entity_type: Company
+    name: BHP Mitsubishi Alliance
+    aliases: [BMA]
+    data_class: structural
+    observability: NOT_OBSERVABLE
+    geometry: null
+    country: au
+    grid_id: null
+    properties: { sector: metallurgical coal mining, structure: 50/50 BHP / Mitsubishi Development JV }
+    external_ids: {}
+    sources: [source:wikidata:sparql]
+    notes: World's largest seaborne metallurgical coal producer - Goonyella Riverside, Peak Downs, Saraji, Caval Ridge and the Hay Point Coal Terminal. Sold Blackwater and Daunia to Whitehaven in 2024.
+
+  - entity_id: company:au:whitehaven-coal
+    entity_type: Company
+    name: Whitehaven Coal
+    aliases: [Whitehaven]
+    data_class: structural
+    observability: NOT_OBSERVABLE
+    geometry: null
+    country: au
+    grid_id: null
+    properties: { sector: coal mining, listed: true, ticker: WHC }
+    external_ids: {}
+    sources: [source:wikidata:sparql]
+    notes: Acquired Blackwater and Daunia from BMA (April 2024); sold 30% of Blackwater to Nippon Steel and JFE Steel (April 2025, verified). Operates Blackwater.
+
+  - entity_id: company:au:coronado
+    entity_type: Company
+    name: Coronado Global Resources
+    aliases: [Coronado]
+    data_class: structural
+    observability: NOT_OBSERVABLE
+    geometry: null
+    country: au
+    grid_id: null
+    properties: { sector: metallurgical coal mining, listed: true, ticker: CRN }
+    external_ids: {}
+    sources: [source:wikidata:sparql]
+    notes: Owner of Curragh (plus US mines). Under liquidity pressure through 2025; Stanwell provided prepayment support tied to coal supply (verified June 2025 agreement).
+
+  - entity_id: company:au:batchfire-resources
+    entity_type: Company
+    name: Batchfire Resources
+    aliases: [Batchfire]
+    data_class: structural
+    observability: NOT_OBSERVABLE
+    geometry: null
+    country: au
+    grid_id: null
+    properties: { sector: coal mining }
+    external_ids: {}
+    sources: [source:wikidata:sparql]
+    notes: Owner of the Callide mine since October 2016 (acquired from Anglo American).
+
+  - entity_id: company:au:glencore
+    entity_type: Company
+    name: Glencore Australia
+    aliases: [Glencore]
+    data_class: structural
+    observability: NOT_OBSERVABLE
+    geometry: null
+    country: au
+    grid_id: null
+    properties: { sector: mining and commodities trading, parent: Glencore plc }
+    external_ids: {}
+    sources: [source:wikidata:sparql]
+    notes: Largest Australian thermal coal producer; 49% of Hunter Valley Operations; ~40% of WICET.
+
+  - entity_id: company:au:anglo-american
+    entity_type: Company
+    name: Anglo American Australia
+    aliases: [Anglo American]
+    data_class: structural
+    observability: NOT_OBSERVABLE
+    geometry: null
+    country: au
+    grid_id: null
+    properties: { sector: mining, parent: Anglo American plc }
+    external_ids: {}
+    sources: [source:wikidata:sparql]
+    notes: >-
+      Former owner of the Callide mine (sold to Batchfire 2016) and of Bowen Basin steelmaking coal mines
+      (Moranbah North, Grosvenor, Capcoal); sale of those mines to Peabody was renegotiated during 2025 after
+      the Moranbah North fire - treated as in transition, so no current-mine edges are asserted in this seed.
+
+  - entity_id: company:au:yancoal
+    entity_type: Company
+    name: Yancoal Australia
+    aliases: [Yancoal]
+    data_class: structural
+    observability: NOT_OBSERVABLE
+    geometry: null
+    country: au
+    grid_id: null
+    properties: { sector: coal mining, listed: true, ticker: YAL }
+    external_ids: {}
+    sources: [source:wikidata:sparql]
+    notes: Majority Chinese-owned (Yankuang Energy); 51% owner and operator of Hunter Valley Operations; WICET shareholder.
+
+  - entity_id: company:au:aurizon
+    entity_type: Company
+    name: Aurizon
+    aliases: [Aurizon Network, QR National]
+    data_class: structural
+    observability: NOT_OBSERVABLE
+    geometry: null
+    country: au
+    grid_id: null
+    properties: { sector: rail freight, listed: true, ticker: AZJ }
+    external_ids: {}
+    sources: [source:wikidata:sparql]
+    notes: Owner-operator of the Central Queensland Coal Network (Blackwater, Moura, Goonyella systems) and a major coal haulage operator.
+
+  - entity_id: company:au:gladstone-ports-corp
+    entity_type: Company
+    name: Gladstone Ports Corporation
+    aliases: [GPC]
+    data_class: structural
+    observability: NOT_OBSERVABLE
+    geometry: null
+    country: au
+    grid_id: null
+    properties: { sector: port authority, ownership: Queensland Government }
+    external_ids: {}
+    sources: [source:wikidata:sparql, source:gpc:cargo-statistics]
+    notes: Queensland government-owned port authority for Gladstone (also Rockhampton/Bundaberg); operates RG Tanna and Barney Point; publishes monthly cargo statistics.
+
+  - entity_id: company:au:wicet-holdings
+    entity_type: Company
+    name: WICET Holdings
+    aliases: [Wiggins Island Coal Export Terminal Pty Ltd]
+    data_class: structural
+    observability: NOT_OBSERVABLE
+    geometry: null
+    country: au
+    grid_id: null
+    properties: { sector: port terminal, structure: shipper-owned consortium }
+    external_ids: {}
+    sources: [source:wikidata:sparql]
+    notes: Consortium vehicle owning WICET - Glencore ~40% with Coronado Curragh and Yancoal (verified); refinanced 2018 and subsequently.
+
+  - entity_id: company:au:dalrymple-bay-infrastructure
+    entity_type: Company
+    name: Dalrymple Bay Infrastructure
+    aliases: [DBI]
+    data_class: structural
+    observability: NOT_OBSERVABLE
+    geometry: null
+    country: au
+    grid_id: null
+    properties: { sector: port terminal, listed: true, ticker: DBI }
+    external_ids: {}
+    sources: [source:wikidata:sparql]
+    notes: Holds the 99-year lease over the Queensland government-owned Dalrymple Bay Coal Terminal.
+
+  - entity_id: company:au:tomago-aluminium
+    entity_type: Company
+    name: Tomago Aluminium Company
+    aliases: [TAC]
+    data_class: structural
+    observability: NOT_OBSERVABLE
+    geometry: null
+    country: au
+    grid_id: null
+    properties: { sector: aluminium smelting, structure: JV (Rio Tinto ~51.55%, CSR ~36.05%, Hydro ~12.4%) }
+    external_ids: {}
+    sources: [source:wikidata:sparql]
+    notes: JV company that owns and operates the Tomago smelter.
+
+  - entity_id: company:au:bluescope
+    entity_type: Company
+    name: BlueScope Steel
+    aliases: [BlueScope]
+    data_class: structural
+    observability: NOT_OBSERVABLE
+    geometry: null
+    country: au
+    grid_id: null
+    properties: { sector: steel, listed: true, ticker: BSL }
+    external_ids: {}
+    sources: [source:wikidata:sparql]
+    notes: Owner of Port Kembla Steelworks; spun out of BHP in 2002.
+
+  - entity_id: company:au:orica
+    entity_type: Company
+    name: Orica
+    aliases: []
+    data_class: structural
+    observability: NOT_OBSERVABLE
+    geometry: null
+    country: au
+    grid_id: null
+    properties: { sector: mining chemicals and explosives, listed: true, ticker: ORI }
+    external_ids: {}
+    sources: [source:wikidata:sparql]
+    notes: World's largest commercial explosives supplier; owner of the Yarwun (Gladstone) ammonium nitrate complex.

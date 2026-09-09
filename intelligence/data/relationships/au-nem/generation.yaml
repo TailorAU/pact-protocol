@@ -1,0 +1,289 @@
+# Structural relationships — generator-to-region GENERATES edges (plus Wivenhoe pumping load).
+# See ../../../schemas/relationship.schema.json
+records:
+  - rel_id: rel:gladstone-ps-generates-qld1
+    rel_type: GENERATES
+    from_id: gen:au-nem:gladstone-ps
+    to_id: region:au-nem:qld1
+    confidence: 1.0
+    source: source:aemo:nem-registration-and-exemption-list
+    method: declared
+    valid_from: "1976-01-01T00:00:00Z"
+    valid_to: null
+    properties: {}
+
+  - rel_id: rel:callide-b-generates-qld1
+    rel_type: GENERATES
+    from_id: gen:au-nem:callide-b
+    to_id: region:au-nem:qld1
+    confidence: 1.0
+    source: source:aemo:nem-registration-and-exemption-list
+    method: declared
+    valid_from: "1988-01-01T00:00:00Z"
+    valid_to: null
+    properties: {}
+
+  - rel_id: rel:callide-c-generates-qld1
+    rel_type: GENERATES
+    from_id: gen:au-nem:callide-c
+    to_id: region:au-nem:qld1
+    confidence: 1.0
+    source: source:aemo:nem-registration-and-exemption-list
+    method: declared
+    valid_from: "2001-01-01T00:00:00Z"
+    valid_to: null
+    properties: { note: C4 offline May 2021 - Aug 2024 after turbine hall explosion }
+
+  - rel_id: rel:stanwell-generates-qld1
+    rel_type: GENERATES
+    from_id: gen:au-nem:stanwell
+    to_id: region:au-nem:qld1
+    confidence: 1.0
+    source: source:aemo:nem-registration-and-exemption-list
+    method: declared
+    valid_from: "1993-01-01T00:00:00Z"
+    valid_to: null
+    properties: {}
+
+  - rel_id: rel:kogan-creek-generates-qld1
+    rel_type: GENERATES
+    from_id: gen:au-nem:kogan-creek
+    to_id: region:au-nem:qld1
+    confidence: 1.0
+    source: source:aemo:nem-registration-and-exemption-list
+    method: declared
+    valid_from: "2007-01-01T00:00:00Z"
+    valid_to: null
+    properties: {}
+
+  - rel_id: rel:tarong-generates-qld1
+    rel_type: GENERATES
+    from_id: gen:au-nem:tarong
+    to_id: region:au-nem:qld1
+    confidence: 1.0
+    source: source:aemo:nem-registration-and-exemption-list
+    method: declared
+    valid_from: "1984-01-01T00:00:00Z"
+    valid_to: null
+    properties: {}
+
+  - rel_id: rel:tarong-north-generates-qld1
+    rel_type: GENERATES
+    from_id: gen:au-nem:tarong-north
+    to_id: region:au-nem:qld1
+    confidence: 1.0
+    source: source:aemo:nem-registration-and-exemption-list
+    method: declared
+    valid_from: "2003-01-01T00:00:00Z"
+    valid_to: null
+    properties: {}
+
+  - rel_id: rel:millmerran-generates-qld1
+    rel_type: GENERATES
+    from_id: gen:au-nem:millmerran
+    to_id: region:au-nem:qld1
+    confidence: 1.0
+    source: source:aemo:nem-registration-and-exemption-list
+    method: declared
+    valid_from: "2002-01-01T00:00:00Z"
+    valid_to: null
+    properties: {}
+
+  - rel_id: rel:wivenhoe-generates-qld1
+    rel_type: GENERATES
+    from_id: gen:au-nem:wivenhoe
+    to_id: region:au-nem:qld1
+    confidence: 1.0
+    source: source:aemo:nem-registration-and-exemption-list
+    method: declared
+    valid_from: "1984-01-01T00:00:00Z"
+    valid_to: null
+    properties: { note: pumped storage - generates in peaks only }
+
+  - rel_id: rel:wivenhoe-consumes-qld1
+    rel_type: CONSUMES
+    from_id: gen:au-nem:wivenhoe
+    to_id: region:au-nem:qld1
+    confidence: 1.0
+    source: source:aemo:nem-registration-and-exemption-list
+    method: derived
+    valid_from: "1984-01-01T00:00:00Z"
+    valid_to: null
+    properties:
+      note: pumped-storage pumping load (~480 MW when pumping); net consumer of energy across a storage cycle
+
+  - rel_id: rel:braemar-generates-qld1
+    rel_type: GENERATES
+    from_id: gen:au-nem:braemar
+    to_id: region:au-nem:qld1
+    confidence: 1.0
+    source: source:aemo:nem-registration-and-exemption-list
+    method: declared
+    valid_from: "2006-01-01T00:00:00Z"
+    valid_to: null
+    properties: {}
+
+  - rel_id: rel:darling-downs-generates-qld1
+    rel_type: GENERATES
+    from_id: gen:au-nem:darling-downs
+    to_id: region:au-nem:qld1
+    confidence: 1.0
+    source: source:aemo:nem-registration-and-exemption-list
+    method: declared
+    valid_from: "2010-01-01T00:00:00Z"
+    valid_to: null
+    properties: {}
+
+  - rel_id: rel:swanbank-e-generates-qld1
+    rel_type: GENERATES
+    from_id: gen:au-nem:swanbank-e
+    to_id: region:au-nem:qld1
+    confidence: 1.0
+    source: source:aemo:nem-registration-and-exemption-list
+    method: declared
+    valid_from: "2002-01-01T00:00:00Z"
+    valid_to: null
+    properties: { note: mothballed 2017-2022; outage Apr-Oct 2025 }
+
+  - rel_id: rel:mt-stuart-generates-qld1
+    rel_type: GENERATES
+    from_id: gen:au-nem:mt-stuart
+    to_id: region:au-nem:qld1
+    confidence: 1.0
+    source: source:aemo:nem-registration-and-exemption-list
+    method: declared
+    valid_from: "1999-01-01T00:00:00Z"
+    valid_to: null
+    properties: {}
+
+  - rel_id: rel:barron-gorge-generates-qld1
+    rel_type: GENERATES
+    from_id: gen:au-nem:barron-gorge
+    to_id: region:au-nem:qld1
+    confidence: 1.0
+    source: source:aemo:nem-registration-and-exemption-list
+    method: declared
+    valid_from: "1963-01-01T00:00:00Z"
+    valid_to: null
+    properties: {}
+
+  - rel_id: rel:kareeya-generates-qld1
+    rel_type: GENERATES
+    from_id: gen:au-nem:kareeya
+    to_id: region:au-nem:qld1
+    confidence: 1.0
+    source: source:aemo:nem-registration-and-exemption-list
+    method: declared
+    valid_from: "1957-01-01T00:00:00Z"
+    valid_to: null
+    properties: {}
+
+  - rel_id: rel:coopers-gap-generates-qld1
+    rel_type: GENERATES
+    from_id: gen:au-nem:coopers-gap
+    to_id: region:au-nem:qld1
+    confidence: 1.0
+    source: source:aemo:nem-registration-and-exemption-list
+    method: declared
+    valid_from: "2020-01-01T00:00:00Z"
+    valid_to: null
+    properties: {}
+
+  - rel_id: rel:western-downs-gph-generates-qld1
+    rel_type: GENERATES
+    from_id: gen:au-nem:western-downs-gph
+    to_id: region:au-nem:qld1
+    confidence: 1.0
+    source: source:aemo:nem-registration-and-exemption-list
+    method: declared
+    valid_from: "2023-01-01T00:00:00Z"
+    valid_to: null
+    properties: {}
+
+  - rel_id: rel:macintyre-generates-qld1
+    rel_type: GENERATES
+    from_id: gen:au-nem:macintyre
+    to_id: region:au-nem:qld1
+    confidence: 1.0
+    source: source:aemo:nem-registration-and-exemption-list
+    method: declared
+    valid_from: "2024-10-01T00:00:00Z"
+    valid_to: null
+    properties: { note: first power October 2024, fully operational 2025 }
+
+  - rel_id: rel:eraring-generates-nsw1
+    rel_type: GENERATES
+    from_id: gen:au-nem:eraring
+    to_id: region:au-nem:nsw1
+    confidence: 1.0
+    source: source:aemo:nem-registration-and-exemption-list
+    method: declared
+    valid_from: "1982-01-01T00:00:00Z"
+    valid_to: null
+    properties: { note: closure extended to 30 April 2029 (announced Feb 2026) }
+
+  - rel_id: rel:bayswater-generates-nsw1
+    rel_type: GENERATES
+    from_id: gen:au-nem:bayswater
+    to_id: region:au-nem:nsw1
+    confidence: 1.0
+    source: source:aemo:nem-registration-and-exemption-list
+    method: declared
+    valid_from: "1985-01-01T00:00:00Z"
+    valid_to: null
+    properties: {}
+
+  - rel_id: rel:mt-piper-generates-nsw1
+    rel_type: GENERATES
+    from_id: gen:au-nem:mt-piper
+    to_id: region:au-nem:nsw1
+    confidence: 1.0
+    source: source:aemo:nem-registration-and-exemption-list
+    method: declared
+    valid_from: "1993-01-01T00:00:00Z"
+    valid_to: null
+    properties: {}
+
+  - rel_id: rel:vales-point-generates-nsw1
+    rel_type: GENERATES
+    from_id: gen:au-nem:vales-point
+    to_id: region:au-nem:nsw1
+    confidence: 1.0
+    source: source:aemo:nem-registration-and-exemption-list
+    method: declared
+    valid_from: "1978-01-01T00:00:00Z"
+    valid_to: null
+    properties: {}
+
+  - rel_id: rel:tallawarra-generates-nsw1
+    rel_type: GENERATES
+    from_id: gen:au-nem:tallawarra
+    to_id: region:au-nem:nsw1
+    confidence: 1.0
+    source: source:aemo:nem-registration-and-exemption-list
+    method: declared
+    valid_from: "2009-01-01T00:00:00Z"
+    valid_to: null
+    properties: {}
+
+  - rel_id: rel:colongra-generates-nsw1
+    rel_type: GENERATES
+    from_id: gen:au-nem:colongra
+    to_id: region:au-nem:nsw1
+    confidence: 1.0
+    source: source:aemo:nem-registration-and-exemption-list
+    method: declared
+    valid_from: "2009-01-01T00:00:00Z"
+    valid_to: null
+    properties: {}
+
+  - rel_id: rel:uranquinty-generates-nsw1
+    rel_type: GENERATES
+    from_id: gen:au-nem:uranquinty
+    to_id: region:au-nem:nsw1
+    confidence: 1.0
+    source: source:aemo:nem-registration-and-exemption-list
+    method: declared
+    valid_from: "2009-01-01T00:00:00Z"
+    valid_to: null
+    properties: {}

@@ -1,0 +1,11 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pact.tailor.au/intelligence/schemas/entity-types/port.properties.json",
+  "title": "Port properties",
+  "type": "object",
+  "properties": {
+    "harbour_type": { "type": "string" },
+    "max_draught_m": { "type": "number" }
+  },
+  "additionalProperties": true
+}

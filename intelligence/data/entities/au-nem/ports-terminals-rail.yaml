@@ -1,0 +1,214 @@
+# Structural seed — export ports, terminals and coal rail systems. See ../../../schemas/entity.schema.json
+records:
+  - entity_id: port:au-qld:gladstone
+    entity_type: Port
+    name: Port of Gladstone
+    aliases: [Gladstone Harbour]
+    data_class: structural
+    observability: ESTIMATED
+    geometry: { type: Point, coordinates: [151.25, -23.83] }
+    country: au
+    admin: { region: Queensland, locality: Gladstone }
+    grid_id: null
+    properties:
+      harbour_type: natural deepwater
+      max_draught_m: 18
+      throughput_mtpa: 120
+      throughput_note: approximately 120 Mtpa across coal, LNG, alumina, aluminium, bauxite and cement
+    external_ids:
+      unlocode: AUGLT
+    sources: [source:gpc:cargo-statistics, source:wikidata:sparql]
+    notes: >-
+      Queensland's largest multi-commodity port and one of the world's top coal and LNG export harbours;
+      managed by Gladstone Ports Corporation, which publishes monthly cargo statistics (the key public
+      observability feed for the cluster). Includes the Curtis Island LNG jetties.
+
+  - entity_id: port:au-nsw:newcastle
+    entity_type: Port
+    name: Port of Newcastle
+    aliases: [Newcastle Harbour]
+    data_class: structural
+    observability: ESTIMATED
+    geometry: { type: Point, coordinates: [151.786, -32.918] }
+    country: au
+    admin: { region: New South Wales, locality: Newcastle }
+    grid_id: null
+    properties:
+      harbour_type: river harbour
+      max_draught_m: 16.5
+      throughput_mtpa: 160
+      throughput_note: approximate; the world's largest coal export port (PWCS and NCIG terminals, not modelled separately)
+    external_ids:
+      unlocode: AUNTL
+    sources: [source:wikidata:sparql]
+    notes: Hunter Valley coal chain outlet; privatised under long-term lease in 2014.
+
+  - entity_id: port:au-qld:hay-point
+    entity_type: Port
+    name: Port of Hay Point
+    aliases: [Hay Point]
+    data_class: structural
+    observability: ESTIMATED
+    geometry: { type: Point, coordinates: [149.30, -21.28] }
+    country: au
+    admin: { region: Queensland, locality: Hay Point }
+    grid_id: null
+    properties:
+      harbour_type: offshore jetty
+      max_draught_m: 14.5
+      throughput_mtpa: 110
+      throughput_note: approximate combined HPCT + DBCT metallurgical coal exports
+    external_ids:
+      unlocode: AUHPT
+    sources: [source:wikidata:sparql]
+    notes: >-
+      Twin-terminal metallurgical coal port south of Mackay serving the Goonyella rail system - NOT part of
+      the Port of Gladstone. Managed by North Queensland Bulk Ports (state-owned).
+
+  - entity_id: terminal:au-qld:rg-tanna
+    entity_type: Terminal
+    name: RG Tanna Coal Terminal
+    aliases: [RGTCT]
+    data_class: structural
+    observability: ESTIMATED
+    geometry: { type: Point, coordinates: [151.220, -23.842] }
+    country: au
+    admin: { region: Queensland, locality: Gladstone }
+    grid_id: null
+    properties:
+      commodities: [coal]
+      nameplate_mtpa: 40
+      nameplate_note: approximately 40 Mtpa
+    external_ids: {}
+    sources: [source:gpc:cargo-statistics, source:wikidata:sparql]
+    notes: Gladstone Ports Corporation's main coal terminal (four berths); served by the Blackwater and Moura rail systems.
+
+  - entity_id: terminal:au-qld:wicet
+    entity_type: Terminal
+    name: Wiggins Island Coal Export Terminal
+    aliases: [WICET]
+    data_class: structural
+    observability: ESTIMATED
+    geometry: { type: Point, coordinates: [151.19, -23.81] }
+    country: au
+    admin: { region: Queensland, locality: Gladstone }
+    grid_id: null
+    properties:
+      commodities: [coal]
+      nameplate_mtpa: 27
+    external_ids: {}
+    sources: [source:gpc:cargo-statistics, source:wikidata:sparql]
+    notes: >-
+      Independent user-funded terminal (first shipment 2015), 27 Mtpa stage one (verified). Owned by its
+      shipper consortium - Glencore ~40% with Coronado Curragh and Yancoal - not by Gladstone Ports Corporation.
+
+  - entity_id: terminal:au-qld:barney-point
+    entity_type: Terminal
+    name: Barney Point Terminal
+    aliases: [Barney Point]
+    data_class: structural
+    observability: ESTIMATED
+    geometry: { type: Point, coordinates: [151.273, -23.850] }
+    country: au
+    admin: { region: Queensland, locality: Gladstone }
+    grid_id: null
+    properties:
+      commodities: [alumina, petroleum coke, gypsum, general bulk]
+      nameplate_mtpa: 5
+      nameplate_note: approximate
+    external_ids: {}
+    sources: [source:gpc:cargo-statistics]
+    notes: Gladstone Ports Corporation berth adjacent to town; coal exports ceased in 2016, now handles non-coal dry bulk.
+
+  - entity_id: terminal:au-qld:hay-point
+    entity_type: Terminal
+    name: Hay Point Coal Terminal
+    aliases: [HPCT]
+    data_class: structural
+    observability: ESTIMATED
+    geometry: { type: Point, coordinates: [149.304, -21.276] }
+    country: au
+    admin: { region: Queensland, locality: Hay Point }
+    grid_id: null
+    properties:
+      commodities: [coal]
+      nameplate_mtpa: 55
+    external_ids: {}
+    sources: [source:wikidata:sparql]
+    notes: BHP Mitsubishi Alliance's dedicated export terminal for its Goonyella-system mines (Goonyella Riverside, Peak Downs, Saraji, Caval Ridge).
+
+  - entity_id: terminal:au-qld:dbct
+    entity_type: Terminal
+    name: Dalrymple Bay Coal Terminal
+    aliases: [DBCT]
+    data_class: structural
+    observability: ESTIMATED
+    geometry: { type: Point, coordinates: [149.288, -21.263] }
+    country: au
+    admin: { region: Queensland, locality: Hay Point }
+    grid_id: null
+    properties:
+      commodities: [coal]
+      nameplate_mtpa: 85
+    external_ids: {}
+    sources: [source:wikidata:sparql]
+    notes: >-
+      World's largest single metallurgical coal export terminal; Queensland government-owned, operated under
+      99-year lease by Dalrymple Bay Infrastructure. Common-user terminal for non-BMA Goonyella-system miners.
+
+  - entity_id: rail:au-qld:blackwater-system
+    entity_type: Railway
+    name: Blackwater Rail System
+    aliases: []
+    data_class: structural
+    observability: ESTIMATED
+    geometry: { type: LineString, coordinates: [[151.22, -23.84], [150.33, -23.51], [148.88, -23.59]] }
+    country: au
+    admin: { region: Queensland }
+    grid_id: null
+    properties:
+      capacity_mtpa: 70
+      capacity_note: approximate contracted system capacity
+      electrified: true
+      gauge_mm: 1067
+    external_ids: {}
+    sources: [source:wikidata:sparql]
+    notes: Central Queensland Coal Network corridor linking Bowen Basin mines (Blackwater, Curragh and others) to RG Tanna and WICET at Gladstone; owned and operated by Aurizon Network.
+
+  - entity_id: rail:au-qld:moura-system
+    entity_type: Railway
+    name: Moura Rail System
+    aliases: []
+    data_class: structural
+    observability: ESTIMATED
+    geometry: { type: LineString, coordinates: [[151.22, -23.84], [150.63, -24.30], [149.97, -24.57]] }
+    country: au
+    admin: { region: Queensland }
+    grid_id: null
+    properties:
+      capacity_mtpa: 13
+      capacity_note: approximate
+      electrified: false
+      gauge_mm: 1067
+    external_ids: {}
+    sources: [source:wikidata:sparql]
+    notes: Non-electrified CQCN corridor linking Moura and Callide/Boundary Hill mines to Gladstone; Aurizon Network.
+
+  - entity_id: rail:au-qld:goonyella-system
+    entity_type: Railway
+    name: Goonyella Rail System
+    aliases: []
+    data_class: structural
+    observability: ESTIMATED
+    geometry: { type: LineString, coordinates: [[149.29, -21.27], [148.19, -22.26], [147.98, -21.75]] }
+    country: au
+    admin: { region: Queensland }
+    grid_id: null
+    properties:
+      capacity_mtpa: 140
+      capacity_note: approximate contracted system capacity
+      electrified: true
+      gauge_mm: 1067
+    external_ids: {}
+    sources: [source:wikidata:sparql]
+    notes: Highest-volume CQCN corridor linking northern Bowen Basin metallurgical mines to Hay Point (HPCT and DBCT); owned and operated by Aurizon Network.

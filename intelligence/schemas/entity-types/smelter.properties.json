@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pact.tailor.au/intelligence/schemas/entity-types/smelter.properties.json",
+  "title": "Smelter properties",
+  "type": "object",
+  "properties": {
+    "product": { "type": "string" },
+    "capacity_tpa": { "type": "number" },
+    "potlines": { "type": "integer" },
+    "technology": { "type": "string" }
+  },
+  "additionalProperties": true
+}

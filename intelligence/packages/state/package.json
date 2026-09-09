@@ -1,0 +1,23 @@
+{
+  "name": "@pact-tailor/state",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Real-time state engine — observation store, current-state projections (event-time semantics, corrections), window aggregation, delta bus",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": "./dist/index.js"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "test": "npm run build && node --test \"test/*.test.mjs\""
+  },
+  "dependencies": {
+    "@pact-tailor/ontology": "*",
+    "@pact-tailor/store": "*"
+  }
+}

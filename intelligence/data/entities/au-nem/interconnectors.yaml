@@ -1,0 +1,142 @@
+# Structural seed — NEM interconnectors. See ../../../schemas/entity.schema.json
+# capacity_mw_forward is in the from_region -> to_region direction. Static nominal limits;
+# actual AEMO transfer limits are dynamic and frequently lower.
+records:
+  - entity_id: intercon:au-nem:qni
+    entity_type: Interconnector
+    name: Queensland-NSW Interconnector
+    aliases: [QNI]
+    data_class: structural
+    observability: KNOWN_LIVE
+    geometry: { type: Point, coordinates: [150.9, -28.9] }
+    country: au
+    admin: { region: Queensland/New South Wales, locality: Bulli Creek - Dumaresq }
+    grid_id: grid:au-nem
+    properties:
+      from_region: NSW1
+      to_region: QLD1
+      capacity_mw_forward: 600
+      capacity_mw_reverse: 1078
+      hvdc: false
+      commissioned: 2001
+    external_ids:
+      aemo_duid: [NSW1-QLD1]
+    sources: [source:aemo:nem-registration-and-exemption-list, source:aemo:vis-nem-summary]
+    notes: >-
+      Double-circuit 330 kV AC link. Nominal limits ~600 MW northward (NSW->QLD) and ~1,078 MW southward; a
+      2021-22 minor upgrade added roughly 190 MW of southward capability under favourable conditions.
+
+  - entity_id: intercon:au-nem:terranora
+    entity_type: Interconnector
+    name: Terranora Interconnector
+    aliases: [Directlink, N-Q-MNSP1]
+    data_class: structural
+    observability: KNOWN_LIVE
+    geometry: { type: Point, coordinates: [153.50, -28.25] }
+    country: au
+    admin: { region: Queensland/New South Wales, locality: Mullumbimby - Terranora }
+    grid_id: grid:au-nem
+    properties:
+      from_region: NSW1
+      to_region: QLD1
+      capacity_mw_forward: 180
+      capacity_mw_reverse: 180
+      hvdc: true
+      commissioned: 2000
+    external_ids:
+      aemo_duid: [N-Q-MNSP1]
+    sources: [source:aemo:nem-registration-and-exemption-list, source:aemo:vis-nem-summary]
+    notes: 59 km underground HVDC light link (3 x 60 MW); originally the merchant Directlink, converted to a regulated asset in 2006. Transfer typically limited below nameplate.
+
+  - entity_id: intercon:au-nem:vni
+    entity_type: Interconnector
+    name: Victoria-NSW Interconnector
+    aliases: [VNI, VIC1-NSW1]
+    data_class: structural
+    observability: KNOWN_LIVE
+    geometry: { type: Point, coordinates: [146.9, -36.1] }
+    country: au
+    admin: { region: Victoria/New South Wales, locality: Murray - Wodonga corridor }
+    grid_id: grid:au-nem
+    properties:
+      from_region: VIC1
+      to_region: NSW1
+      capacity_mw_forward: 1600
+      capacity_mw_reverse: 1350
+      hvdc: false
+      commissioned: 1959
+    external_ids:
+      aemo_duid: [VIC1-NSW1]
+    sources: [source:aemo:nem-registration-and-exemption-list, source:aemo:vis-nem-summary]
+    notes: Meshed 330/220 kV AC corridor through the Snowy region; limits are strongly condition-dependent (indicative ~1,600 MW north, ~1,350 MW south). VNI West HVDC augmentation is under development.
+
+  - entity_id: intercon:au-nem:murraylink
+    entity_type: Interconnector
+    name: Murraylink
+    aliases: [V-MNSP1]
+    data_class: structural
+    observability: KNOWN_LIVE
+    geometry: { type: Point, coordinates: [141.5, -34.3] }
+    country: au
+    admin: { region: Victoria/South Australia, locality: Red Cliffs - Berri }
+    grid_id: grid:au-nem
+    properties:
+      from_region: VIC1
+      to_region: SA1
+      capacity_mw_forward: 220
+      capacity_mw_reverse: 200
+      hvdc: true
+      commissioned: 2002
+    external_ids:
+      aemo_duid: [V-MNSP1]
+    sources: [source:aemo:nem-registration-and-exemption-list, source:aemo:vis-nem-summary]
+    notes: 180 km underground HVDC light cable, the world's longest when built; regulated asset owned by APA Group.
+
+  - entity_id: intercon:au-nem:heywood
+    entity_type: Interconnector
+    name: Heywood Interconnector
+    aliases: [V-SA, VIC1-SA1]
+    data_class: structural
+    observability: KNOWN_LIVE
+    geometry: { type: Point, coordinates: [141.3, -38.1] }
+    country: au
+    admin: { region: Victoria/South Australia, locality: Heywood - South East }
+    grid_id: grid:au-nem
+    properties:
+      from_region: VIC1
+      to_region: SA1
+      capacity_mw_forward: 650
+      capacity_mw_reverse: 650
+      hvdc: false
+      commissioned: 1988
+    external_ids:
+      aemo_duid: [V-SA]
+    sources: [source:aemo:nem-registration-and-exemption-list, source:aemo:vis-nem-summary]
+    notes: 275 kV AC link, SA's main interconnection; upgraded to ~650 MW nominal each way in 2016. Frequently constrained below nominal for system security.
+
+  - entity_id: intercon:au-nem:basslink
+    entity_type: Interconnector
+    name: Basslink
+    aliases: [T-V-MNSP1]
+    data_class: structural
+    observability: KNOWN_LIVE
+    geometry: { type: Point, coordinates: [146.7, -39.7] }
+    country: au
+    admin: { region: Tasmania/Victoria, locality: George Town - Loy Yang }
+    grid_id: grid:au-nem
+    properties:
+      from_region: TAS1
+      to_region: VIC1
+      capacity_mw_forward: 500
+      capacity_mw_reverse: 478
+      hvdc: true
+      commissioned: 2006
+      regulated_from: "2026-07"
+    external_ids:
+      aemo_duid: [T-V-MNSP1]
+    sources: [source:aemo:nem-registration-and-exemption-list, source:aemo:vis-nem-summary]
+    notes: >-
+      370 km HVDC monopole across Bass Strait (500 MW continuous, up to ~630 MW short-term TAS->VIC).
+      Owned by APA Group since 2022 (acquired out of the Basslink Pty Ltd administration) - not state-owned.
+      The AER approved conversion from a market network service to a prescribed (regulated) transmission
+      service in June 2025, with regulated operation from July 2026 (verified).

@@ -1,0 +1,267 @@
+# Structural relationships — export logistics: port destination flows, rail-port connectivity,
+# and SYNTHETIC exemplar vessel movements (demo scenarios, not real ship tracks).
+# See ../../../schemas/relationship.schema.json
+records:
+  - rel_id: rel:vessel-bowen-trader-loads-at-rg-tanna
+    rel_type: LOADS_AT
+    from_id: vessel:imo:9000001
+    to_id: terminal:au-qld:rg-tanna
+    confidence: 1.0
+    source: source:gpc:cargo-statistics
+    method: manual
+    valid_from: null
+    valid_to: null
+    properties: { commodity: commodity:coal-metallurgical, note: SYNTHETIC demo scenario - exemplar vessel, not a real ship movement }
+
+  - rel_id: rel:vessel-bowen-trader-departs-gladstone
+    rel_type: DEPARTS_FROM
+    from_id: vessel:imo:9000001
+    to_id: port:au-qld:gladstone
+    confidence: 1.0
+    source: source:gpc:cargo-statistics
+    method: manual
+    valid_from: null
+    valid_to: null
+    properties: { note: SYNTHETIC demo scenario }
+
+  - rel_id: rel:vessel-bowen-trader-ships-to-jp
+    rel_type: SHIPS_TO
+    from_id: vessel:imo:9000001
+    to_id: dest:jp
+    confidence: 1.0
+    source: source:gpc:cargo-statistics
+    method: manual
+    valid_from: null
+    valid_to: null
+    properties: { commodity: commodity:coal-metallurgical, note: SYNTHETIC demo scenario }
+
+  - rel_id: rel:vessel-boyne-spirit-loads-at-gladstone
+    rel_type: LOADS_AT
+    from_id: vessel:imo:9000002
+    to_id: port:au-qld:gladstone
+    confidence: 1.0
+    source: source:gpc:cargo-statistics
+    method: manual
+    valid_from: null
+    valid_to: null
+    properties: { commodity: commodity:aluminium, note: SYNTHETIC demo scenario - loads aluminium ingot at the Boyne wharf }
+
+  - rel_id: rel:vessel-boyne-spirit-ships-to-jp
+    rel_type: SHIPS_TO
+    from_id: vessel:imo:9000002
+    to_id: dest:jp
+    confidence: 1.0
+    source: source:gpc:cargo-statistics
+    method: manual
+    valid_from: null
+    valid_to: null
+    properties: { commodity: commodity:aluminium, note: SYNTHETIC demo scenario }
+
+  - rel_id: rel:vessel-curtis-pioneer-loads-at-gladstone
+    rel_type: LOADS_AT
+    from_id: vessel:imo:9000003
+    to_id: port:au-qld:gladstone
+    confidence: 1.0
+    source: source:gpc:cargo-statistics
+    method: manual
+    valid_from: null
+    valid_to: null
+    properties: { commodity: commodity:lng, note: SYNTHETIC demo scenario - Curtis Island LNG jetty }
+
+  - rel_id: rel:vessel-curtis-pioneer-ships-to-cn
+    rel_type: SHIPS_TO
+    from_id: vessel:imo:9000003
+    to_id: dest:cn
+    confidence: 1.0
+    source: source:gpc:cargo-statistics
+    method: manual
+    valid_from: null
+    valid_to: null
+    properties: { commodity: commodity:lng, note: SYNTHETIC demo scenario }
+
+  - rel_id: rel:gladstone-port-exports-jp
+    rel_type: EXPORTS_TO
+    from_id: port:au-qld:gladstone
+    to_id: dest:jp
+    confidence: 0.9
+    source: source:gpc:cargo-statistics
+    method: derived
+    valid_from: null
+    valid_to: null
+    properties: { commodities: [commodity:coal-metallurgical, commodity:coal-thermal, commodity:lng, commodity:aluminium, commodity:alumina], note: derived from GPC destination statistics }
+
+  - rel_id: rel:gladstone-port-exports-cn
+    rel_type: EXPORTS_TO
+    from_id: port:au-qld:gladstone
+    to_id: dest:cn
+    confidence: 0.9
+    source: source:gpc:cargo-statistics
+    method: derived
+    valid_from: null
+    valid_to: null
+    properties: { commodities: [commodity:lng, commodity:coal-metallurgical, commodity:alumina], note: derived from GPC destination statistics }
+
+  - rel_id: rel:gladstone-port-exports-kr
+    rel_type: EXPORTS_TO
+    from_id: port:au-qld:gladstone
+    to_id: dest:kr
+    confidence: 0.9
+    source: source:gpc:cargo-statistics
+    method: derived
+    valid_from: null
+    valid_to: null
+    properties: { commodities: [commodity:coal-thermal, commodity:coal-metallurgical, commodity:lng, commodity:aluminium], note: derived from GPC destination statistics }
+
+  - rel_id: rel:gladstone-port-exports-tw
+    rel_type: EXPORTS_TO
+    from_id: port:au-qld:gladstone
+    to_id: dest:tw
+    confidence: 0.85
+    source: source:gpc:cargo-statistics
+    method: derived
+    valid_from: null
+    valid_to: null
+    properties: { commodities: [commodity:coal-thermal, commodity:coal-metallurgical], note: derived from GPC destination statistics }
+
+  - rel_id: rel:gladstone-port-exports-in
+    rel_type: EXPORTS_TO
+    from_id: port:au-qld:gladstone
+    to_id: dest:in
+    confidence: 0.85
+    source: source:gpc:cargo-statistics
+    method: derived
+    valid_from: null
+    valid_to: null
+    properties: { commodities: [commodity:coal-metallurgical], note: derived from GPC destination statistics }
+
+  - rel_id: rel:hay-point-exports-jp
+    rel_type: EXPORTS_TO
+    from_id: port:au-qld:hay-point
+    to_id: dest:jp
+    confidence: 0.85
+    source: source:wikidata:sparql
+    method: derived
+    valid_from: null
+    valid_to: null
+    properties: { commodities: [commodity:coal-metallurgical], note: derived from public trade statistics }
+
+  - rel_id: rel:hay-point-exports-cn
+    rel_type: EXPORTS_TO
+    from_id: port:au-qld:hay-point
+    to_id: dest:cn
+    confidence: 0.8
+    source: source:wikidata:sparql
+    method: derived
+    valid_from: null
+    valid_to: null
+    properties: { commodities: [commodity:coal-metallurgical], note: flows resumed after the 2020-23 informal import ban }
+
+  - rel_id: rel:hay-point-exports-in
+    rel_type: EXPORTS_TO
+    from_id: port:au-qld:hay-point
+    to_id: dest:in
+    confidence: 0.85
+    source: source:wikidata:sparql
+    method: derived
+    valid_from: null
+    valid_to: null
+    properties: { commodities: [commodity:coal-metallurgical] }
+
+  - rel_id: rel:hay-point-exports-kr
+    rel_type: EXPORTS_TO
+    from_id: port:au-qld:hay-point
+    to_id: dest:kr
+    confidence: 0.85
+    source: source:wikidata:sparql
+    method: derived
+    valid_from: null
+    valid_to: null
+    properties: { commodities: [commodity:coal-metallurgical] }
+
+  - rel_id: rel:newcastle-exports-jp
+    rel_type: EXPORTS_TO
+    from_id: port:au-nsw:newcastle
+    to_id: dest:jp
+    confidence: 0.9
+    source: source:wikidata:sparql
+    method: derived
+    valid_from: null
+    valid_to: null
+    properties: { commodities: [commodity:coal-thermal], note: Japan is the largest Newcastle thermal coal destination }
+
+  - rel_id: rel:newcastle-exports-cn
+    rel_type: EXPORTS_TO
+    from_id: port:au-nsw:newcastle
+    to_id: dest:cn
+    confidence: 0.8
+    source: source:wikidata:sparql
+    method: derived
+    valid_from: null
+    valid_to: null
+    properties: { commodities: [commodity:coal-thermal] }
+
+  - rel_id: rel:newcastle-exports-tw
+    rel_type: EXPORTS_TO
+    from_id: port:au-nsw:newcastle
+    to_id: dest:tw
+    confidence: 0.85
+    source: source:wikidata:sparql
+    method: derived
+    valid_from: null
+    valid_to: null
+    properties: { commodities: [commodity:coal-thermal] }
+
+  - rel_id: rel:newcastle-exports-kr
+    rel_type: EXPORTS_TO
+    from_id: port:au-nsw:newcastle
+    to_id: dest:kr
+    confidence: 0.85
+    source: source:wikidata:sparql
+    method: derived
+    valid_from: null
+    valid_to: null
+    properties: { commodities: [commodity:coal-thermal] }
+
+  - rel_id: rel:hvo-transports-newcastle
+    rel_type: TRANSPORTS
+    from_id: mine:au-nsw:hunter-valley-operations
+    to_id: port:au-nsw:newcastle
+    confidence: 0.9
+    source: source:gem:global-coal-mine-tracker
+    method: derived
+    valid_from: null
+    valid_to: null
+    properties: { commodity: commodity:coal-thermal, note: via the Hunter Valley rail corridor (ARTC network, not modelled) to PWCS/NCIG terminals }
+
+  - rel_id: rel:blackwater-system-connected-gladstone
+    rel_type: CONNECTED_TO
+    from_id: rail:au-qld:blackwater-system
+    to_id: port:au-qld:gladstone
+    confidence: 1.0
+    source: source:wikidata:sparql
+    method: declared
+    valid_from: null
+    valid_to: null
+    properties: { note: terminates at RG Tanna and WICET }
+
+  - rel_id: rel:moura-system-connected-gladstone
+    rel_type: CONNECTED_TO
+    from_id: rail:au-qld:moura-system
+    to_id: port:au-qld:gladstone
+    confidence: 1.0
+    source: source:wikidata:sparql
+    method: declared
+    valid_from: null
+    valid_to: null
+    properties: {}
+
+  - rel_id: rel:goonyella-system-connected-hay-point
+    rel_type: CONNECTED_TO
+    from_id: rail:au-qld:goonyella-system
+    to_id: port:au-qld:hay-point
+    confidence: 1.0
+    source: source:wikidata:sparql
+    method: declared
+    valid_from: null
+    valid_to: null
+    properties: { note: terminates at HPCT and DBCT }

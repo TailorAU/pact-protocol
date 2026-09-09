@@ -1,0 +1,313 @@
+# Source registry — Global reference datasets (structural, production/trade, satellite). See ../../schemas/source.schema.json
+records:
+  - source_id: source:gem:global-coal-plant-tracker
+    publisher: Global Energy Monitor
+    dataset: Global Coal Plant Tracker (GCPT) - every coal-fired unit >=30MW worldwide
+    api_type: bulk-download
+    url: https://globalenergymonitor.org/projects/global-coal-plant-tracker/
+    docs_url: https://globalenergymonitor.org/projects/global-coal-plant-tracker/download-data/
+    coverage:
+      global: true
+    entity_types: [Generator, Company]
+    metrics: [asset.capacity.mw]
+    data_class: static
+    latency: n/a (structural reference)
+    resolution: unit level (capacity, status, fuel, owner, coordinates, GEM ID)
+    update_frequency: twice yearly (January and July releases)
+    history_depth: status history since 2010 (proposals) / 2000 (retirements) captured in fields
+    authentication: registration
+    licensing:
+      class: open-attribution
+      notes: CC BY 4.0; download requires filling a short form (name/email) - not an account. Cite as 'Global Coal Plant Tracker, Global Energy Monitor, [release]'.
+    cost: free
+    reliability: 4
+    quality_notes: The de facto standard global coal fleet registry; GEM IDs map to entity external_ids.gem_id. Research-compiled - verify AU units against AEMO registration data where they overlap.
+    verification_status: documented_only
+    last_checked: "2026-08-12"
+    notes: XLSX download; latest release January 2026 at time of writing.
+
+  - source_id: source:gem:global-coal-mine-tracker
+    publisher: Global Energy Monitor
+    dataset: Global Coal Mine Tracker (GCMT) - operating and proposed coal mines
+    api_type: bulk-download
+    url: https://globalenergymonitor.org/projects/global-coal-mine-tracker/
+    docs_url: https://globalenergymonitor.org/projects/global-coal-mine-tracker/download-data/
+    coverage:
+      global: true
+    entity_types: [Mine, Company]
+    metrics: [production.capacity.mtpa]
+    data_class: static
+    latency: n/a (structural reference)
+    resolution: mine level (capacity Mtpa, coal type, mine type, owner, coordinates, workforce)
+    update_frequency: roughly annual releases (with interim updates)
+    history_depth: current-state snapshot per release
+    authentication: registration
+    licensing:
+      class: open-attribution
+      notes: CC BY 4.0; form-based download like the plant tracker.
+    cost: free
+    reliability: 4
+    quality_notes: Best open global mine registry (covers mines >=1Mtpa comprehensively, smaller where known); production capacities are estimates - calibrate AU mines against Queensland/NSW official statistics.
+    verification_status: documented_only
+    last_checked: "2026-08-12"
+    notes: XLSX; includes met vs thermal classification vital for the steel-chain model.
+
+  - source_id: source:gem:global-gas-infrastructure-tracker
+    publisher: Global Energy Monitor
+    dataset: Global Gas Infrastructure Tracker (pipelines + LNG terminals; GGIT)
+    api_type: bulk-download
+    url: https://globalenergymonitor.org/projects/global-gas-infrastructure-tracker/
+    docs_url: https://globalenergymonitor.org/projects/global-gas-infrastructure-tracker/download-data/
+    coverage:
+      global: true
+    entity_types: [Pipeline, LngTerminal, Company]
+    metrics: [pipeline.capacity.bcm_y, lng.capacity.mtpa]
+    data_class: static
+    latency: n/a (structural reference)
+    resolution: pipeline/terminal level with routes (GeoJSON-style geometry for pipelines)
+    update_frequency: roughly twice yearly
+    history_depth: current-state snapshot per release
+    authentication: registration
+    licensing:
+      class: open-attribution
+      notes: CC BY 4.0; form-based download.
+    cost: free
+    reliability: 4
+    quality_notes: Structural backbone for the gas/LNG chain (Curtis Island trains, east-coast pipelines); route geometries are approximate.
+    verification_status: documented_only
+    last_checked: "2026-08-12"
+    notes: XLSX + geometry files; complements AEMO GBB (live flows) with global static structure.
+
+  - source_id: source:naturalearth:110m
+    publisher: Natural Earth (NACIS)
+    dataset: Natural Earth 1:110m cultural and physical vectors (countries, coastlines, land)
+    api_type: bulk-download
+    url: https://www.naturalearthdata.com/downloads/110m-cultural-vectors/
+    docs_url: https://www.naturalearthdata.com/about/terms-of-use/
+    coverage:
+      global: true
+    entity_types: [Country, Location]
+    metrics: []
+    data_class: static
+    latency: n/a (basemap geometry)
+    resolution: 1:110,000,000 (globe-scale rendering)
+    update_frequency: occasional versioned releases (v5.x current line)
+    history_depth: versioned releases retained
+    authentication: none
+    licensing:
+      class: public-domain
+      notes: Public domain - free for any use, no attribution required (credit appreciated). Safe to COMMIT to the repo per LEGAL-LICENSING.md.
+    cost: free
+    reliability: 5
+    quality_notes: Standard globe basemap; disputed-boundary variants available. Committed in this workspace for the deck.gl globe.
+    verification_status: documented_only
+    last_checked: "2026-08-12"
+    notes: Shapefile/GeoJSON; 50m and 10m siblings if zoom detail is ever needed.
+
+  - source_id: source:wikidata:sparql
+    publisher: Wikimedia Foundation / Wikidata community
+    dataset: Wikidata Query Service (SPARQL endpoint over the Wikidata knowledge graph)
+    api_type: rest
+    url: https://query.wikidata.org/sparql
+    docs_url: https://www.wikidata.org/wiki/Wikidata:SPARQL_query_service
+    coverage:
+      global: true
+    entity_types: [Company, Generator, Port, Mine, Location]
+    metrics: []
+    data_class: static
+    latency: live queries against a continuously edited graph (seconds-to-minutes edit lag)
+    resolution: entity level (QIDs)
+    update_frequency: continuous community edits
+    history_depth: full revision history per entity
+    authentication: none
+    licensing:
+      class: public-domain
+      notes: CC0 (public domain dedication) - maximally permissive. Query service etiquette - 60s query timeout, descriptive User-Agent, back off on 429s.
+    cost: free
+    reliability: 3
+    quality_notes: Used for entity resolution/enrichment (QIDs as external_ids.wikidata_qid, links to LEI/GEM/OSM). Community-maintained - never a primary source for operational facts.
+    verification_status: documented_only
+    last_checked: "2026-08-12"
+    notes: SPARQL results as JSON/XML; linked-data fragments and dumps available for bulk work.
+
+  - source_id: source:comtrade:api
+    publisher: United Nations Statistics Division
+    dataset: UN Comtrade - international merchandise trade statistics (HS commodity x partner)
+    api_type: rest
+    url: https://comtradeapi.un.org/
+    docs_url: https://uncomtrade.org/docs/
+    coverage:
+      global: true
+    entity_types: [Country, Commodity]
+    metrics: [trade.export.tonnes, trade.export.value.usd, trade.import.tonnes, trade.import.value.usd]
+    data_class: static
+    latency: monthly data lags ~2-3 months; annual consolidations later
+    resolution: reporter x partner x HS6 commodity, monthly/annual
+    update_frequency: continuous ingestion of national submissions; practical monthly cadence
+    history_depth: annual back to 1962; monthly for recent decades
+    authentication: api_key
+    licensing:
+      class: open-registration
+      notes: Free registration issues a subscription key - free tier ~500 calls/day, 100k records/call; premium tiers for bulk. Data free to reuse with attribution to UN Comtrade; bulk redistribution restricted.
+    cost: free tier; paid premium
+    reliability: 4
+    quality_notes: The global ground truth for coal/LNG/alumina/aluminium trade flows at country level - calibrates inferred port-to-country flows. Mirror-flow asymmetries are a known feature; use reporter/partner reconciliation.
+    verification_status: documented_only
+    last_checked: "2026-08-12"
+    notes: Key HS codes for this workspace - 2701 (coal), 2711 (gas/LNG), 2818 (alumina), 7601 (unwrought aluminium), 2601 (iron ore), 7207-72xx (steel).
+
+  - source_id: source:jodi:world-databases
+    publisher: Joint Organisations Data Initiative (JODI) - IEA, OPEC, APEC, Eurostat, IEF, OLADE, UNSD, GECF
+    dataset: JODI-Oil and JODI-Gas World Databases (monthly national oil/gas production, demand, stocks, trade)
+    api_type: bulk-download
+    url: https://www.jodidata.org/
+    docs_url: https://www.jodidata.org/oil/support/user-guide.aspx
+    coverage:
+      global: true
+    entity_types: [Country, Commodity]
+    metrics: [oil.production.kbd, gas.production.mcm, stocks.level.kt, trade.export.tonnes]
+    data_class: static
+    latency: ~1-2 months behind (data to one month old)
+    resolution: country x product x flow, monthly
+    update_frequency: monthly
+    history_depth: oil since January 2002; gas since January 2009
+    authentication: none
+    licensing:
+      class: open-attribution
+      notes: Free downloads (CSV and Beyond-20/20 formats), no registration; cite JODI. Self-reported national data - coverage ~90 percent of markets with varying quality flags.
+    cost: free
+    reliability: 3
+    quality_notes: The only free monthly global oil/gas balance; JODI-Gas covers LNG trade relevant to the Gladstone LNG exemplar. Quality codes per country-series must be honoured.
+    verification_status: documented_only
+    last_checked: "2026-08-12"
+    notes: One registry record covers both the oil and gas databases (same publisher/portal/terms).
+
+  - source_id: source:usgs:mineral-commodity-summaries
+    publisher: U.S. Geological Survey (National Minerals Information Center)
+    dataset: Mineral Commodity Summaries (annual world production, reserves, trade by commodity)
+    api_type: bulk-download
+    url: https://www.usgs.gov/centers/national-minerals-information-center/mineral-commodity-summaries
+    docs_url: https://www.usgs.gov/centers/national-minerals-information-center
+    coverage:
+      global: true
+    entity_types: [Country, Commodity]
+    metrics: [production.rate.ktpa, reserves.tonnes]
+    data_class: static
+    latency: annual (published each January for the prior year, with estimates)
+    resolution: commodity x country, annual (~90 commodities)
+    update_frequency: annual (MCS); monthly/quarterly surveys for some commodities separately
+    history_depth: MCS editions back decades; historical statistics series to 1900 for many commodities
+    authentication: none
+    licensing:
+      class: public-domain
+      notes: US federal government work - public domain; data releases also on ScienceBase with DOIs and machine-readable CSV/XLSX.
+    cost: free
+    reliability: 4
+    quality_notes: Reference series for bauxite/alumina/aluminium, iron ore and coal country-level production - anchors long-run capacity/production priors.
+    verification_status: documented_only
+    last_checked: "2026-08-12"
+    notes: 2026 edition covers 2025 estimates; per-commodity PDF + consolidated data files.
+
+  - source_id: source:worldsteel:production-statistics
+    publisher: World Steel Association (worldsteel)
+    dataset: Monthly crude steel (+ iron/DRI) production statistics
+    api_type: html
+    url: https://worldsteel.org/data/
+    docs_url: https://worldsteel.org/data/about-our-data/
+    coverage:
+      global: true
+    entity_types: [Country, Commodity]
+    metrics: [production.crude_steel.mt, production.pig_iron.mt, production.dri.mt]
+    data_class: static
+    latency: monthly figures released ~22nd-25th of the following month
+    resolution: country level (~70 reporting countries, ~98 percent of world production), monthly
+    update_frequency: monthly press release + annual yearbook
+    history_depth: annual data back to 1900s via yearbooks; monthly series for recent years
+    authentication: none
+    licensing:
+      class: mixed
+      notes: Headline monthly press-release tables are free to cite with attribution; the detailed monthly subscription (~EUR 1590/yr) and Steel Statistical Yearbook data files are commercial. Record the split - free aggregates, paid detail.
+    cost: free headline; commercial detail
+    reliability: 4
+    quality_notes: Industry-association self-reported but the accepted global benchmark - steel production drives met-coal demand, the demand side of the Bowen Basin chain.
+    verification_status: documented_only
+    last_checked: "2026-08-12"
+    notes: Scrape-light approach - one press release per month; China (~half of world output) also cross-checkable against NBS.
+
+  - source_id: source:iai:aluminium-statistics
+    publisher: International Aluminium Institute
+    dataset: IAI statistics - primary aluminium and alumina production (monthly, by region)
+    api_type: html
+    url: https://international-aluminium.org/statistics/primary-aluminium-production/
+    docs_url: https://international-aluminium.org/statistics-overview/
+    coverage:
+      global: true
+    entity_types: [Country, Commodity, Smelter]
+    metrics: [production.primary_aluminium.kt, production.alumina.kt]
+    data_class: static
+    latency: ~3 weeks after month end (e.g. monthly release around the 20th)
+    resolution: regional aggregates (incl. Oceania - covers AU smelters), monthly; annual by country detail
+    update_frequency: monthly
+    history_depth: primary aluminium series back to 1973; alumina to 1974
+    authentication: none
+    licensing:
+      class: open-attribution
+      notes: Free to view/download from the IAI statistics pages with attribution; reproduction of substantial extracts needs IAI permission. Member-reported plus estimates of unreported production.
+    cost: free
+    reliability: 4
+    quality_notes: The demand/production benchmark for the aluminium chain exemplar (Boyne Island smelter, Yarwun/QAL alumina) - Oceania regional series is the calibration line for inferred smelter utilisation.
+    verification_status: documented_only
+    last_checked: "2026-08-12"
+    notes: Interactive charts with CSV export; regional not plant-level - plant attribution stays inferred.
+
+  - source_id: source:copernicus:sentinel-2
+    publisher: European Commission / ESA (Copernicus Data Space Ecosystem)
+    dataset: Sentinel-2 L1C/L2A optical imagery via CDSE (STAC/OData/openEO/Sentinel Hub APIs)
+    api_type: rest
+    url: https://dataspace.copernicus.eu/
+    docs_url: https://documentation.dataspace.copernicus.eu/APIs.html
+    coverage:
+      global: true
+    entity_types: [Location, Facility, Port, Mine]
+    metrics: [satellite.image.scene]
+    data_class: both
+    latency: new acquisitions published within hours of downlink
+    resolution: 10-60m multispectral; ~5-day revisit (twin satellites)
+    update_frequency: continuous acquisition; per-tile revisit ~5 days
+    history_depth: full mission archive since 2015
+    authentication: registration
+    licensing:
+      class: open-attribution
+      notes: Copernicus free, full and open data policy - free registration issues OAuth-style access tokens for download; generous free quotas, commercial terms only for very large-scale processing. Attribute Copernicus Sentinel data.
+    cost: free (quotas)
+    reliability: 4
+    quality_notes: Visual/NDWI-style monitoring of stockpiles, berth occupancy, plant activity at named facilities - evidence imagery for inferences, cloud-cover dependent.
+    verification_status: documented_only
+    last_checked: "2026-08-12"
+    notes: STAC catalogue at stac.dataspace.copernicus.eu; also mirrored on AWS/Planetary Computer. Sentinel-1 SAR (all-weather ship/facility monitoring) available under the same ecosystem.
+
+  - source_id: source:nasa:firms
+    publisher: NASA LANCE / University of Maryland
+    dataset: FIRMS - active fire / thermal anomaly detections (VIIRS 375m, MODIS 1km)
+    api_type: rest
+    url: https://firms.modaps.eosdis.nasa.gov/api/
+    docs_url: https://firms.modaps.eosdis.nasa.gov/api/area/
+    coverage:
+      global: true
+    entity_types: [Location, Facility, Smelter, Refinery]
+    metrics: [thermal.anomaly.frp_mw, thermal.anomaly.count]
+    data_class: live
+    latency: NRT within ~3h of overpass (ultra-real-time <1min for US/Canada)
+    resolution: 375m (VIIRS S-NPP/NOAA-20/NOAA-21), 1km (MODIS); ~2-4 overpasses/day/satellite
+    update_frequency: per satellite overpass
+    history_depth: archive back to 2000 (MODIS) / 2012 (VIIRS) via country/archive downloads
+    authentication: api_key
+    licensing:
+      class: open-registration
+      notes: Free MAP_KEY (instant email issue); 5000 transactions per 10-minute window. NASA data - effectively unrestricted with attribution; cite LANCE/FIRMS.
+    cost: free
+    reliability: 4
+    quality_notes: NOTED USE - persistent industrial heat sources (smelters, steelworks, refinery flares, LNG flaring) appear as recurring thermal anomalies, so FIRMS doubles as a crude live activity/outage signal for facilities with no published telemetry - a documented mitigation for observability gaps. Confounded by bushfires - filter by persistence at fixed coordinates.
+    verification_status: documented_only
+    last_checked: "2026-08-12"
+    notes: CSV/JSON/WFS; area API takes bbox+date, e.g. poll a small bbox around Boyne Island / Curtis Island.

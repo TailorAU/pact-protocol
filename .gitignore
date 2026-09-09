@@ -5,3 +5,6 @@ dist/
 
 # Claude Code session state (per-session worktrees, not part of repo)
 .claude/
+
+# Intelligence workspace runtime output (bronze/silver/gold data lake)
+intelligence/var/

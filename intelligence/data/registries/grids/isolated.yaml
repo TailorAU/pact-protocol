@@ -1,0 +1,161 @@
+# Grid registry — isolated & notable island systems. Class-A structural records. See ../../schemas/grid.schema.json
+records:
+  - grid_id: grid:is
+    name: Iceland National Grid
+    kind: isolated_grid
+    parent_grid: null
+    countries: [is]
+    frequency_hz: 50
+    timezone: Atlantic/Reykjavik
+    operators:
+      - { name: Landsnet, role: system_operator }
+      - { name: Landsnet, role: transmission_owner }
+      - { name: Orkustofnun, role: regulator }
+    market:
+      structure: bilateral contracts; energy-intensive industry takes ~80% of demand; nascent trading platform
+      price_mechanism: negotiated long-term contracts; regulated transmission tariffs
+      dispatch_interval: null
+    interconnections: []
+    live_data:
+      availability: partial
+      notes: near-real-time system map and operational data published by Landsnet; no dispatch-level API
+      source_ids: [source:wikidata:sparql]
+    demand_range_mw: { min: 1600, max: 2400 }
+    sources: [source:wikidata:sparql]
+    notes: "Fully isolated island grid, ~100% renewable (hydro plus geothermal); very flat load dominated by aluminium smelters; IceLink interconnector proposals shelved."
+
+  - grid_id: grid:nz
+    name: New Zealand Power System
+    kind: national_grid
+    parent_grid: null
+    countries: [nz]
+    frequency_hz: 50
+    timezone: Pacific/Auckland
+    operators:
+      - { name: Transpower, role: system_operator }
+      - { name: Transpower, role: transmission_owner }
+      - { name: Electricity Authority, role: regulator }
+    market:
+      structure: energy-only gross pool (NZEM) with nodal pricing
+      price_mechanism: real-time 5-minute dispatch prices; 30-minute trading periods
+      dispatch_interval: 5min
+    interconnections: []
+    live_data:
+      availability: rich
+      notes: 5-minute prices, load and generation freely available (WITS free data, em6 dashboards, Transpower live data)
+      source_ids: [source:wikidata:sparql]
+    demand_range_mw: { min: 4000, max: 7200 }
+    sources: [source:wikidata:sparql]
+    notes: "No international interconnections; two AC islands joined by the 1200 MW HVDC Inter-Island link; ~85% renewable, dominated by South Island hydro; dry-year risk is the defining security question."
+
+  - grid_id: grid:nz-north
+    name: New Zealand North Island Grid
+    kind: regional_grid
+    parent_grid: grid:nz
+    countries: [nz]
+    frequency_hz: 50
+    timezone: Pacific/Auckland
+    operators:
+      - { name: Transpower, role: system_operator }
+    market: null
+    interconnections:
+      - { to_grid: grid:nz-south, name: "HVDC Inter-Island link (Benmore-Haywards)", capacity_mw: 1200 }
+    live_data:
+      availability: rich
+      notes: covered by the same 5-minute national market data as the parent record
+      source_ids: [source:wikidata:sparql]
+    demand_range_mw: null
+    sources: [source:wikidata:sparql]
+    notes: "Auckland and Wellington load centres; geothermal, hydro and gas generation; net importer over the HVDC in dry southern years."
+
+  - grid_id: grid:nz-south
+    name: New Zealand South Island Grid
+    kind: regional_grid
+    parent_grid: grid:nz
+    countries: [nz]
+    frequency_hz: 50
+    timezone: Pacific/Auckland
+    operators:
+      - { name: Transpower, role: system_operator }
+    market: null
+    interconnections:
+      - { to_grid: grid:nz-north, name: "HVDC Inter-Island link (Benmore-Haywards)", capacity_mw: 1200 }
+    live_data:
+      availability: rich
+      notes: covered by the same 5-minute national market data as the parent record
+      source_ids: [source:wikidata:sparql]
+    demand_range_mw: null
+    sources: [source:wikidata:sparql]
+    notes: "Hydro-dominated (Benmore, Manapouri, Clyde); Tiwai Point aluminium smelter is the single largest load; usually exports north over the HVDC."
+
+  - grid_id: grid:us-hi
+    name: Hawaii Island Grids
+    kind: isolated_grid
+    parent_grid: null
+    countries: [us]
+    frequency_hz: 60
+    timezone: Pacific/Honolulu
+    operators:
+      - { name: Hawaiian Electric, role: system_operator }
+      - { name: Kauai Island Utility Cooperative, role: system_operator }
+      - { name: Hawaii Public Utilities Commission, role: regulator }
+    market:
+      structure: vertically integrated regulated utilities under performance-based regulation
+      price_mechanism: regulated tariffs; renewable PPAs
+      dispatch_interval: null
+    interconnections: []
+    live_data:
+      availability: minimal
+      notes: no real-time public feed; EIA-930 excludes Hawaii; the real portals are monthly EIA data and utility dashboards
+      source_ids: [source:eia:api-v2]
+    demand_range_mw: { min: 700, max: 1800 }
+    sources: [source:eia:api-v2]
+    notes: "Umbrella record for six separate island systems (Oahu, Maui, Hawaii Island, Kauai, Molokai, Lanai) with no inter-island cables; among the world's highest rooftop-PV penetration; 100% renewable mandate by 2045."
+
+  - grid_id: grid:pr
+    name: Puerto Rico Grid
+    kind: isolated_grid
+    parent_grid: null
+    countries: [us]
+    frequency_hz: 60
+    timezone: America/Puerto_Rico
+    operators:
+      - { name: LUMA Energy, role: system_operator }
+      - { name: LUMA Energy, role: transmission_owner }
+      - { name: Puerto Rico Energy Bureau, role: regulator }
+    market:
+      structure: PREPA-owned assets under private operation (LUMA for T&D since 2021, Genera PR for generation since 2023)
+      price_mechanism: regulated tariffs
+      dispatch_interval: null
+    interconnections: []
+    live_data:
+      availability: minimal
+      notes: LUMA outage and system dashboards only; EIA-930 excludes Puerto Rico; monthly EIA territory data
+      source_ids: [source:eia:api-v2]
+    demand_range_mw: { min: 1800, max: 3100 }
+    sources: [source:eia:api-v2]
+    notes: "Isolated 60 Hz island system still rebuilding from Hurricane Maria (2017); chronic generation shortfalls and island-wide outages; large federally funded solar-plus-storage program."
+
+  - grid_id: grid:lk
+    name: Sri Lanka National Grid
+    kind: isolated_grid
+    parent_grid: null
+    countries: [lk]
+    frequency_hz: 50
+    timezone: Asia/Colombo
+    operators:
+      - { name: Ceylon Electricity Board, role: system_operator }
+      - { name: Ceylon Electricity Board, role: transmission_owner }
+      - { name: Public Utilities Commission of Sri Lanka, role: regulator }
+    market:
+      structure: vertically integrated single buyer (CEB); unbundling legislated 2024
+      price_mechanism: regulated tariffs
+      dispatch_interval: null
+    interconnections: []
+    live_data:
+      availability: minimal
+      notes: daily generation reports and dashboards from CEB; no real-time public feed
+      source_ids: [source:wikidata:sparql]
+    demand_range_mw: { min: 1500, max: 2900 }
+    sources: [source:wikidata:sparql]
+    notes: "Isolated 50 Hz island grid; hydro plus imported-fuel thermal with growing solar; HVDC interconnection with India long proposed; 2022 fuel crisis forced rolling cuts."

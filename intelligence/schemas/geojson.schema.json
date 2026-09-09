@@ -1,0 +1,79 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pact.tailor.au/intelligence/schemas/geojson.schema.json",
+  "title": "GeoJSON (minimal WGS84 subset)",
+  "description": "Minimal GeoJSON geometry definitions. Positions are [lon, lat] (optionally + elevation) number arrays in WGS84.",
+  "$defs": {
+    "position": {
+      "type": "array",
+      "items": { "type": "number" },
+      "minItems": 2,
+      "maxItems": 3,
+      "description": "[lon, lat] or [lon, lat, elevation]"
+    },
+    "linearRing": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/position" },
+      "minItems": 4
+    },
+    "point": {
+      "type": "object",
+      "required": ["type", "coordinates"],
+      "properties": {
+        "type": { "const": "Point" },
+        "coordinates": { "$ref": "#/$defs/position" }
+      },
+      "additionalProperties": false
+    },
+    "lineString": {
+      "type": "object",
+      "required": ["type", "coordinates"],
+      "properties": {
+        "type": { "const": "LineString" },
+        "coordinates": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/position" },
+          "minItems": 2
+        }
+      },
+      "additionalProperties": false
+    },
+    "polygon": {
+      "type": "object",
+      "required": ["type", "coordinates"],
+      "properties": {
+        "type": { "const": "Polygon" },
+        "coordinates": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/linearRing" },
+          "minItems": 1
+        }
+      },
+      "additionalProperties": false
+    },
+    "multiPolygon": {
+      "type": "object",
+      "required": ["type", "coordinates"],
+      "properties": {
+        "type": { "const": "MultiPolygon" },
+        "coordinates": {
+          "type": "array",
+          "items": {
+            "type": "array",
+            "items": { "$ref": "#/$defs/linearRing" },
+            "minItems": 1
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "geometry": {
+      "oneOf": [
+        { "$ref": "#/$defs/point" },
+        { "$ref": "#/$defs/lineString" },
+        { "$ref": "#/$defs/polygon" },
+        { "$ref": "#/$defs/multiPolygon" }
+      ]
+    }
+  }
+}

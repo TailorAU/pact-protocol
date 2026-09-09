@@ -1,0 +1,155 @@
+# Structural seed — Gladstone industrial cluster (depth exemplar) plus NSW industrial-load counterparts
+# (Tomago, Port Kembla, Sydney DC cluster). See ../../../schemas/entity.schema.json
+records:
+  - entity_id: smelter:au-qld:boyne-island
+    entity_type: Smelter
+    name: Boyne Island Aluminium Smelter
+    aliases: [Boyne Smelters, BSL]
+    data_class: structural
+    observability: INSTRUMENTATION_OPPORTUNITY
+    geometry: { type: Point, coordinates: [151.355, -23.946] }
+    country: au
+    admin: { region: Queensland, locality: Boyne Island }
+    grid_id: grid:au-nem
+    properties:
+      product: aluminium
+      capacity_tpa: 500000
+      potlines: 3
+      technology: prebake
+      commissioned: 1982
+      load_mw: 950
+      load_note: approximately 950 MW continuous electrical load, the largest single load in Queensland
+    external_ids: {}
+    sources: [source:wikidata:sparql, source:gpc:cargo-statistics]
+    notes: >-
+      Boyne Smelters Limited JV, Rio Tinto ~73.5% and operator. Output curtailed (~14%) since 2017 due to
+      electricity costs. Power supplied predominantly by Gladstone Power Station under contracts running to
+      March 2029. No public real-time telemetry - a strong instrumentation opportunity via grid-side inference.
+
+  - entity_id: refinery:au-qld:qal
+    entity_type: Refinery
+    name: Queensland Alumina Limited Refinery
+    aliases: [QAL]
+    data_class: structural
+    observability: ESTIMATED
+    geometry: { type: Point, coordinates: [151.278, -23.860] }
+    country: au
+    admin: { region: Queensland, locality: Gladstone }
+    grid_id: grid:au-nem
+    properties:
+      product: alumina
+      capacity_tpa: 3950000
+      technology: Bayer process
+      commissioned: 1967
+    external_ids: {}
+    sources: [source:wikidata:sparql, source:gpc:cargo-statistics]
+    notes: >-
+      One of the world's largest alumina refineries. Rio Tinto 80%, Rusal 20%; Rio Tinto assumed 100%
+      operational control in 2022 with the Rusal interest quarantined under Australian sanctions. Bauxite
+      shipped from Weipa; alumina feeds Boyne Island and export markets. Production reported quarterly.
+
+  - entity_id: refinery:au-qld:yarwun
+    entity_type: Refinery
+    name: Yarwun Alumina Refinery
+    aliases: [Rio Tinto Yarwun, Comalco Alumina Refinery]
+    data_class: structural
+    observability: ESTIMATED
+    geometry: { type: Point, coordinates: [151.156, -23.795] }
+    country: au
+    admin: { region: Queensland, locality: Yarwun }
+    grid_id: grid:au-nem
+    properties:
+      product: alumina
+      capacity_tpa: 3000000
+      technology: Bayer process
+      commissioned: 2004
+    external_ids: {}
+    sources: [source:wikidata:sparql, source:gpc:cargo-statistics]
+    notes: Rio Tinto 100%. Expanded 2012; has its own gas-fired cogeneration. Weipa bauxite feed; alumina largely exported.
+
+  - entity_id: chem:au-qld:orica-yarwun
+    entity_type: ChemicalPlant
+    name: Orica Yarwun Chemical Complex
+    aliases: [Orica Gladstone]
+    data_class: structural
+    observability: ESTIMATED
+    geometry: { type: Point, coordinates: [151.163, -23.808] }
+    country: au
+    admin: { region: Queensland, locality: Yarwun }
+    grid_id: grid:au-nem
+    properties:
+      products: [ammonium nitrate, ammonia, sodium cyanide]
+      capacity_tpa: 680000
+      capacity_note: approximately 680 ktpa ammonium nitrate; also a major sodium cyanide producer
+      commissioned: 1990
+    external_ids: {}
+    sources: [source:wikidata:sparql, source:gpc:cargo-statistics]
+    notes: >-
+      Orica's largest manufacturing site; supplies bulk explosives precursors to Bowen Basin coal mining and
+      cyanide to gold mining. Significant natural gas and electricity consumer in the Gladstone cluster.
+
+  - entity_id: smelter:au-nsw:tomago
+    entity_type: Smelter
+    name: Tomago Aluminium Smelter
+    aliases: [Tomago]
+    data_class: structural
+    observability: INSTRUMENTATION_OPPORTUNITY
+    geometry: { type: Point, coordinates: [151.712, -32.836] }
+    country: au
+    admin: { region: New South Wales, locality: Tomago }
+    grid_id: grid:au-nem
+    properties:
+      product: aluminium
+      capacity_tpa: 590000
+      potlines: 3
+      technology: prebake
+      commissioned: 1983
+      load_mw: 950
+      load_note: roughly 950 MW, around 10% of NSW electricity demand; Australia's largest single electricity consumer
+    external_ids: {}
+    sources: [source:wikidata:sparql]
+    notes: >-
+      Operated by Tomago Aluminium Company JV (Rio Tinto ~51.55%, CSR ~36.05%, Hydro Aluminium ~12.4%).
+      Demand-response capable (potline interruption). NSW counterpart to Boyne Island in the demand model.
+
+  - entity_id: steel:au-nsw:port-kembla
+    entity_type: SteelMill
+    name: Port Kembla Steelworks
+    aliases: [BlueScope Port Kembla]
+    data_class: structural
+    observability: ESTIMATED
+    geometry: { type: Point, coordinates: [150.893, -34.463] }
+    country: au
+    admin: { region: New South Wales, locality: Port Kembla }
+    grid_id: grid:au-nem
+    properties:
+      product: crude steel
+      capacity_tpa: 3200000
+      technology: integrated blast furnace / BOS
+      commissioned: 1928
+    external_ids: {}
+    sources: [source:wikidata:sparql]
+    notes: >-
+      Australia's largest steelworks, BlueScope-owned. Consumes metallurgical coal (largely from nearby
+      Illawarra mines) and iron ore; No. 6 blast furnace reline underway to extend life. Production
+      reported half-yearly.
+
+  - entity_id: dc:au-nsw:sydney-metro-cluster
+    entity_type: DataCentre
+    name: Sydney Metro Data Centre Cluster
+    aliases: [Sydney DC cluster]
+    data_class: structural
+    observability: ESTIMATED
+    geometry: { type: Point, coordinates: [151.19, -33.87] }
+    country: au
+    admin: { region: New South Wales, locality: Sydney }
+    grid_id: grid:au-nem
+    properties:
+      facility_count: 85
+      it_load_mw: 1100
+      load_note: aggregate entity; approximately 1 GW+ of commissioned IT load across the metro area, growing rapidly
+    external_ids: {}
+    sources: [source:wikidata:sparql]
+    notes: >-
+      Aggregate stand-in for Sydney's data-centre fleet (NextDC, AirTrunk, Equinix, CDC and others) - the
+      fastest-growing large load in NSW1. Individual sites not modelled in this structural seed.

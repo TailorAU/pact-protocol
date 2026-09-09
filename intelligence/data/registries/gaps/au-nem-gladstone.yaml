@@ -1,0 +1,290 @@
+# Observability-gap registry — Gladstone industrial cluster (NEM / QLD1). See ../../schemas/observability-gap.schema.json
+records:
+  - gap_id: gap:au-nem:boyne-live-load
+    entity_id: smelter:au-qld:boyne-island
+    desired_metric: power.load.mw
+    current_source: null
+    best_available_proxy:
+      source_id: source:aemo:nemweb-dispatch-scada
+      metric: grid.demand.mw
+      derivation: QLD1 regional demand net of scheduled generation; smelter is ~10% of QLD load and its potline load is near-constant, so residual-load deltas at known interruption events isolate it
+    required_resolution: 1min
+    required_accuracy: ±1%
+    commercial_value: high
+    strategic_value: critical
+    instrumentation_options:
+      - { kind: substation_gateway, notes: Boyne smelter is fed by dedicated 275 kV circuits from Calvale/Gladstone; a gateway at the smelter substation would give exact potline load, indicative_cost_band: high }
+      - { kind: revenue_meter, notes: integration with the retailer/TNSP revenue meter via customer API, indicative_cost_band: medium }
+      - { kind: customer_api, notes: direct data-sharing agreement with Rio Tinto, indicative_cost_band: low }
+    estimated_complexity: medium
+    priority: P1
+    status: open
+    notes: Largest single electricity consumer in Queensland; ~950-1000 MW continuous draw, ~8 TWh/yr. Its state is the keystone of Gladstone-cluster intelligence.
+
+  - gap_id: gap:au-nem:boyne-production-rate
+    entity_id: smelter:au-qld:boyne-island
+    desired_metric: production.rate.tph
+    current_source: null
+    best_available_proxy:
+      source_id: source:aemo:nemweb-dispatch-scada
+      metric: grid.demand.mw
+      derivation: "Potline load divided by specific energy of 13.5-14 MWh/t gives hot-metal rate; at ~950 MW that is ~68-70 t/h, ~500-545 kt/yr against a 585 kt/yr nameplate (three potlines, one partially curtailed since 2017). Load-shedding events longer than ~3 h imply pot instability and multi-week production loss."
+    required_resolution: 1h
+    required_accuracy: ±5%
+    commercial_value: high
+    strategic_value: high
+    instrumentation_options:
+      - { kind: customer_api, notes: "Rio Tinto production data-sharing agreement; smelter output is metered internally per potline", indicative_cost_band: low }
+      - { kind: substation_gateway, notes: "exact potline MW from an owned substation gateway makes the MWh/t conversion accurate to ~2%", indicative_cost_band: high }
+      - { kind: partner_feed, notes: "GPC aluminium/alumina wharf tonnage feed reconciles inferred production monthly", indicative_cost_band: medium }
+    estimated_complexity: medium
+    priority: P2
+    status: open
+    notes: Production is an almost deterministic function of potline load, so this gap closes automatically once gap:au-nem:boyne-live-load is instrumented.
+
+  - gap_id: gap:au-nem:qal-alumina-production
+    entity_id: refinery:au-qld:qal
+    desired_metric: production.rate.tph
+    current_source: null
+    best_available_proxy:
+      source_id: source:aisstream:websocket
+      metric: vessel.movement.events
+      derivation: "QAL (~3.7 Mtpa, ~420-460 t/h) runs a closed Weipa-Gladstone bauxite shuttle at ~2.3 t bauxite per t alumina; counting bauxite-carrier arrivals at the QAL wharf (parcels ~70-90 kt) and alumina/caustic vessel calls gives a ~weekly production nowcast, reconciled monthly against GPC cargo statistics."
+    required_resolution: 1d
+    required_accuracy: ±10%
+    commercial_value: high
+    strategic_value: high
+    instrumentation_options:
+      - { kind: customer_api, notes: "data-sharing agreement with Rio Tinto (80% owner and operator; Rusal's 20% is sanctions-affected and Rio has sole operational control since 2022)", indicative_cost_band: low }
+      - { kind: camera_ocr, notes: "camera on the QAL wharf unloader/shiploader with OCR of vessel names plus belt-motion detection", indicative_cost_band: medium }
+      - { kind: partner_feed, notes: "GPC per-wharf tonnage feed at daily rather than monthly cadence", indicative_cost_band: medium }
+    estimated_complexity: medium
+    priority: P2
+    status: open
+    notes: One of the world's largest alumina refineries, operating since 1967; feeds Boyne and export markets. Bauxite inventory on site (~2-3 weeks) smooths the AIS proxy.
+
+  - gap_id: gap:au-nem:qal-gas-intake
+    entity_id: refinery:au-qld:qal
+    desired_metric: gas.consumption.tj
+    current_source: null
+    best_available_proxy:
+      source_id: source:aemo:gas-bulletin-board
+      metric: pipeline.deliveries.tj
+      derivation: "Queensland Gas Pipeline (Wallumbilla-Gladstone) daily deliveries into the Gladstone demand zone, published D+1, less the Yarwun cogeneration/calcination baseline and the Orica baseline, leaves the QAL steam/calcination gas share; step-changes greater than ~10 TJ/d flag digester or calciner outages."
+    required_resolution: 1h
+    required_accuracy: ±5%
+    commercial_value: medium
+    strategic_value: high
+    instrumentation_options:
+      - { kind: customer_api, notes: "Rio Tinto energy-desk data share covering QAL fuel intake", indicative_cost_band: low }
+      - { kind: partner_feed, notes: "pipeline-operator (Jemena QGP) delivery-point feed for the Gladstone laterals", indicative_cost_band: medium }
+      - { kind: iot_gateway, notes: "owned gateway on the site gas metering skid under a service agreement", indicative_cost_band: high }
+    estimated_complexity: medium
+    priority: P3
+    status: open
+    notes: Gas intake is the fastest-moving observable of refinery run-rate and of Gladstone's competing claim on east-coast gas; GBB zone granularity hides the per-customer split.
+
+  - gap_id: gap:au-nem:yarwun-production
+    entity_id: refinery:au-qld:yarwun
+    desired_metric: production.rate.tph
+    current_source: null
+    best_available_proxy:
+      source_id: source:aemo:gas-bulletin-board
+      metric: pipeline.deliveries.tj
+      derivation: "Yarwun (~3 Mtpa, ~340 t/h) is gas-fired (on-site cogeneration plus gas calcination), so its share of QGP Gladstone-zone deliveries scales near-linearly with output; AIS bauxite arrivals and GPC monthly alumina tonnages anchor the level. Rio has announced a ~40% output cut from October 2026 - detecting the actual ramp-down date and depth is the immediate use case."
+    required_resolution: 1d
+    required_accuracy: ±10%
+    commercial_value: high
+    strategic_value: high
+    instrumentation_options:
+      - { kind: customer_api, notes: "Rio Tinto data-sharing agreement (sole owner-operator)", indicative_cost_band: low }
+      - { kind: satellite_thermal, notes: "thermal signature of the calciner stacks distinguishes 1-, 2- and 3-calciner operation on each satellite pass", indicative_cost_band: medium }
+      - { kind: partner_feed, notes: "GPC per-wharf alumina tonnage at daily cadence", indicative_cost_band: medium }
+    estimated_complexity: medium
+    priority: P2
+    status: open
+    notes: The announced curtailment makes Yarwun the most likely near-term structural change in Gladstone gas and electricity demand.
+
+  - gap_id: gap:au-nem:orica-yarwun-operating-state
+    entity_id: chem:au-qld:orica-yarwun
+    desired_metric: plant.operating.state
+    current_source: null
+    best_available_proxy:
+      source_id: source:aisstream:websocket
+      metric: vessel.movement.events
+      derivation: "The site imports ammonia and caustic soda through Fisherman's Landing; ammonia-carrier call cadence (parcels every few weeks) bounds feedstock availability, while step-changes in QGP Gladstone-zone gas deliveries flag trips of the nitric-acid/sodium-cyanide units. Absence of an expected ammonia call implies a turnaround or outage within ~2-4 weeks."
+    required_resolution: 1d
+    required_accuracy: state-accurate (running/reduced/down)
+    commercial_value: medium
+    strategic_value: high
+    instrumentation_options:
+      - { kind: environmental_sensor, notes: "NOx/plume sensing downwind of the three nitric-acid plants gives a direct on/off signature", indicative_cost_band: medium }
+      - { kind: partner_feed, notes: "Orica supply-chain data share; their AN dispatch schedule is the ground truth", indicative_cost_band: low }
+      - { kind: camera_ocr, notes: "skyline camera reading steam-plume state of the AN prill towers", indicative_cost_band: low }
+    estimated_complexity: medium
+    priority: P3
+    status: open
+    notes: Yarwun produces 500 kt/yr class ammonium nitrate (three nitric-acid plants, two AN plants) plus sodium cyanide; it is the explosives feedstock chokepoint for Bowen Basin mining, so its state propagates into coal-production forecasts.
+
+  - gap_id: gap:au-nem:rg-tanna-shiploader-throughput
+    entity_id: terminal:au-qld:rg-tanna
+    desired_metric: bulk.shiploading.tph
+    current_source: null
+    best_available_proxy:
+      source_id: source:aisstream:websocket
+      metric: vessel.draught.delta
+      derivation: "AIS draught delta between arrival and departure times tonnes-per-cm immersion (~65-70 t/cm Panamax, ~100-120 t/cm capesize) estimates each parcel to ±5-10%; berth-polygon dwell times give loading intervals and hence average tph per shiploader; monthly reconciliation against GPC cargo statistics removes drift."
+    required_resolution: 1h
+    required_accuracy: ±5%
+    commercial_value: high
+    strategic_value: high
+    instrumentation_options:
+      - { kind: camera_ocr, notes: "camera on the shiploader aprons with OCR of hull names and boom-position detection turns berth state into a live loading signal", indicative_cost_band: medium }
+      - { kind: partner_feed, notes: "GPC operational feed (terminal is GPC-owned and operated) at daily or shift cadence", indicative_cost_band: low }
+      - { kind: ais_receiver, notes: "owned AIS receiver at Gladstone removes aggregator gaps and gives <10 s berth-event latency", indicative_cost_band: low }
+    estimated_complexity: low
+    priority: P1
+    status: open
+    notes: Gladstone's principal coal terminal - GPC quotes capacity in excess of 60 Mtpa while port-wide coal exports run ~55-70 Mt/yr, of which RG Tanna handles the large majority. Its loading rate is the highest-frequency public-ish observable of the whole Blackwater/Moura coal chain.
+
+  - gap_id: gap:au-nem:wicet-throughput
+    entity_id: terminal:au-qld:wicet
+    desired_metric: bulk.throughput.tpd
+    current_source: null
+    best_available_proxy:
+      source_id: source:aisstream:websocket
+      metric: vessel.draught.delta
+      derivation: "Single berth and single shiploader make WICET the easiest terminal to observe by AIS - one vessel at a time, parcel size from draught delta, throughput from parcel-per-dwell arithmetic; monthly totals reconciled to GPC cargo statistics."
+    required_resolution: 1d
+    required_accuracy: ±5%
+    commercial_value: medium
+    strategic_value: medium
+    instrumentation_options:
+      - { kind: ais_receiver, notes: "shared with the Gladstone receiver; WICET berth polygon is unambiguous", indicative_cost_band: low }
+      - { kind: partner_feed, notes: "WICET operational feed via its shipper-owners", indicative_cost_band: medium }
+    estimated_complexity: low
+    priority: P2
+    status: open
+    notes: Opened 2015 at 27 Mtpa stage-1 nameplate but debt-burdened and historically well under capacity (~10-15 Mt/yr); utilisation swings are a sensitive read on Bowen Basin export economics at the margin.
+
+  - gap_id: gap:au-nem:barney-point-throughput
+    entity_id: terminal:au-qld:barney-point
+    desired_metric: bulk.throughput.tpd
+    current_source: null
+    best_available_proxy:
+      source_id: source:gpc:cargo-statistics
+      metric: cargo.tonnage.monthly
+      derivation: "GPC monthly cargo statistics by berth/commodity, ~4-6 weeks in arrears, plus AIS calls at the Barney Point berth for event-level timing."
+    required_resolution: 1d
+    required_accuracy: ±10%
+    commercial_value: low
+    strategic_value: low
+    instrumentation_options:
+      - { kind: ais_receiver, notes: "covered by the same owned Gladstone AIS receiver at no marginal cost", indicative_cost_band: low }
+    estimated_complexity: low
+    priority: P4
+    status: open
+    notes: Coal exports ceased in 2016 when GPC consolidated coal at RG Tanna; Barney Point now handles minor dry-bulk trades. Tracked mainly for completeness and as spare-capacity context for the port.
+
+  - gap_id: gap:au-nem:qclng-train-production
+    entity_id: lng:au-qld:qclng
+    desired_metric: lng.train.production.tpd
+    current_source: null
+    best_available_proxy:
+      source_id: source:aemo:gas-bulletin-board
+      metric: pipeline.deliveries.tj
+      derivation: "Wallumbilla-Gladstone Pipeline daily deliveries to Curtis Island (D+1) divided by ~52-54 TJ per kt of LNG (including ~8-9% liquefaction fuel/shrinkage) gives plant-level output; AIS tanker departures (~65-75 kt LNG per standard 170000 m3 carrier, roughly one every 2-3 days at full rates) confirm. The two 4.25 Mtpa trains share one feed, so per-train attribution is only possible at outage events."
+    required_resolution: 1d
+    required_accuracy: ±5%
+    commercial_value: high
+    strategic_value: high
+    instrumentation_options:
+      - { kind: satellite_thermal, notes: "flare and train heat signatures on each pass separate one-train from two-train operation - the attribution the pipeline proxy cannot do", indicative_cost_band: medium }
+      - { kind: ais_receiver, notes: "owned Gladstone receiver timestamps loadings at the QCLNG jetty precisely", indicative_cost_band: low }
+      - { kind: customer_api, notes: "data-sharing agreement with Shell/QGC", indicative_cost_band: high }
+    estimated_complexity: medium
+    priority: P2
+    status: open
+    notes: QCLNG - two trains, 8.5 Mtpa nameplate, Shell-operated. Combined Curtis Island feed hit records above 4300 TJ/d in 2024; per-train state is the missing term for east-coast gas balance nowcasts.
+
+  - gap_id: gap:au-nem:aplng-train-production
+    entity_id: lng:au-qld:aplng
+    desired_metric: lng.train.production.tpd
+    current_source: null
+    best_available_proxy:
+      source_id: source:aemo:gas-bulletin-board
+      metric: pipeline.deliveries.tj
+      derivation: "APLNG Pipeline daily deliveries (D+1) divided by ~52-54 TJ per kt of LNG; AIS tanker cadence at the APLNG jetty confirms. Two 4.5 Mtpa trains (largest of the three projects at 9.0 Mtpa combined) share one feed, so train-level split needs an independent signal."
+    required_resolution: 1d
+    required_accuracy: ±5%
+    commercial_value: high
+    strategic_value: high
+    instrumentation_options:
+      - { kind: satellite_thermal, notes: "train-level thermal/flare discrimination per pass", indicative_cost_band: medium }
+      - { kind: ais_receiver, notes: "shared Gladstone receiver", indicative_cost_band: low }
+      - { kind: customer_api, notes: "data-sharing agreement with ConocoPhillips (downstream operator) or Origin (upstream)", indicative_cost_band: high }
+    estimated_complexity: medium
+    priority: P2
+    status: open
+    notes: APLNG is the largest domestic-market supplier among the three projects, so its train state moves both LNG exports and the domestic gas balance.
+
+  - gap_id: gap:au-nem:glng-train-production
+    entity_id: lng:au-qld:glng
+    desired_metric: lng.train.production.tpd
+    current_source: null
+    best_available_proxy:
+      source_id: source:aemo:gas-bulletin-board
+      metric: pipeline.deliveries.tj
+      derivation: "GLNG Gas Transmission Pipeline daily deliveries (D+1) divided by ~52-54 TJ per kt of LNG; AIS tanker cadence confirms. Two trains, 7.8 Mtpa combined nameplate, chronically underfed from equity gas - GLNG's third-party gas purchases make its run-rate the marginal driver of east-coast domestic gas tightness."
+    required_resolution: 1d
+    required_accuracy: ±5%
+    commercial_value: critical
+    strategic_value: high
+    instrumentation_options:
+      - { kind: satellite_thermal, notes: "train-level thermal/flare discrimination; GLNG single-train periods are common and commercially significant", indicative_cost_band: medium }
+      - { kind: ais_receiver, notes: "shared Gladstone receiver", indicative_cost_band: low }
+      - { kind: customer_api, notes: "data-sharing agreement with Santos (operator)", indicative_cost_band: high }
+    estimated_complexity: medium
+    priority: P1
+    status: open
+    notes: Of the three Curtis Island projects, GLNG's utilisation has the highest information value per tonne because it is the marginal buyer in the domestic gas market.
+
+  - gap_id: gap:au-nem:gladstone-ps-coal-stockpile
+    entity_id: gen:au-nem:gladstone-ps
+    desired_metric: fuel.stockpile.tonnes
+    current_source: null
+    best_available_proxy:
+      source_id: source:aemo:nemweb-dispatch-scada
+      metric: unit.generation.mw
+      derivation: "Integrate GSTONE1-6 dispatch SCADA at ~0.45-0.55 t coal per MWh (six 280 MW subcritical units, ~4 Mt/yr burn at high utilisation) to get draw-down; rail deliveries are unobserved so the estimate drifts and must be re-anchored by periodic satellite stockpile volumetrics."
+    required_resolution: 1d
+    required_accuracy: ±10%
+    commercial_value: medium
+    strategic_value: high
+    instrumentation_options:
+      - { kind: satellite_optical, notes: "stockpile volumetrics from stereo/pushbroom imagery, weekly tasking, ±10% per measurement - directly re-anchors the burn-integration drift", indicative_cost_band: low }
+      - { kind: camera_ocr, notes: "camera on the stacker/reclaimer line-of-sight for daily pile-height reads", indicative_cost_band: medium }
+      - { kind: customer_api, notes: "data share with NRG (operator) or the owner consortium including Rio Tinto (~42%)", indicative_cost_band: medium }
+    estimated_complexity: medium
+    priority: P3
+    status: open
+    notes: 1680 MW station whose ~60% contracted supply to Boyne makes its fuel security a direct input to smelter-continuity risk; low-stockpile periods have historically coincided with QLD1 price stress.
+
+  - gap_id: gap:au-nem:gladstone-vessel-queue
+    entity_id: port:au-qld:gladstone
+    desired_metric: port.queue.count
+    current_source: null
+    best_available_proxy:
+      source_id: source:aisstream:websocket
+      metric: vessel.position.count
+      derivation: "Count vessels inside the designated Gladstone anchorage polygons via aggregated AIS; aggregator coverage of the outer anchorages is patchy (terrestrial receiver range) and position cadence degrades to minutes, so the count is right to ±1-2 vessels most of the time."
+    required_resolution: 5min
+    required_accuracy: exact count
+    commercial_value: high
+    strategic_value: medium
+    instrumentation_options:
+      - { kind: ais_receiver, notes: "one owned AIS receiver on elevated ground at Gladstone covers harbour plus outer anchorages with <10 s latency and closes the gap outright; also serves every other Gladstone AIS-proxied gap", indicative_cost_band: low }
+    estimated_complexity: low
+    priority: P2
+    status: proxied
+    notes: Queue depth leads terminal throughput by days and prices demurrage risk across coal, LNG and alumina trades; this is the single highest-leverage owned-sensor deployment in the cluster.

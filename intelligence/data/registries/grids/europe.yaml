@@ -1,0 +1,493 @@
+# Grid registry — Europe. Class-A structural records. See ../../schemas/grid.schema.json
+records:
+  - grid_id: grid:eu-continental
+    name: Continental Europe Synchronous Area
+    kind: synchronous_area
+    parent_grid: null
+    countries: [de, fr, es, pt, it, pl, nl, be, lu, ch, at, cz, sk, hu, si, hr, ro, bg, gr, rs, ba, me, mk, al, dk, ua, md, tr, ee, lv, lt]
+    frequency_hz: 50
+    timezone: Europe/Brussels
+    operators:
+      - { name: "ENTSO-E Regional Group Continental Europe (coordination of member TSOs)", role: system_operator }
+    market:
+      structure: EU internal electricity market; zonal bidding areas coupled via SDAC/SIDC
+      price_mechanism: zonal marginal pricing in coupled day-ahead and intraday auctions
+      dispatch_interval: null
+    interconnections:
+      - { to_grid: grid:eu-nordic, name: "multiple HVDC links (Skagerrak, Kontek, Baltic Cable, NordLink, NorNed, COBRA and others)", capacity_mw: null }
+      - { to_grid: grid:gb, name: "HVDC links from France, Belgium, Netherlands and Denmark", capacity_mw: null }
+    live_data:
+      availability: rich
+      notes: pan-area load, generation and cross-border flows via the ENTSO-E transparency platform
+      source_ids: [source:entsoe:transparency-platform]
+    demand_range_mw: null
+    sources: [source:entsoe:transparency-platform]
+    notes: "World's largest synchronous area by connected capacity; includes west Denmark (DK1) only; Ukraine/Moldova joined Mar 2022, Baltic states Feb 2025, Turkey synchronized since 2010."
+
+  - grid_id: grid:eu-nordic
+    name: Nordic Synchronous Area
+    kind: synchronous_area
+    parent_grid: null
+    countries: ["no", se, fi, dk]
+    frequency_hz: 50
+    timezone: Europe/Oslo
+    operators:
+      - { name: Statnett, role: tso }
+      - { name: Svenska kraftnat, role: tso }
+      - { name: Fingrid, role: tso }
+      - { name: Energinet, role: tso }
+    market:
+      structure: Nord Pool day-ahead and intraday markets across zonal bidding areas
+      price_mechanism: zonal marginal pricing; 15-minute imbalance settlement
+      dispatch_interval: null
+    interconnections:
+      - { to_grid: grid:eu-continental, name: "multiple HVDC links to Germany, Netherlands, Poland and DK1", capacity_mw: null }
+      - { to_grid: grid:gb, name: "North Sea Link (Norway-GB HVDC)", capacity_mw: 1400 }
+      - { to_grid: grid:eu-baltic, name: "EstLink 1+2 (Finland-Estonia) and NordBalt (Sweden-Lithuania) HVDC", capacity_mw: 1700 }
+    live_data:
+      availability: rich
+      notes: TSO and market data via ENTSO-E transparency and Nord Pool
+      source_ids: [source:entsoe:transparency-platform, source:nordpool:market-data]
+    demand_range_mw: null
+    sources: [source:entsoe:transparency-platform, source:nordpool:market-data]
+    notes: "Hydro-dominated synchronous system of Norway, Sweden, Finland and east Denmark (DK2); joint Nordic balancing model."
+
+  - grid_id: grid:eu-baltic
+    name: Baltic States Grid (Estonia-Latvia-Lithuania)
+    kind: regional_grid
+    parent_grid: grid:eu-continental
+    countries: [ee, lv, lt]
+    frequency_hz: 50
+    timezone: Europe/Vilnius
+    operators:
+      - { name: Elering, role: tso }
+      - { name: Augstsprieguma tikls (AST), role: tso }
+      - { name: Litgrid, role: tso }
+    market:
+      structure: Nord Pool bidding zones (EE, LV, LT) within the EU coupled market
+      price_mechanism: zonal marginal pricing via SDAC/SIDC
+      dispatch_interval: null
+    interconnections:
+      - { to_grid: grid:pl, name: "LitPol Link (AC, the synchronous tie to Continental Europe)", capacity_mw: 500 }
+      - { to_grid: grid:fi, name: "EstLink 1+2 HVDC", capacity_mw: 1000 }
+      - { to_grid: grid:se, name: "NordBalt HVDC", capacity_mw: 700 }
+    live_data:
+      availability: rich
+      notes: full ENTSO-E transparency coverage plus Nord Pool market data
+      source_ids: [source:entsoe:transparency-platform, source:nordpool:market-data]
+    demand_range_mw: null
+    sources: [source:entsoe:transparency-platform]
+    notes: "Desynchronized from the Russian-controlled BRELL ring on 8 Feb 2025 and synchronized with Continental Europe on 9 Feb 2025 via LitPol; Harmony Link HVDC to Poland planned."
+
+  - grid_id: grid:gb
+    name: Great Britain Synchronous Area
+    kind: synchronous_area
+    parent_grid: null
+    countries: [gb]
+    frequency_hz: 50
+    timezone: Europe/London
+    operators:
+      - { name: National Energy System Operator (NESO), role: system_operator }
+      - { name: National Grid Electricity Transmission, role: transmission_owner }
+      - { name: Elexon, role: market_operator }
+      - { name: Ofgem, role: regulator }
+    market:
+      structure: bilateral trading with a balancing mechanism (BETTA)
+      price_mechanism: pay-as-bid balancing mechanism; half-hourly imbalance settlement
+      dispatch_interval: 30min
+    interconnections:
+      - { to_grid: grid:fr, name: "IFA, IFA2 and ElecLink HVDC", capacity_mw: 4000 }
+      - { to_grid: grid:be, name: "Nemo Link HVDC", capacity_mw: 1000 }
+      - { to_grid: grid:nl, name: "BritNed HVDC", capacity_mw: 1000 }
+      - { to_grid: grid:no, name: "North Sea Link HVDC", capacity_mw: 1400 }
+      - { to_grid: grid:dk, name: "Viking Link HVDC", capacity_mw: 1400 }
+      - { to_grid: grid:ie-sem, name: "Moyle, EWIC and Greenlink HVDC", capacity_mw: 1500 }
+    live_data:
+      availability: rich
+      notes: unit-level balancing mechanism, generation, demand and price data via Elexon BMRS/Insights API
+      source_ids: [source:elexon:bmrs]
+    demand_range_mw: { min: 15000, max: 48000 }
+    sources: [source:elexon:bmrs]
+    notes: "Own synchronous island; NESO (publicly owned, replaced National Grid ESO in Oct 2024); Scottish TOs are SSEN and SP Energy Networks; Northern Ireland belongs to the Ireland synchronous area, not this one."
+
+  - grid_id: grid:ie-sem
+    name: Single Electricity Market (island of Ireland)
+    kind: synchronous_area
+    parent_grid: null
+    countries: [ie, gb]
+    frequency_hz: 50
+    timezone: Europe/Dublin
+    operators:
+      - { name: EirGrid, role: tso }
+      - { name: SONI, role: tso }
+      - { name: SEMO, role: market_operator }
+    market:
+      structure: all-island gross pool (I-SEM) with EU day-ahead/intraday coupling and a balancing market
+      price_mechanism: marginal pricing; half-hourly imbalance settlement
+      dispatch_interval: 5min
+    interconnections:
+      - { to_grid: grid:gb, name: "Moyle, EWIC and Greenlink HVDC", capacity_mw: 1500 }
+    live_data:
+      availability: rich
+      notes: real-time system dashboards from EirGrid/SONI, SEMO market data, ENTSO-E transparency coverage
+      source_ids: [source:entsoe:transparency-platform]
+    demand_range_mw: { min: 2500, max: 7500 }
+    sources: [source:entsoe:transparency-platform]
+    notes: "Single synchronous area and market spanning Ireland and Northern Ireland; world-leading system non-synchronous penetration limits (75%); Celtic Interconnector to France (700 MW) under construction."
+
+  - grid_id: grid:de
+    name: Germany (DE-LU bidding zone)
+    kind: tso_area
+    parent_grid: grid:eu-continental
+    countries: [de]
+    frequency_hz: 50
+    timezone: Europe/Berlin
+    operators:
+      - { name: 50Hertz Transmission, role: tso }
+      - { name: Amprion, role: tso }
+      - { name: TenneT TSO GmbH, role: tso }
+      - { name: TransnetBW, role: tso }
+      - { name: Bundesnetzagentur, role: regulator }
+    market:
+      structure: single DE-LU bidding zone across four TSO areas; self-dispatch
+      price_mechanism: zonal marginal pricing via SDAC/SIDC; quarter-hourly intraday products
+      dispatch_interval: null
+    interconnections: []
+    live_data:
+      availability: rich
+      notes: generation, load, prices and flows via ENTSO-E transparency and the national SMARD portal
+      source_ids: [source:entsoe:transparency-platform]
+    demand_range_mw: { min: 35000, max: 80000 }
+    sources: [source:entsoe:transparency-platform]
+    notes: "Europe's largest power system; four TSOs share one bidding zone (zone-split debate ongoing); heavy north-south congestion and redispatch."
+
+  - grid_id: grid:fr
+    name: France (RTE area)
+    kind: tso_area
+    parent_grid: grid:eu-continental
+    countries: [fr]
+    frequency_hz: 50
+    timezone: Europe/Paris
+    operators:
+      - { name: RTE (Reseau de Transport d'Electricite), role: tso }
+      - { name: Commission de Regulation de l'Energie, role: regulator }
+    market:
+      structure: single bidding zone; self-dispatch; EPEX Spot trading
+      price_mechanism: zonal marginal pricing via SDAC/SIDC
+      dispatch_interval: null
+    interconnections: []
+    live_data:
+      availability: rich
+      notes: ENTSO-E transparency plus RTE's open eco2mix real-time data
+      source_ids: [source:entsoe:transparency-platform]
+    demand_range_mw: { min: 30000, max: 102000 }
+    sources: [source:entsoe:transparency-platform]
+    notes: "Nuclear-dominated (~65% of output); Europe's most temperature-sensitive demand; major exporter in normal years."
+
+  - grid_id: grid:es
+    name: Spain (Red Electrica area)
+    kind: tso_area
+    parent_grid: grid:eu-continental
+    countries: [es]
+    frequency_hz: 50
+    timezone: Europe/Madrid
+    operators:
+      - { name: Red Electrica de Espana, role: tso }
+      - { name: OMIE, role: market_operator }
+      - { name: CNMC, role: regulator }
+    market:
+      structure: MIBEL Iberian market with Portugal; self-dispatch
+      price_mechanism: zonal marginal pricing via SDAC/SIDC
+      dispatch_interval: null
+    interconnections: []
+    live_data:
+      availability: rich
+      notes: ENTSO-E transparency plus REE's real-time demand and generation data
+      source_ids: [source:entsoe:transparency-platform]
+    demand_range_mw: { min: 20000, max: 45000 }
+    sources: [source:entsoe:transparency-platform]
+    notes: "Weakly interconnected with France (electrical peninsula); April 2025 Iberian blackout prompted grid-strength reforms; Balearics linked by HVDC, Canaries isolated."
+
+  - grid_id: grid:it
+    name: Italy (Terna area)
+    kind: tso_area
+    parent_grid: grid:eu-continental
+    countries: [it]
+    frequency_hz: 50
+    timezone: Europe/Rome
+    operators:
+      - { name: Terna, role: tso }
+      - { name: Gestore dei Mercati Energetici (GME), role: market_operator }
+      - { name: ARERA, role: regulator }
+    market:
+      structure: seven bidding zones; national single price for consumers (PUN)
+      price_mechanism: zonal marginal pricing via SDAC/SIDC
+      dispatch_interval: null
+    interconnections: []
+    live_data:
+      availability: rich
+      notes: ENTSO-E transparency plus Terna's public real-time system data
+      source_ids: [source:entsoe:transparency-platform]
+    demand_range_mw: { min: 20000, max: 60000 }
+    sources: [source:entsoe:transparency-platform]
+    notes: "Zonal north-south structure; HVDC links to Sardinia, Montenegro and Greece; gas-heavy generation mix."
+
+  - grid_id: grid:pl
+    name: Poland (PSE area)
+    kind: tso_area
+    parent_grid: grid:eu-continental
+    countries: [pl]
+    frequency_hz: 50
+    timezone: Europe/Warsaw
+    operators:
+      - { name: Polskie Sieci Elektroenergetyczne (PSE), role: tso }
+      - { name: Towarowa Gielda Energii (TGE), role: market_operator }
+      - { name: Urzad Regulacji Energetyki, role: regulator }
+    market:
+      structure: single bidding zone; central dispatch of large units
+      price_mechanism: zonal marginal pricing via SDAC/SIDC plus capacity market
+      dispatch_interval: null
+    interconnections: []
+    live_data:
+      availability: rich
+      notes: ENTSO-E transparency plus PSE's public operational data
+      source_ids: [source:entsoe:transparency-platform]
+    demand_range_mw: { min: 11000, max: 28000 }
+    sources: [source:entsoe:transparency-platform]
+    notes: "Coal-heavy but rapidly adding solar; hosts LitPol, the Baltic states' synchronous gateway to Continental Europe."
+
+  - grid_id: grid:nl
+    name: Netherlands (TenneT area)
+    kind: tso_area
+    parent_grid: grid:eu-continental
+    countries: [nl]
+    frequency_hz: 50
+    timezone: Europe/Amsterdam
+    operators:
+      - { name: TenneT TSO B.V., role: tso }
+      - { name: Autoriteit Consument en Markt, role: regulator }
+    market:
+      structure: single bidding zone; self-dispatch
+      price_mechanism: zonal marginal pricing via SDAC/SIDC
+      dispatch_interval: null
+    interconnections: []
+    live_data:
+      availability: rich
+      notes: ENTSO-E transparency plus TenneT operational data
+      source_ids: [source:entsoe:transparency-platform]
+    demand_range_mw: { min: 8000, max: 19000 }
+    sources: [source:entsoe:transparency-platform]
+    notes: "Large offshore wind buildout; severe distribution-level grid congestion (netcongestie) constraining new connections."
+
+  - grid_id: grid:be
+    name: Belgium (Elia area)
+    kind: tso_area
+    parent_grid: grid:eu-continental
+    countries: [be]
+    frequency_hz: 50
+    timezone: Europe/Brussels
+    operators:
+      - { name: Elia, role: tso }
+      - { name: CREG, role: regulator }
+    market:
+      structure: single bidding zone; self-dispatch
+      price_mechanism: zonal marginal pricing via SDAC/SIDC
+      dispatch_interval: null
+    interconnections: []
+    live_data:
+      availability: rich
+      notes: ENTSO-E transparency plus Elia's open data portal
+      source_ids: [source:entsoe:transparency-platform]
+    demand_range_mw: { min: 6000, max: 14000 }
+    sources: [source:entsoe:transparency-platform]
+    notes: "Nuclear life extensions (Doel 4, Tihange 3) reversed the phase-out; Nemo Link to GB and Nautilus planned."
+
+  - grid_id: grid:ch
+    name: Switzerland (Swissgrid area)
+    kind: tso_area
+    parent_grid: grid:eu-continental
+    countries: [ch]
+    frequency_hz: 50
+    timezone: Europe/Zurich
+    operators:
+      - { name: Swissgrid, role: tso }
+      - { name: ElCom, role: regulator }
+    market:
+      structure: national market outside EU market coupling (no EU electricity agreement in force)
+      price_mechanism: exchange trading with explicit border capacity allocation
+      dispatch_interval: null
+    interconnections: []
+    live_data:
+      availability: rich
+      notes: ENTSO-E transparency coverage; Swissgrid operational data
+      source_ids: [source:entsoe:transparency-platform]
+    demand_range_mw: { min: 4000, max: 10000 }
+    sources: [source:entsoe:transparency-platform]
+    notes: "Alpine hydro storage hub at the heart of the Continental grid; heavily transited despite exclusion from EU coupling."
+
+  - grid_id: grid:at
+    name: Austria (APG area)
+    kind: tso_area
+    parent_grid: grid:eu-continental
+    countries: [at]
+    frequency_hz: 50
+    timezone: Europe/Vienna
+    operators:
+      - { name: Austrian Power Grid, role: tso }
+      - { name: E-Control, role: regulator }
+    market:
+      structure: single bidding zone (split from DE-AT zone in 2018); self-dispatch
+      price_mechanism: zonal marginal pricing via SDAC/SIDC
+      dispatch_interval: null
+    interconnections: []
+    live_data:
+      availability: rich
+      notes: ENTSO-E transparency plus APG operational data
+      source_ids: [source:entsoe:transparency-platform]
+    demand_range_mw: { min: 5000, max: 12000 }
+    sources: [source:entsoe:transparency-platform]
+    notes: "Hydro-dominated; pumped-storage services for Germany; Vorarlberg area is electrically closer to the German grid."
+
+  - grid_id: grid:no
+    name: Norway (Statnett area)
+    kind: tso_area
+    parent_grid: grid:eu-nordic
+    countries: ["no"]
+    frequency_hz: 50
+    timezone: Europe/Oslo
+    operators:
+      - { name: Statnett, role: tso }
+      - { name: NVE-RME, role: regulator }
+    market:
+      structure: five bidding zones (NO1-NO5) in Nord Pool
+      price_mechanism: zonal marginal pricing
+      dispatch_interval: null
+    interconnections: []
+    live_data:
+      availability: rich
+      notes: ENTSO-E transparency plus Nord Pool and Statnett data
+      source_ids: [source:entsoe:transparency-platform, source:nordpool:market-data]
+    demand_range_mw: { min: 10000, max: 25000 }
+    sources: [source:entsoe:transparency-platform, source:nordpool:market-data]
+    notes: "~90% hydro; Europe's battery via NordLink, NorNed and North Sea Link HVDC exports; strong internal north-south price splits."
+
+  - grid_id: grid:se
+    name: Sweden (Svenska kraftnat area)
+    kind: tso_area
+    parent_grid: grid:eu-nordic
+    countries: [se]
+    frequency_hz: 50
+    timezone: Europe/Stockholm
+    operators:
+      - { name: Svenska kraftnat, role: tso }
+      - { name: Energimarknadsinspektionen, role: regulator }
+    market:
+      structure: four bidding zones (SE1-SE4) in Nord Pool
+      price_mechanism: zonal marginal pricing
+      dispatch_interval: null
+    interconnections: []
+    live_data:
+      availability: rich
+      notes: ENTSO-E transparency plus Nord Pool and SvK data
+      source_ids: [source:entsoe:transparency-platform, source:nordpool:market-data]
+    demand_range_mw: { min: 8000, max: 27000 }
+    sources: [source:entsoe:transparency-platform, source:nordpool:market-data]
+    notes: "Hydro north, nuclear south, chronic SE2/SE3 transfer constraint; NordBalt tie to Lithuania."
+
+  - grid_id: grid:fi
+    name: Finland (Fingrid area)
+    kind: tso_area
+    parent_grid: grid:eu-nordic
+    countries: [fi]
+    frequency_hz: 50
+    timezone: Europe/Helsinki
+    operators:
+      - { name: Fingrid, role: tso }
+      - { name: Energiavirasto, role: regulator }
+    market:
+      structure: single bidding zone in Nord Pool
+      price_mechanism: zonal marginal pricing
+      dispatch_interval: null
+    interconnections: []
+    live_data:
+      availability: rich
+      notes: ENTSO-E transparency plus Fingrid's open data API
+      source_ids: [source:entsoe:transparency-platform, source:nordpool:market-data]
+    demand_range_mw: { min: 5000, max: 15000 }
+    sources: [source:entsoe:transparency-platform, source:nordpool:market-data]
+    notes: "Olkiluoto 3 made Finland near self-sufficient; Russian imports halted 2022; EstLink HVDC ties to Estonia."
+
+  - grid_id: grid:dk
+    name: Denmark (Energinet area)
+    kind: tso_area
+    parent_grid: null
+    countries: [dk]
+    frequency_hz: 50
+    timezone: Europe/Copenhagen
+    operators:
+      - { name: Energinet, role: tso }
+      - { name: Forsyningstilsynet, role: regulator }
+    market:
+      structure: two bidding zones in different synchronous areas; Nord Pool trading
+      price_mechanism: zonal marginal pricing
+      dispatch_interval: null
+    interconnections:
+      - { to_grid: grid:no, name: "Skagerrak HVDC", capacity_mw: 1700 }
+      - { to_grid: grid:se, name: "Konti-Skan HVDC plus Oresund AC", capacity_mw: 2400 }
+      - { to_grid: grid:de, name: "Jutland AC ties plus Kontek HVDC", capacity_mw: 3500 }
+      - { to_grid: grid:nl, name: "COBRAcable HVDC", capacity_mw: 700 }
+      - { to_grid: grid:gb, name: "Viking Link HVDC", capacity_mw: 1400 }
+    live_data:
+      availability: rich
+      notes: ENTSO-E transparency plus Energinet's open Energi Data Service API
+      source_ids: [source:entsoe:transparency-platform, source:nordpool:market-data]
+    demand_range_mw: { min: 2000, max: 6500 }
+    sources: [source:entsoe:transparency-platform]
+    notes: "Split system: DK1 (Jutland/Funen) is in the Continental Europe synchronous area, DK2 (Zealand) in the Nordic area, joined internally by the 600 MW Great Belt HVDC; parent_grid left null because of the split."
+
+  - grid_id: grid:ua
+    name: Ukraine (Ukrenergo area)
+    kind: tso_area
+    parent_grid: grid:eu-continental
+    countries: [ua]
+    frequency_hz: 50
+    timezone: Europe/Kyiv
+    operators:
+      - { name: NPC Ukrenergo, role: tso }
+      - { name: NEURC, role: regulator }
+    market:
+      structure: day-ahead, intraday and balancing markets since 2019; price caps in force
+      price_mechanism: zonal marginal pricing with administrative caps
+      dispatch_interval: null
+    interconnections: []
+    live_data:
+      availability: partial
+      notes: partial ENTSO-E transparency coverage; wartime restrictions limit published operational data
+      source_ids: [source:entsoe:transparency-platform]
+    demand_range_mw: { min: 9000, max: 18000 }
+    sources: [source:entsoe:transparency-platform]
+    notes: "Emergency-synchronized with Continental Europe on 16 Mar 2022 (together with Moldova), hours after disconnecting from the Russian IPS/UPS; commercial exchanges with EU neighbours since Jun 2022; infrastructure under repeated wartime attack."
+
+  - grid_id: grid:tr
+    name: Turkey (TEIAS area)
+    kind: tso_area
+    parent_grid: grid:eu-continental
+    countries: [tr]
+    frequency_hz: 50
+    timezone: Europe/Istanbul
+    operators:
+      - { name: TEIAS, role: tso }
+      - { name: EPIAS (EXIST), role: market_operator }
+      - { name: EMRA, role: regulator }
+    market:
+      structure: day-ahead, intraday and balancing power markets operated by EPIAS
+      price_mechanism: hourly market clearing price (moving to quarter-hourly)
+      dispatch_interval: null
+    interconnections: []
+    live_data:
+      availability: partial
+      notes: hourly generation, consumption and price data via the EPIAS transparency platform (free registration); limited ENTSO-E coverage
+      source_ids: [source:wikidata:sparql]
+    demand_range_mw: { min: 25000, max: 56000 }
+    sources: [source:wikidata:sparql]
+    notes: "Synchronous with Continental Europe via Bulgaria and Greece since the 2010 trial, permanent under the 2015 long-term agreement; ENTSO-E observer member; also asynchronous ties toward Georgia, Iraq and Iran."

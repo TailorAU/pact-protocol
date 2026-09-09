@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pact.tailor.au/intelligence/schemas/telemetry-feed.schema.json",
+  "title": "Telemetry feed",
+  "description": "A concrete live-data feed binding a source to a connector and metrics.",
+  "type": "object",
+  "required": ["feed_id", "source_id", "connector_id", "metrics", "cadence"],
+  "properties": {
+    "feed_id": { "$ref": "defs.schema.json#/$defs/feedId" },
+    "source_id": { "$ref": "defs.schema.json#/$defs/sourceId" },
+    "connector_id": { "type": "string" },
+    "metrics": {
+      "type": "array",
+      "items": { "$ref": "defs.schema.json#/$defs/metric" },
+      "minItems": 1
+    },
+    "cadence": { "type": "string" },
+    "description": { "type": "string" },
+    "entity_scope": { "type": "string" },
+    "notes": { "type": "string" }
+  },
+  "additionalProperties": false
+}

@@ -1,0 +1,159 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pact.tailor.au/intelligence/schemas/source.schema.json",
+  "title": "Source",
+  "description": "A registered data source (publisher + dataset) in the source registry.",
+  "type": "object",
+  "required": [
+    "source_id",
+    "publisher",
+    "dataset",
+    "api_type",
+    "url",
+    "coverage",
+    "data_class",
+    "licensing",
+    "verification_status",
+    "last_checked"
+  ],
+  "properties": {
+    "source_id": {
+      "$ref": "defs.schema.json#/$defs/sourceId"
+    },
+    "publisher": {
+      "type": "string"
+    },
+    "dataset": {
+      "type": "string"
+    },
+    "api_type": {
+      "enum": [
+        "rest",
+        "websocket",
+        "file-drop",
+        "html",
+        "bulk-download",
+        "none"
+      ]
+    },
+    "url": {
+      "type": "string"
+    },
+    "docs_url": {
+      "type": "string"
+    },
+    "coverage": {
+      "type": "object",
+      "properties": {
+        "grids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "countries": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "global": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false
+    },
+    "data_class": {
+      "enum": [
+        "live",
+        "static",
+        "both"
+      ]
+    },
+    "entity_types": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "metrics": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "latency": {
+      "type": "string"
+    },
+    "resolution": {
+      "type": "string"
+    },
+    "update_frequency": {
+      "type": "string"
+    },
+    "history_depth": {
+      "type": "string"
+    },
+    "licensing": {
+      "type": "object",
+      "required": [
+        "class"
+      ],
+      "properties": {
+        "class": {
+          "enum": [
+            "open",
+            "public-domain",
+            "open-attribution",
+            "open-registration",
+            "open-noncommercial",
+            "open-sharealike",
+            "reciprocal",
+            "registration-required",
+            "commercial",
+            "restricted",
+            "mixed"
+          ]
+        },
+        "notes": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "authentication": {
+      "enum": [
+        "none",
+        "api_key",
+        "oauth",
+        "registration"
+      ]
+    },
+    "cost": {
+      "type": "string"
+    },
+    "reliability": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 5
+    },
+    "verification_status": {
+      "enum": [
+        "verified_live",
+        "documented_only",
+        "unverified"
+      ]
+    },
+    "last_checked": {
+      "type": "string",
+      "format": "date"
+    },
+    "quality_notes": {
+      "type": "string"
+    },
+    "notes": {
+      "type": "string"
+    }
+  },
+  "additionalProperties": false
+}

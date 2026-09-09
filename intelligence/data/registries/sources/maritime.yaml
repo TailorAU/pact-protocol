@@ -1,0 +1,261 @@
+# Source registry — Maritime & logistics. See ../../schemas/source.schema.json
+records:
+  - source_id: source:aisstream:websocket
+    publisher: aisstream.io
+    dataset: AISStream real-time AIS websocket (terrestrial AIS network)
+    api_type: websocket
+    url: wss://stream.aisstream.io/v0/stream
+    docs_url: https://aisstream.io/documentation
+    coverage:
+      global: true
+    entity_types: [Vessel]
+    metrics: [vessel.position, vessel.speed.kn, vessel.course.deg, vessel.draught.m, vessel.destination]
+    data_class: live
+    latency: seconds (streaming)
+    resolution: per received AIS message; bounding-box + MMSI + message-type subscription filters
+    update_frequency: continuous stream
+    history_depth: none (live stream only - no replay/history)
+    authentication: api_key
+    licensing:
+      class: open-registration
+      notes: Free API key via sign-in (GitHub etc.); key sent inside the subscription JSON payload. Terms permit free programmatic use but NOT redistribution of the feed; terrestrial-only coverage (coastal), no satellite AIS.
+    cost: free
+    reliability: 3
+    quality_notes: Community-grade terrestrial network - good coverage near major ports/coasts (fine for AU port approaches), open-ocean gaps by design. Design-target AIS source for this workspace per LEGAL-LICENSING.md.
+    verification_status: documented_only
+    last_checked: "2026-08-12"
+    notes: JSON messages (PositionReport, ShipStaticData etc.); reconnect logic required - single connection per key.
+
+  - source_id: source:aishub:webservice
+    publisher: AISHub
+    dataset: AISHub aggregated AIS webservice (XML/JSON/CSV)
+    api_type: rest
+    url: https://www.aishub.net/api
+    docs_url: https://www.aishub.net/api
+    coverage:
+      global: true
+    entity_types: [Vessel]
+    metrics: [vessel.position, vessel.speed.kn, vessel.course.deg]
+    data_class: live
+    latency: near-real-time; polling not more than once per minute
+    resolution: latest position per vessel per poll
+    update_frequency: poll up to 1/min
+    history_depth: none (current positions only)
+    authentication: registration
+    licensing:
+      class: reciprocal
+      notes: PEER-EXCHANGE MODEL - free access requires CONTRIBUTING your own raw NMEA AIS feed (min ~10 vessels average coverage, 90 percent uptime over 7 days). No feed, no access. Data for members' own use.
+    cost: free for feed contributors
+    reliability: 3
+    quality_notes: Terrestrial volunteer network. Relevant here as the documented upgrade path if Tailor deploys owned AIS receivers (e.g. Gladstone/Newcastle) - contributing one receiver unlocks the global aggregate.
+    verification_status: documented_only
+    last_checked: "2026-08-12"
+    notes: Recorded as reciprocal-access, pending owned instrumentation; ties into the observability-gap registry for owned AIS receivers.
+
+  - source_id: source:spire:maritime-ais
+    publisher: Spire Global
+    dataset: Spire Maritime - satellite + terrestrial + enhanced satellite AIS (API and TCP feeds)
+    api_type: rest
+    url: https://spire.com/maritime/
+    docs_url: https://documentation.spire.com/
+    coverage:
+      global: true
+    entity_types: [Vessel]
+    metrics: [vessel.position, vessel.speed.kn, vessel.course.deg, vessel.draught.m, vessel.destination]
+    data_class: both
+    latency: minutes (satellite revisit dependent) to seconds (terrestrial)
+    resolution: per AIS message; ~600k vessels detected daily
+    update_frequency: continuous
+    history_depth: historical AIS archive back to 2010 (paid)
+    authentication: api_key
+    licensing:
+      class: commercial
+      notes: COMMERCIAL subscription (GraphQL/REST API or raw TCP NMEA); no free tier. Documented as the production upgrade path for open-ocean coverage that terrestrial AIS cannot provide.
+    cost: commercial (subscription)
+    reliability: 4
+    quality_notes: Own satellite constellation - genuine open-ocean coverage incl. Australia-Asia trade lanes; enhanced satellite AIS improves congested-area detection.
+    verification_status: documented_only
+    last_checked: "2026-08-12"
+    notes: No connector without a contract; recorded so cost/benefit of closing the open-ocean gap is explicit.
+
+  - source_id: source:marinetraffic:api
+    publisher: MarineTraffic (a Kpler company)
+    dataset: MarineTraffic AIS data services (vessel positions, port calls, voyages)
+    api_type: rest
+    url: https://www.marinetraffic.com/
+    docs_url: https://support.marinetraffic.com/en/articles/9552659-api-services
+    coverage:
+      global: true
+    entity_types: [Vessel, Port]
+    metrics: [vessel.position, vessel.speed.kn, vessel.draught.m, port.call.count, vessel.eta]
+    data_class: both
+    latency: near-real-time (terrestrial) / minutes (satellite)
+    resolution: per vessel position; port-call event granularity
+    update_frequency: continuous
+    history_depth: deep historical archive (paid)
+    authentication: api_key
+    licensing:
+      class: commercial
+      notes: COMMERCIAL ONLY - credit-based API retired in favour of enterprise subscriptions via Kpler sales. Website ToS PROHIBITS SCRAPING and any external dissemination or commercial use of displayed data without licence. Recorded explicitly so no connector is ever built against the public website.
+    cost: commercial (enterprise subscription)
+    reliability: 4
+    quality_notes: Largest terrestrial network + satellite blend; strong port-call/ETA derived products. This workspace's licensing posture (LEGAL-LICENSING.md) rejects scraping it.
+    verification_status: documented_only
+    last_checked: "2026-08-12"
+    notes: UNCTAD port-call statistics are the licensed public derivative of MarineTraffic data - use that for aggregates.
+
+  - source_id: source:kpler:platform
+    publisher: Kpler
+    dataset: Kpler commodity trade intelligence (cargo flows, tanker/dry-bulk tracking, inventories)
+    api_type: rest
+    url: https://www.kpler.com/
+    docs_url: https://www.kpler.com/product/maritime
+    coverage:
+      global: true
+    entity_types: [Vessel, Port, Terminal, Commodity]
+    metrics: [cargo.flow.tonnes, vessel.position, port.call.count, inventory.level.tonnes]
+    data_class: both
+    latency: near-real-time AIS (~seconds-scale claimed); flow estimates updated daily
+    resolution: cargo/voyage level; terminal-level flows
+    update_frequency: continuous
+    history_depth: multi-year flow history
+    authentication: api_key
+    licensing:
+      class: commercial
+      notes: COMMERCIAL - enterprise SaaS + API, typically tens of thousands USD/yr upward. Cargo flows are Kpler's own INFERENCES from AIS + port + terminal data; if ingested they belong in the derived-intelligence class with Kpler as evidence, never as reported fact.
+    cost: commercial (enterprise)
+    reliability: 4
+    quality_notes: Market-leading cargo-flow inference (owns MarineTraffic); brief record for the commercial upgrade path only.
+    verification_status: documented_only
+    last_checked: "2026-08-12"
+    notes: Overlaps this workspace's own cargo-inference ambitions - useful benchmark, incompatible licence for redistribution.
+
+  - source_id: source:vesselfinder:api
+    publisher: VesselFinder Ltd
+    dataset: VesselFinder AIS API (real-time positions, port calls, master data)
+    api_type: rest
+    url: https://api.vesselfinder.com/docs/
+    docs_url: https://api.vesselfinder.com/docs/
+    coverage:
+      global: true
+    entity_types: [Vessel, Port]
+    metrics: [vessel.position, vessel.speed.kn, vessel.draught.m, port.call.count]
+    data_class: both
+    latency: near-real-time
+    resolution: per vessel position (terrestrial 1 credit, satellite 10 credits)
+    update_frequency: continuous
+    history_depth: historical track/port-call products (paid)
+    authentication: api_key
+    licensing:
+      class: commercial
+      notes: COMMERCIAL credit-based API (from ~EUR 330 per 10k credits) - cheaper entry than enterprise-only competitors. Website ToS prohibits scraping; API is the only sanctioned programmatic path.
+    cost: commercial (pay-per-credit)
+    reliability: 3
+    quality_notes: Credible mid-market alternative; brief record for the commercial upgrade path.
+    verification_status: documented_only
+    last_checked: "2026-08-12"
+    notes: Credit pricing makes it viable for narrow queries (e.g. polling a handful of coal berths) if ever licensed.
+
+  - source_id: source:unctad:port-statistics
+    publisher: UNCTAD (UN Trade and Development)
+    dataset: UNCTADstat port call and performance statistics (+ maritime transport indicators)
+    api_type: bulk-download
+    url: https://unctadstat.unctad.org/datacentre/reportInfo/US.PortCallsArrivals_S
+    docs_url: https://unctadstat.unctad.org/
+    coverage:
+      global: true
+    entity_types: [Port, Country]
+    metrics: [port.call.count, port.time_in_port.days, vessel.size.gt.median]
+    data_class: static
+    latency: published semi-annually, ~months after period end
+    resolution: country x market segment (8 commercial vessel classes), semi-annual
+    update_frequency: twice yearly
+    history_depth: since 2018 (port calls); other maritime series longer
+    authentication: none
+    licensing:
+      class: open-attribution
+      notes: Free to use with attribution to UNCTAD; underlying data derived from MarineTraffic AIS under a licensed partnership (vessels >=1000 GT) - do not disaggregate beyond what UNCTAD publishes.
+    cost: free
+    reliability: 4
+    quality_notes: The clean, licence-safe public aggregate of global port activity - baseline/benchmark data for port-level models, not live telemetry.
+    verification_status: documented_only
+    last_checked: "2026-08-12"
+    notes: CSV/Excel export from the UNCTADstat Data Centre; also mirrored on World Bank Data360.
+
+  - source_id: source:unece:unlocode
+    publisher: UNECE (UN Centre for Trade Facilitation and Electronic Business)
+    dataset: UN/LOCODE - United Nations Code for Trade and Transport Locations
+    api_type: bulk-download
+    url: https://unece.org/trade/cefact/UNLOCODE-Download
+    docs_url: https://unece.org/trade/uncefact/unlocode
+    coverage:
+      global: true
+    entity_types: [Port, Location]
+    metrics: []
+    data_class: static
+    latency: n/a (reference registry)
+    resolution: location level (~103k locations, 249 countries)
+    update_frequency: twice yearly (cut-offs 31 March / 30 September)
+    history_depth: all editions downloadable; codes are stable identifiers
+    authentication: none
+    licensing:
+      class: open-attribution
+      notes: Free UN publication, redistributable; also republished as a datahub.io/datasets GitHub data package under open terms.
+    cost: free
+    reliability: 5
+    quality_notes: THE canonical port/location identifier scheme - used as external_ids.unlocode throughout this workspace's entity registry (e.g. AUGLT = Gladstone, AUNTL = Newcastle).
+    verification_status: documented_only
+    last_checked: "2026-08-12"
+    notes: CSV/MS-Access/text distributions; function classifiers (port, rail, airport) and coordinates included (coordinates are approximate).
+
+  - source_id: source:gpc:cargo-statistics
+    publisher: Gladstone Ports Corporation (Queensland Government-owned)
+    dataset: GPC cargo statistics - monthly trade by commodity/terminal (Gladstone, Bundaberg, Rockhampton)
+    api_type: html
+    url: https://gpcl.com.au/ports-and-trade/
+    docs_url: https://gpcl.com.au/
+    coverage:
+      countries: [au]
+    entity_types: [Port, Terminal, Commodity]
+    metrics: [export.tonnes.mt, import.tonnes.mt, port.throughput.tonnes, vessel.call.count]
+    data_class: static
+    latency: ~weeks after month end
+    resolution: monthly, by commodity (coal, LNG, alumina, bauxite, cement etc.) and trade direction
+    update_frequency: monthly
+    history_depth: multi-year published statistics; annual reports deeper
+    authentication: none
+    licensing:
+      class: open-attribution
+      notes: Published on GPC's public website; Queensland GOC publication - cite GPC. No machine API; figures also flow into TMR's 'Trade statistics for Queensland ports' annual compendium.
+    cost: free
+    reliability: 4
+    quality_notes: Ground truth for the Gladstone worked exemplar - RG Tanna/Barney Point coal, Curtis Island LNG, alumina chain tonnages. Monthly cadence makes it the calibration series for cargo inference from AIS.
+    verification_status: documented_only
+    last_checked: "2026-08-12"
+    notes: HTML tables/downloadable reports; historically a 'Trade Statistics' interactive page - scrape gently and cache.
+
+  - source_id: source:pon:trade-reports
+    publisher: Port of Newcastle
+    dataset: Port of Newcastle monthly trade reports and vessel statistics
+    api_type: html
+    url: https://pon.com.au/trade-and-business/trade-overview-reports/
+    docs_url: https://pon.com.au/
+    coverage:
+      countries: [au]
+    entity_types: [Port, Commodity]
+    metrics: [export.tonnes.mt, import.tonnes.mt, vessel.call.count, port.throughput.tonnes]
+    data_class: static
+    latency: ~weeks after month end
+    resolution: monthly + YTD, by commodity group (coal ~149Mt/yr dominant)
+    update_frequency: monthly
+    history_depth: monthly reports back to January 2018
+    authentication: none
+    licensing:
+      class: open-attribution
+      notes: Public reports on the port's website; cite Port of Newcastle. NSW Transport also republishes port freight data.
+    cost: free
+    reliability: 4
+    quality_notes: The world's largest coal export port - monthly tonnage ground truth for the Hunter Valley chain (pairs with ARTC/Aurizon rail context and AIS vessel observation).
+    verification_status: documented_only
+    last_checked: "2026-08-12"
+    notes: PDF/interactive monthly trade reports; daily shipping movements (expected/at-berth) also published on the site's shipping pages - live-ish but scrape-sensitive.

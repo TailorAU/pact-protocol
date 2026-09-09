@@ -1,0 +1,30 @@
+{
+  "name": "@pact-tailor/api",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Zero-dependency REST + SSE API over the knowledge graph and real-time state, with server-driven UI (SDUI) composition",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": "./dist/index.js"
+  },
+  "bin": {
+    "pt-api": "dist/cli.js"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "test": "npm run build && node --test \"test/*.test.mjs\""
+  },
+  "dependencies": {
+    "@pact-tailor/graph": "*",
+    "@pact-tailor/intel": "*",
+    "@pact-tailor/ontology": "*",
+    "@pact-tailor/registry": "*",
+    "@pact-tailor/state": "*",
+    "@pact-tailor/store": "*"
+  }
+}

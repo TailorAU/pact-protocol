@@ -1,0 +1,103 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pact.tailor.au/intelligence/schemas/inference.schema.json",
+  "title": "Inference (class C)",
+  "description": "A derived claim with evidence, lineage, and confidence.",
+  "type": "object",
+  "required": ["inference_id", "claim", "claim_structured", "tier", "confidence", "status", "method", "evidence", "sources", "produced_at"],
+  "properties": {
+    "inference_id": { "$ref": "defs.schema.json#/$defs/inferenceId" },
+    "claim": { "type": "string" },
+    "claim_structured": {
+      "type": "object",
+      "required": ["subject", "predicate", "object"],
+      "properties": {
+        "subject": { "$ref": "defs.schema.json#/$defs/entityId" },
+        "predicate": { "type": "string" },
+        "object": { "type": "string" },
+        "qualifiers": { "type": "object" }
+      },
+      "additionalProperties": false
+    },
+    "tier": {
+      "enum": ["A", "B", "C"]
+    },
+    "confidence": { "$ref": "defs.schema.json#/$defs/confidence" },
+    "status": {
+      "enum": ["INFERRED", "CORROBORATED", "CONTESTED", "VERIFIED", "RETRACTED"]
+    },
+    "method": {
+      "type": "string",
+      "pattern": "^rule:[a-z0-9-]+@[0-9]+\\.[0-9]+\\.[0-9]+$"
+    },
+    "evidence": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["kind", "ref", "role"],
+        "properties": {
+          "kind": { "enum": ["observation", "structural", "inference"] },
+          "ref": { "type": "string" },
+          "role": { "const": "supports" }
+        },
+        "additionalProperties": false
+      }
+    },
+    "contrary_evidence": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["kind", "ref", "role"],
+        "properties": {
+          "kind": { "enum": ["observation", "structural", "inference"] },
+          "ref": { "type": "string" },
+          "role": { "const": "contradicts" }
+        },
+        "additionalProperties": false
+      }
+    },
+    "sources": {
+      "type": "array",
+      "items": { "$ref": "defs.schema.json#/$defs/sourceId" },
+      "minItems": 1
+    },
+    "produced_at": { "$ref": "defs.schema.json#/$defs/timestamp" },
+    "event_time_range": {
+      "type": "object",
+      "properties": {
+        "from": { "$ref": "defs.schema.json#/$defs/timestamp" },
+        "to": { "$ref": "defs.schema.json#/$defs/timestamp" }
+      },
+      "additionalProperties": false
+    },
+    "lineage": {
+      "type": "object",
+      "properties": {
+        "correlation_id": { "type": "string" },
+        "in_response_to": {
+          "type": ["string", "null"]
+        },
+        "prev_hash": {
+          "type": ["string", "null"]
+        }
+      },
+      "additionalProperties": false
+    },
+    "pact": {
+      "anyOf": [
+        {
+          "type": "object",
+          "properties": {
+            "fabric_id": { "type": "string" },
+            "proposal_id": { "type": "string" }
+          },
+          "additionalProperties": false
+        },
+        { "type": "null" }
+      ]
+    },
+    "notes": { "type": "string" }
+  },
+  "additionalProperties": false
+}

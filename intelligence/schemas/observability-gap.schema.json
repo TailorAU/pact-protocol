@@ -1,0 +1,91 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pact.tailor.au/intelligence/schemas/observability-gap.schema.json",
+  "title": "Observability gap",
+  "description": "A desired-but-missing metric for an entity, with instrumentation options.",
+  "type": "object",
+  "required": ["gap_id", "entity_id", "desired_metric", "commercial_value", "strategic_value", "priority", "status"],
+  "properties": {
+    "gap_id": { "$ref": "defs.schema.json#/$defs/gapId" },
+    "entity_id": { "$ref": "defs.schema.json#/$defs/entityId" },
+    "desired_metric": { "$ref": "defs.schema.json#/$defs/metric" },
+    "commercial_value": {
+      "enum": ["low", "medium", "high", "critical"]
+    },
+    "strategic_value": {
+      "enum": ["low", "medium", "high", "critical"]
+    },
+    "priority": {
+      "enum": ["P1", "P2", "P3", "P4"]
+    },
+    "status": {
+      "enum": ["open", "proxied", "instrumented", "wont_do"]
+    },
+    "current_source": {
+      "anyOf": [
+        { "$ref": "defs.schema.json#/$defs/sourceId" },
+        { "type": "null" }
+      ]
+    },
+    "best_available_proxy": {
+      "anyOf": [
+        {
+          "type": "object",
+          "required": ["source_id", "metric"],
+          "properties": {
+            "source_id": { "$ref": "defs.schema.json#/$defs/sourceId" },
+            "metric": { "$ref": "defs.schema.json#/$defs/metric" },
+            "derivation": { "type": "string" }
+          },
+          "additionalProperties": false
+        },
+        { "type": "null" }
+      ]
+    },
+    "required_resolution": { "type": "string" },
+    "required_accuracy": { "type": "string" },
+    "instrumentation_options": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["kind"],
+        "properties": {
+          "kind": {
+            "enum": [
+              "ct_sensor",
+              "revenue_meter",
+              "power_quality_meter",
+              "substation_gateway",
+              "iot_gateway",
+              "weather_station",
+              "camera_ocr",
+              "ais_receiver",
+              "gnss",
+              "scada_integration",
+              "plc_integration",
+              "opc_ua",
+              "modbus",
+              "mqtt_gateway",
+              "environmental_sensor",
+              "condition_sensor",
+              "satellite_thermal",
+              "satellite_optical",
+              "partner_feed",
+              "customer_api"
+            ]
+          },
+          "notes": { "type": "string" },
+          "indicative_cost_band": {
+            "enum": ["low", "medium", "high"]
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "estimated_complexity": {
+      "enum": ["low", "medium", "high"]
+    },
+    "notes": { "type": "string" }
+  },
+  "additionalProperties": false
+}

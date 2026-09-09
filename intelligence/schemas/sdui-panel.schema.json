@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pact.tailor.au/intelligence/schemas/sdui-panel.schema.json",
+  "title": "SDUI panel document",
+  "description": "Server-driven UI layout for an entity's intelligence view.",
+  "type": "object",
+  "required": ["entity_id", "entity_type", "situation", "layout"],
+  "properties": {
+    "entity_id": { "$ref": "defs.schema.json#/$defs/entityId" },
+    "entity_type": { "$ref": "defs.schema.json#/$defs/entityType" },
+    "situation": {
+      "type": "array",
+      "items": {
+        "enum": ["no-live-data", "stale-telemetry", "has-gaps", "estimated-load", "anomaly-active", "normal"]
+      }
+    },
+    "layout": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["panel"],
+        "properties": {
+          "panel": {
+            "enum": [
+              "headline-state",
+              "timeseries",
+              "gap-card",
+              "graph-neighborhood",
+              "inference-list",
+              "vessel-track",
+              "fuel-mix",
+              "price-strip",
+              "flow-arcs",
+              "table",
+              "markdown-note"
+            ]
+          },
+          "props": { "type": "object" },
+          "data": {
+            "type": "object",
+            "required": ["endpoint"],
+            "properties": {
+              "endpoint": {
+                "type": "string",
+                "pattern": "^/api/intel/"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}

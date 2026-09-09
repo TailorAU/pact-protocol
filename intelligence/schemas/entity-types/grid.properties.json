@@ -1,0 +1,11 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pact.tailor.au/intelligence/schemas/entity-types/grid.properties.json",
+  "title": "Grid properties",
+  "type": "object",
+  "properties": {
+    "frequency_hz": { "enum": [50, 60] },
+    "kind": { "type": "string" }
+  },
+  "additionalProperties": true
+}

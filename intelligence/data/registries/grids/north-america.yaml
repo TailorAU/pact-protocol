@@ -1,0 +1,333 @@
+# Grid registry — North America. Class-A structural records. See ../../schemas/grid.schema.json
+records:
+  - grid_id: grid:us-eastern
+    name: Eastern Interconnection
+    kind: interconnection
+    parent_grid: null
+    countries: [us, ca]
+    frequency_hz: 60
+    timezone: America/New_York
+    operators:
+      - { name: North American Electric Reliability Corporation, role: regulator }
+    market: null
+    interconnections:
+      - { to_grid: grid:us-western, name: "back-to-back HVDC ties", capacity_mw: 1300 }
+      - { to_grid: grid:us-texas, name: "DC ties (North and East)", capacity_mw: 820 }
+      - { to_grid: grid:ca-hydro-quebec, name: "HVDC and variable-frequency-transformer ties", capacity_mw: 5500 }
+    live_data:
+      availability: partial
+      notes: hourly balancing-authority-level demand, generation and interchange via EIA-930
+      source_ids: [source:eia:eia930]
+    demand_range_mw: null
+    sources: [source:eia:eia930]
+    notes: "Largest of the three major North American interconnections; Rockies to the Atlantic including most of eastern Canada, excluding Quebec and Texas."
+
+  - grid_id: grid:us-western
+    name: Western Interconnection
+    kind: interconnection
+    parent_grid: null
+    countries: [us, ca, mx]
+    frequency_hz: 60
+    timezone: America/Denver
+    operators:
+      - { name: Western Electricity Coordinating Council, role: regulator }
+    market: null
+    interconnections:
+      - { to_grid: grid:us-eastern, name: "back-to-back HVDC ties", capacity_mw: 1300 }
+    live_data:
+      availability: partial
+      notes: hourly balancing-authority-level demand, generation and interchange via EIA-930
+      source_ids: [source:eia:eia930]
+    demand_range_mw: null
+    sources: [source:eia:eia930]
+    notes: "Spans 14 western US states, Alberta, British Columbia and Baja California (Mexico); CAISO's WEIM/EDAM markets increasingly span the footprint."
+
+  - grid_id: grid:us-texas
+    name: Texas Interconnection
+    kind: interconnection
+    parent_grid: null
+    countries: [us]
+    frequency_hz: 60
+    timezone: America/Chicago
+    operators:
+      - { name: Texas Reliability Entity, role: regulator }
+    market: null
+    interconnections:
+      - { to_grid: grid:us-eastern, name: "DC ties (North and East)", capacity_mw: 820 }
+      - { to_grid: grid:mx-sin, name: "DC ties and VFT (Railroad, Eagle Pass, Laredo)", capacity_mw: 430 }
+    live_data:
+      availability: rich
+      notes: coextensive with ERCOT; real-time public data via ERCOT dashboards and EIA-930
+      source_ids: [source:ercot:mis, source:eia:eia930]
+    demand_range_mw: { min: 28000, max: 86000 }
+    sources: [source:eia:eia930]
+    notes: "Electrically separate synchronous system covering most of Texas; asynchronous DC ties only, historically preserving intrastate regulatory status."
+
+  - grid_id: grid:us-pjm
+    name: PJM Interconnection
+    kind: iso_rto
+    parent_grid: grid:us-eastern
+    countries: [us]
+    frequency_hz: 60
+    timezone: America/New_York
+    operators:
+      - { name: PJM Interconnection, role: system_operator }
+      - { name: PJM Interconnection, role: market_operator }
+      - { name: Federal Energy Regulatory Commission, role: regulator }
+    market:
+      structure: energy, capacity (RPM) and ancillary services markets
+      price_mechanism: nodal locational marginal pricing, 5-minute real-time settlement
+      dispatch_interval: 5min
+    interconnections: []
+    live_data:
+      availability: rich
+      notes: public real-time LMPs, load and generation mix via Data Miner 2 API
+      source_ids: [source:pjm:dataminer2, source:eia:eia930]
+    demand_range_mw: { min: 60000, max: 165000 }
+    sources: [source:pjm:dataminer2, source:eia:eia930]
+    notes: "World's largest wholesale power market by volume; 13 mid-Atlantic/Midwest states plus DC; datacenter-driven load growth."
+
+  - grid_id: grid:us-miso
+    name: Midcontinent Independent System Operator
+    kind: iso_rto
+    parent_grid: grid:us-eastern
+    countries: [us, ca]
+    frequency_hz: 60
+    timezone: America/Chicago
+    operators:
+      - { name: Midcontinent Independent System Operator, role: system_operator }
+      - { name: Midcontinent Independent System Operator, role: market_operator }
+      - { name: Federal Energy Regulatory Commission, role: regulator }
+    market:
+      structure: energy and ancillary markets plus annual capacity auction
+      price_mechanism: nodal locational marginal pricing, 5-minute real-time settlement
+      dispatch_interval: 5min
+    interconnections: []
+    live_data:
+      availability: rich
+      notes: public real-time LMPs, load and fuel mix via MISO market data APIs
+      source_ids: [source:miso:market-data, source:eia:eia930]
+    demand_range_mw: { min: 55000, max: 127000 }
+    sources: [source:miso:market-data, source:eia:eia930]
+    notes: "15 US states plus Manitoba, in north and south sub-regions with a constrained transfer path between them."
+
+  - grid_id: grid:us-caiso
+    name: California Independent System Operator
+    kind: iso_rto
+    parent_grid: grid:us-western
+    countries: [us]
+    frequency_hz: 60
+    timezone: America/Los_Angeles
+    operators:
+      - { name: California Independent System Operator, role: system_operator }
+      - { name: California Independent System Operator, role: market_operator }
+      - { name: Federal Energy Regulatory Commission, role: regulator }
+    market:
+      structure: energy and ancillary markets; Western Energy Imbalance Market and EDAM extend beyond CAISO
+      price_mechanism: nodal locational marginal pricing, 15-minute market plus 5-minute dispatch
+      dispatch_interval: 5min
+    interconnections: []
+    live_data:
+      availability: rich
+      notes: public real-time prices, demand, generation mix and curtailment via OASIS and Today's Outlook
+      source_ids: [source:caiso:oasis, source:eia:eia930]
+    demand_range_mw: { min: 15000, max: 52000 }
+    sources: [source:caiso:oasis, source:eia:eia930]
+    notes: "Solar duck-curve archetype; large battery fleet; imports heavily over Pacific interties."
+
+  - grid_id: grid:us-ercot
+    name: Electric Reliability Council of Texas
+    kind: iso_rto
+    parent_grid: grid:us-texas
+    countries: [us]
+    frequency_hz: 60
+    timezone: America/Chicago
+    operators:
+      - { name: Electric Reliability Council of Texas, role: system_operator }
+      - { name: Electric Reliability Council of Texas, role: market_operator }
+      - { name: Public Utility Commission of Texas, role: regulator }
+    market:
+      structure: energy-only market, no capacity market
+      price_mechanism: nodal locational marginal pricing with operating reserve demand curve adders, 5-minute SCED
+      dispatch_interval: 5min
+    interconnections: []
+    live_data:
+      availability: rich
+      notes: real-time prices, load, fuel mix and reserves publicly on ERCOT dashboards and MIS
+      source_ids: [source:ercot:mis, source:eia:eia930]
+    demand_range_mw: { min: 28000, max: 86000 }
+    sources: [source:ercot:mis, source:eia:eia930]
+    notes: "Covers ~90% of Texas load; fastest-growing wind, solar and battery fleet in the US; scarcity-pricing design tested by Winter Storm Uri (2021)."
+
+  - grid_id: grid:us-spp
+    name: Southwest Power Pool
+    kind: iso_rto
+    parent_grid: grid:us-eastern
+    countries: [us]
+    frequency_hz: 60
+    timezone: America/Chicago
+    operators:
+      - { name: Southwest Power Pool, role: system_operator }
+      - { name: Southwest Power Pool, role: market_operator }
+      - { name: Federal Energy Regulatory Commission, role: regulator }
+    market:
+      structure: Integrated Marketplace energy and ancillary markets
+      price_mechanism: nodal locational marginal pricing, 5-minute real-time settlement
+      dispatch_interval: 5min
+    interconnections: []
+    live_data:
+      availability: rich
+      notes: public real-time prices and operational data via SPP Marketplace portal; hourly via EIA-930
+      source_ids: [source:eia:eia930]
+    demand_range_mw: { min: 20000, max: 56000 }
+    sources: [source:eia:eia930]
+    notes: "14-state footprint on the wind-rich Great Plains; frequently very high instantaneous wind penetration; expanding into the Western Interconnection with Markets+."
+
+  - grid_id: grid:us-nyiso
+    name: New York Independent System Operator
+    kind: iso_rto
+    parent_grid: grid:us-eastern
+    countries: [us]
+    frequency_hz: 60
+    timezone: America/New_York
+    operators:
+      - { name: New York Independent System Operator, role: system_operator }
+      - { name: New York Independent System Operator, role: market_operator }
+      - { name: Federal Energy Regulatory Commission, role: regulator }
+    market:
+      structure: energy, capacity (ICAP) and ancillary markets
+      price_mechanism: zonal/nodal locational based marginal pricing, 5-minute real-time settlement
+      dispatch_interval: 5min
+    interconnections: []
+    live_data:
+      availability: rich
+      notes: public real-time LBMPs, load and fuel mix via NYISO OASIS and dashboards
+      source_ids: [source:eia:eia930]
+    demand_range_mw: { min: 14000, max: 34000 }
+    sources: [source:eia:eia930]
+    notes: "Single-state ISO; chronic upstate-downstate transmission constraint; Champlain Hudson HVDC bringing Quebec hydro to NYC."
+
+  - grid_id: grid:us-isone
+    name: ISO New England
+    kind: iso_rto
+    parent_grid: grid:us-eastern
+    countries: [us]
+    frequency_hz: 60
+    timezone: America/New_York
+    operators:
+      - { name: ISO New England, role: system_operator }
+      - { name: ISO New England, role: market_operator }
+      - { name: Federal Energy Regulatory Commission, role: regulator }
+    market:
+      structure: energy, forward capacity and ancillary markets
+      price_mechanism: nodal locational marginal pricing, 5-minute real-time settlement
+      dispatch_interval: 5min
+    interconnections: []
+    live_data:
+      availability: rich
+      notes: public real-time prices, load and fuel mix via ISO Express API and dashboards
+      source_ids: [source:eia:eia930]
+    demand_range_mw: { min: 9000, max: 28500 }
+    sources: [source:eia:eia930]
+    notes: "Six New England states; winter gas-electric fuel security is the defining risk; HVDC imports from Quebec and New Brunswick ties."
+
+  - grid_id: grid:ca-ieso
+    name: Independent Electricity System Operator (Ontario)
+    kind: iso_rto
+    parent_grid: grid:us-eastern
+    countries: [ca]
+    frequency_hz: 60
+    timezone: America/Toronto
+    operators:
+      - { name: Independent Electricity System Operator, role: system_operator }
+      - { name: Independent Electricity System Operator, role: market_operator }
+      - { name: Hydro One, role: transmission_owner }
+      - { name: Ontario Energy Board, role: regulator }
+    market:
+      structure: single-schedule market since the May 2025 market renewal
+      price_mechanism: locational marginal pricing, 5-minute dispatch
+      dispatch_interval: 5min
+    interconnections: []
+    live_data:
+      availability: rich
+      notes: 5-minute public demand, price, generator output and intertie flow via IESO public reports
+      source_ids: [source:ieso:public-reports]
+    demand_range_mw: { min: 11000, max: 27000 }
+    sources: [source:ieso:public-reports]
+    notes: "Nuclear-hydro dominated; synchronous within the Eastern Interconnection with ties to Manitoba, Michigan, New York and Minnesota; radial/asynchronous ties toward Quebec."
+
+  - grid_id: grid:ca-aeso
+    name: Alberta Electric System Operator
+    kind: iso_rto
+    parent_grid: grid:us-western
+    countries: [ca]
+    frequency_hz: 60
+    timezone: America/Edmonton
+    operators:
+      - { name: Alberta Electric System Operator, role: system_operator }
+      - { name: Alberta Electric System Operator, role: market_operator }
+      - { name: Alberta Utilities Commission, role: regulator }
+    market:
+      structure: energy-only power pool; restructuring toward a day-ahead market under review
+      price_mechanism: system marginal price averaged to an hourly pool price
+      dispatch_interval: null
+    interconnections: []
+    live_data:
+      availability: rich
+      notes: real-time pool price, demand and per-asset generation via the public AESO ETS current supply-demand report
+      source_ids: [source:wikidata:sparql]
+    demand_range_mw: { min: 8000, max: 12500 }
+    sources: [source:wikidata:sparql]
+    notes: "Synchronous member of the Western Interconnection via the BC tie; also HVDC back-to-back tie to Saskatchewan (Eastern Interconnection); gas-dominated after full coal exit (2024)."
+
+  - grid_id: grid:ca-hydro-quebec
+    name: Quebec Interconnection (Hydro-Quebec)
+    kind: synchronous_area
+    parent_grid: null
+    countries: [ca]
+    frequency_hz: 60
+    timezone: America/Toronto
+    operators:
+      - { name: Hydro-Quebec TransEnergie, role: system_operator }
+      - { name: Hydro-Quebec TransEnergie, role: transmission_owner }
+      - { name: Regie de l'energie du Quebec, role: regulator }
+    market:
+      structure: vertically integrated; Hydro-Quebec Production dominant, no organized wholesale market
+      price_mechanism: regulated heritage-pool tariffs; export sales into neighbouring markets
+      dispatch_interval: null
+    interconnections:
+      - { to_grid: grid:us-eastern, name: "HVDC and variable-frequency-transformer ties (New York, New England, Ontario, New Brunswick)", capacity_mw: 5500 }
+    live_data:
+      availability: partial
+      notes: public near-real-time aggregate demand and open-data portal; no dispatch-level feed
+      source_ids: [source:wikidata:sparql]
+    demand_range_mw: { min: 15000, max: 43000 }
+    sources: [source:wikidata:sparql]
+    notes: "One of NERC's four interconnections in its own right: operates asynchronously from the Eastern Interconnection with all external ties HVDC or VFT; vast winter-peaking hydro system (~37 GW hydro)."
+
+  - grid_id: grid:mx-sin
+    name: Sistema Interconectado Nacional (Mexico)
+    kind: national_grid
+    parent_grid: null
+    countries: [mx]
+    frequency_hz: 60
+    timezone: America/Mexico_City
+    operators:
+      - { name: Centro Nacional de Control de Energia (CENACE), role: system_operator }
+      - { name: Centro Nacional de Control de Energia (CENACE), role: market_operator }
+      - { name: Comision Federal de Electricidad, role: transmission_owner }
+      - { name: Comision Nacional de Energia, role: regulator }
+    market:
+      structure: short-term wholesale market (MEM) from the 2014 reform; CFE dominant, 2024-25 counter-reform re-centralizing
+      price_mechanism: nodal local marginal prices, day-ahead and real-time
+      dispatch_interval: 5min
+    interconnections:
+      - { to_grid: grid:us-texas, name: "DC ties and VFT (Railroad, Eagle Pass, Laredo)", capacity_mw: 430 }
+      - { to_grid: grid:siepac, name: "AC tie to Guatemala (Tapachula-Los Brillantes), normally operated radially", capacity_mw: 200 }
+    live_data:
+      availability: partial
+      notes: CENACE publishes demand, dispatch and nodal price data with modest delay; the real portal is CENACE's market information system
+      source_ids: [source:wikidata:sparql]
+    demand_range_mw: { min: 25000, max: 53000 }
+    sources: [source:wikidata:sparql]
+    notes: "Own synchronous system; Baja California norte is instead part of the Western Interconnection and Baja California Sur is isolated; asynchronous ties to ERCOT."

@@ -1,0 +1,78 @@
+# Structural seed — SYNTHETIC exemplar vessels for demo scenarios.
+# These are NOT real ships: IMO numbers 9000001-9000003 are deliberately outside the plausible
+# registry range and properties.synthetic is true on every record.
+# See ../../../schemas/entity.schema.json
+records:
+  - entity_id: vessel:imo:9000001
+    entity_type: Vessel
+    name: MV Bowen Trader
+    aliases: []
+    data_class: structural
+    observability: ESTIMATED
+    geometry: null
+    country: null
+    grid_id: null
+    properties:
+      synthetic: true
+      vessel_type: capesize bulk carrier
+      dwt: 180000
+      loa_m: 292
+      beam_m: 45
+      flag: pa
+    external_ids:
+      imo: "9000001"
+      mmsi: "503000001"
+    sources: [source:gpc:cargo-statistics]
+    notes: >-
+      SYNTHETIC EXEMPLAR for demo purposes - not a real ship. Represents a typical capesize coal carrier
+      loading metallurgical coal at RG Tanna for Japan, modelled on trade patterns in GPC cargo statistics.
+      A real deployment would replace this with AIS-derived vessel entities (KNOWN_LIVE).
+
+  - entity_id: vessel:imo:9000002
+    entity_type: Vessel
+    name: MV Boyne Spirit
+    aliases: []
+    data_class: structural
+    observability: ESTIMATED
+    geometry: null
+    country: null
+    grid_id: null
+    properties:
+      synthetic: true
+      vessel_type: general cargo / aluminium products carrier
+      dwt: 35000
+      loa_m: 180
+      beam_m: 30
+      flag: sg
+    external_ids:
+      imo: "9000002"
+      mmsi: "503000002"
+    sources: [source:gpc:cargo-statistics]
+    notes: >-
+      SYNTHETIC EXEMPLAR for demo purposes - not a real ship. Represents the regular aluminium ingot liner
+      trade from the Boyne Island smelter wharf to North Asian rolling mills.
+
+  - entity_id: vessel:imo:9000003
+    entity_type: Vessel
+    name: LNGC Curtis Pioneer
+    aliases: []
+    data_class: structural
+    observability: ESTIMATED
+    geometry: null
+    country: null
+    grid_id: null
+    properties:
+      synthetic: true
+      vessel_type: LNG carrier (membrane)
+      dwt: 95000
+      capacity_m3: 174000
+      loa_m: 295
+      beam_m: 46
+      flag: bs
+    external_ids:
+      imo: "9000003"
+      mmsi: "503000003"
+    sources: [source:gpc:cargo-statistics]
+    notes: >-
+      SYNTHETIC EXEMPLAR for demo purposes - not a real ship. Represents a standard 174,000 m3 LNG carrier
+      lifting a Curtis Island cargo for a Chinese term buyer.

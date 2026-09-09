@@ -1,0 +1,296 @@
+# Source registry — North America. See ../../schemas/source.schema.json
+records:
+  - source_id: source:eia:api-v2
+    publisher: U.S. Energy Information Administration
+    dataset: EIA Open Data API v2 (electricity, natural gas, petroleum, coal series)
+    api_type: rest
+    url: https://api.eia.gov/v2/
+    docs_url: https://www.eia.gov/opendata/documentation.php
+    coverage:
+      countries: [us]
+    entity_types: [Grid, GridRegion, Generator, Mine, Pipeline]
+    metrics: [grid.demand.mw, grid.generation.mw, power.output.mw, production.rate.tph, storage.level.pct]
+    data_class: both
+    latency: hourly series ~1-2h behind; monthly/annual series lag weeks to months
+    resolution: hourly (grid monitor) to annual, per series
+    update_frequency: varies by route - hourly for electricity/rto, monthly/annual for most statistical series
+    history_depth: decades for statistical series; hourly grid data since July 2015
+    authentication: api_key
+    licensing:
+      class: public-domain
+      notes: US federal government work - public domain; free API key required (instant issue), rate limits apply (~5000 req/hr).
+    cost: free
+    reliability: 5
+    quality_notes: Authoritative US statistical agency; v2 API is a facet/route model (JSON). Plant-level data via electricity routes joins on EIA plant code.
+    verification_status: documented_only
+    last_checked: "2026-08-12"
+    notes: Bulk download files also available for full-dataset sync without hammering the API.
+
+  - source_id: source:eia:eia930
+    publisher: U.S. Energy Information Administration
+    dataset: EIA-930 Hourly Electric Grid Monitor (balancing authority demand, generation by fuel, interchange)
+    api_type: rest
+    url: https://api.eia.gov/v2/electricity/rto/
+    docs_url: https://www.eia.gov/electricity/gridmonitor/about
+    coverage:
+      countries: [us]
+    entity_types: [Grid, GridRegion, Interconnector]
+    metrics: [grid.demand.mw, grid.generation.mw, intercon.flow.mw, grid.demand.forecast.mw]
+    data_class: live
+    latency: ~1-2 hours behind real time
+    resolution: hourly, per balancing authority (~65 BAs)
+    update_frequency: hourly
+    history_depth: since July 2015; fuel-mix detail since July 2018
+    authentication: api_key
+    licensing:
+      class: public-domain
+      notes: US federal government work - public domain; same free EIA API key as api-v2.
+    cost: free
+    reliability: 4
+    quality_notes: The only consistent cross-US BA-level hourly picture (demand, net generation by fuel, interchange); BA-reported with known reporting gaps/imputation - EIA flags imputed values.
+    verification_status: documented_only
+    last_checked: "2026-08-12"
+    notes: Also downloadable as bulk CSV from the Grid Monitor UI; sub-BA demand available for larger BAs.
+
+  - source_id: source:caiso:oasis
+    publisher: California Independent System Operator
+    dataset: CAISO OASIS (Open Access Same-time Information System)
+    api_type: rest
+    url: http://oasis.caiso.com/oasisapi/SingleZip
+    docs_url: https://www.caiso.com/library/oasis-frequently-asked-questions
+    coverage:
+      grids: [grid:us-caiso]
+      countries: [us]
+    entity_types: [Grid, GridRegion, Interconnector]
+    metrics: [market.price.energy, grid.demand.mw, grid.generation.mw, intercon.flow.mw]
+    data_class: both
+    latency: minutes for real-time market results
+    resolution: 5min (RTM/RTD), 15min (FMM), hourly (DAM)
+    update_frequency: per market run
+    history_depth: years of history queryable by date range
+    authentication: none
+    licensing:
+      class: open-attribution
+      notes: Public market transparency data; no key required. CAISO terms permit use of OASIS data; heavy automated use should respect published request limits.
+    cost: free
+    reliability: 4
+    quality_notes: LMPs at thousands of nodes, system demand/forecast, fuel mix, interchange; quirky legacy API (ZIP-of-CSV/XML responses, strict query windows) but authoritative.
+    verification_status: documented_only
+    last_checked: "2026-08-12"
+    notes: Today's Outlook dashboard JSON endpoints are a simpler live alternative for headline fuel-mix/demand.
+
+  - source_id: source:pjm:dataminer2
+    publisher: PJM Interconnection
+    dataset: PJM Data Miner 2 API (market and operations data)
+    api_type: rest
+    url: https://api.pjm.com/api/v1/
+    docs_url: https://dataminer2.pjm.com/
+    coverage:
+      grids: [grid:us-pjm]
+      countries: [us]
+    entity_types: [Grid, GridRegion, Interconnector]
+    metrics: [market.price.energy, grid.demand.mw, grid.generation.mw, intercon.flow.mw]
+    data_class: both
+    latency: minutes for instantaneous load/LMP feeds
+    resolution: 5min to hourly depending on feed
+    update_frequency: per feed - 5min for real-time LMP/load, hourly/daily for others
+    history_depth: multi-year history per feed (varies)
+    authentication: api_key
+    licensing:
+      class: open-registration
+      notes: Free but requires a PJM Tools account and a subscription key (Ocp-Apim-Subscription-Key header); non-members request access via DataMiner2Support@pjm.com. Data provided for informational purposes under PJM terms.
+    cost: free
+    reliability: 4
+    quality_notes: Comprehensive REST/JSON coverage of the largest US RTO (LMPs, load, generation by fuel, interchange, ancillary); the web UI needs no login, API does.
+    verification_status: documented_only
+    last_checked: "2026-08-12"
+    notes: Feed catalogue and per-feed schema browsable at dataminer2.pjm.com.
+
+  - source_id: source:ercot:mis
+    publisher: Electric Reliability Council of Texas
+    dataset: ERCOT public reports (MIS) and Public API
+    api_type: rest
+    url: https://api.ercot.com/
+    docs_url: https://developer.ercot.com/
+    coverage:
+      grids: [grid:us-ercot]
+      countries: [us]
+    entity_types: [Grid, GridRegion]
+    metrics: [market.price.energy, grid.demand.mw, grid.generation.mw, grid.frequency.hz]
+    data_class: both
+    latency: minutes for real-time dashboards and SCED results
+    resolution: 5min (SCED/real-time), 15min settlement, hourly DAM
+    update_frequency: per report - many at 5min cadence
+    history_depth: years via the Data Access Portal archive
+    authentication: api_key
+    licensing:
+      class: open-registration
+      notes: Public reports are free; the Public API (api.ercot.com) requires free registration for a client ID + subscription key under ERCOT API Terms of Use. Certificate-secured MIS content is participant-only.
+    cost: free
+    reliability: 4
+    quality_notes: Real-time prices, load, fuel mix, wind/solar production and forecasts; the modern Public API/Data Access Portal (data.ercot.com) supersedes scraping the legacy MIS report site.
+    verification_status: documented_only
+    last_checked: "2026-08-12"
+    notes: Legacy public report listings remain at www.ercot.com/mp/data-products; grid conditions dashboard offers simple JSON.
+
+  - source_id: source:miso:market-data
+    publisher: Midcontinent Independent System Operator
+    dataset: MISO market reports, real-time web display APIs, and Data Exchange
+    api_type: rest
+    url: https://api.misoenergy.org/MISORTWDDataBroker/data-links.html
+    docs_url: https://www.misoenergy.org/markets-and-operations/rtdataapis/
+    coverage:
+      grids: [grid:us-miso]
+      countries: [us, ca]
+    entity_types: [Grid, GridRegion, Interconnector]
+    metrics: [market.price.energy, grid.demand.mw, grid.generation.mw, intercon.flow.mw]
+    data_class: both
+    latency: minutes for real-time data broker feeds
+    resolution: 5min real-time; hourly DA/RT ex-post
+    update_frequency: 5min for RT web display feeds; daily for market reports
+    history_depth: market report archive spans years; RT feeds are snapshot-only
+    authentication: none
+    licensing:
+      class: open-registration
+      notes: RT web-display JSON feeds are open; MISO is migrating market reports to the registration-based (free) MISO Data Exchange API - plan for account creation. MISO terms permit informational use.
+    cost: free
+    reliability: 4
+    quality_notes: Real-time feeds are JSON-only as of Dec 2025. Legacy CSV/XLS market reports being phased out in favour of Data Exchange.
+    verification_status: documented_only
+    last_checked: "2026-08-12"
+    notes: Covers 15 US states + Manitoba - hence countries [us, ca].
+
+  - source_id: source:ieso:public-reports
+    publisher: Independent Electricity System Operator (Ontario)
+    dataset: IESO public reports directory (XML/CSV market and operations reports)
+    api_type: file-drop
+    url: https://reports-public.ieso.ca/public/
+    docs_url: https://www.ieso.ca/power-data/data-directory
+    coverage:
+      grids: [grid:ca-ieso]
+      countries: [ca]
+    entity_types: [Grid, Generator, Interconnector]
+    metrics: [grid.demand.mw, power.output.mw, market.price.energy, intercon.flow.mw]
+    data_class: both
+    latency: minutes (5-min reports) to hourly
+    resolution: 5min and hourly; generator-level hourly output/capability
+    update_frequency: per report - 5min, hourly, daily
+    history_depth: multi-year archive in the same directory tree
+    authentication: none
+    licensing:
+      class: open-attribution
+      notes: Public reports free to use under IESO terms of use with attribution.
+    cost: free
+    reliability: 4
+    quality_notes: Unusually rich open unit-level data (GenOutputCapability XML per generator, hourly). Ontario's May 2025 market renewal moved pricing from HOEP to LMP - report set changed; use current data directory.
+    verification_status: documented_only
+    last_checked: "2026-08-12"
+    notes: Plain directory listing of versioned XML/CSV files - trivially pollable.
+
+  - source_id: source:nyiso:oasis
+    publisher: New York Independent System Operator
+    dataset: NYISO OASIS / public CSV market data (mis.nyiso.com)
+    api_type: file-drop
+    url: http://mis.nyiso.com/public/
+    docs_url: https://www.nyiso.com/energy-market-operational-data
+    coverage:
+      grids: [grid:us-nyiso]
+      countries: [us]
+    entity_types: [Grid, GridRegion, Interconnector]
+    metrics: [market.price.energy, grid.demand.mw, intercon.flow.mw, grid.generation.mw]
+    data_class: both
+    latency: ~5min for real-time LBMP and load
+    resolution: 5min (RT), hourly (DA); zonal and generator-node LBMPs
+    update_frequency: every 5 minutes for RT files; daily rollups
+    history_depth: daily/monthly CSV archives back to ~1999
+    authentication: none
+    licensing:
+      class: open-attribution
+      notes: Public market data; free with attribution under NYISO terms.
+    cost: free
+    reliability: 4
+    quality_notes: Predictable CSV URL patterns (e.g. /public/csv/realtime/{yyyymmdd}realtime_zone.csv) make this one of the easiest ISOs to ingest without an API.
+    verification_status: documented_only
+    last_checked: "2026-08-12"
+    notes: Fuel mix, interface flows, load forecast files under parallel csv directories.
+
+  - source_id: source:isone:web-services
+    publisher: ISO New England
+    dataset: ISO-NE Web Services API v1.1 (ISO Express data)
+    api_type: rest
+    url: https://webservices.iso-ne.com/api/v1.1
+    docs_url: https://webservices.iso-ne.com/docs/v1.1/
+    coverage:
+      grids: [grid:us-isone]
+      countries: [us]
+    entity_types: [Grid, GridRegion, Interconnector]
+    metrics: [market.price.energy, grid.demand.mw, grid.generation.mw, intercon.flow.mw]
+    data_class: both
+    latency: minutes for real-time series
+    resolution: 5min (RT LMP, load) and hourly
+    update_frequency: per endpoint - 5min to daily
+    history_depth: multi-year via date-parameterised endpoints
+    authentication: registration
+    licensing:
+      class: open-registration
+      notes: Free ISO Express account grants API access via HTTP Basic auth over TLS; ISO-NE data terms permit informational use with attribution.
+    cost: free
+    reliability: 4
+    quality_notes: Clean REST (XML/JSON) over all public ISO Express content - fuel mix, LMPs, demand, reserves.
+    verification_status: documented_only
+    last_checked: "2026-08-12"
+    notes: Sandbox at ws-sandbox.iso-ne.com for development.
+
+  - source_id: source:aeso:ets
+    publisher: Alberta Electric System Operator
+    dataset: AESO Energy Trading System (ETS) public reports and AESO API (pool price, AIL, generation)
+    api_type: rest
+    url: https://api.aeso.ca/
+    docs_url: https://ets.aeso.ca/
+    coverage:
+      grids: [grid:ca-aeso]
+      countries: [ca]
+    entity_types: [Grid, Generator, Interconnector]
+    metrics: [market.price.energy, grid.demand.mw, power.output.mw, intercon.flow.mw]
+    data_class: both
+    latency: minutes (current supply/demand report is near-real-time)
+    resolution: hourly pool price / Alberta Internal Load; asset-level MW in current supply-demand report
+    update_frequency: continuous for CSD report; hourly for price series
+    history_depth: ETS historical reports back to 2000
+    authentication: api_key
+    licensing:
+      class: open-registration
+      notes: ETS web reports are open; the AESO API portal (api.aeso.ca, e.g. Pool Price and Current Supply Demand APIs) issues free keys on registration. AESO terms permit informational use.
+    cost: free
+    reliability: 4
+    quality_notes: Alberta is an energy-only market with unit-level current MW/max capability in the CSD report - one of the few live asset-level Canadian feeds. Restructured Energy Market changes (2026-27) may alter report formats.
+    verification_status: documented_only
+    last_checked: "2026-08-12"
+    notes: Legacy CSD HTML at ets.aeso.ca is scrape-fragile; prefer the JSON API.
+
+  - source_id: source:hydroquebec:open-data
+    publisher: Hydro-Québec
+    dataset: Hydro-Québec open data portal (electricity demand, generation/consumption history)
+    api_type: rest
+    url: https://donnees.hydroquebec.com/
+    docs_url: https://www.hydroquebec.com/documents-data/open-data/
+    coverage:
+      grids: [grid:ca-hq]
+      countries: [ca]
+    entity_types: [Grid]
+    metrics: [grid.demand.mw, grid.generation.mw]
+    data_class: both
+    latency: near-real-time for the demand dataset
+    resolution: 15min (Québec electricity demand); hourly proxies for generation/consumption history
+    update_frequency: demand dataset refreshed every 15 minutes
+    history_depth: multi-year history datasets published separately
+    authentication: none
+    licensing:
+      class: open-noncommercial
+      notes: CC BY-NC 4.0 - attribution required and COMMERCIAL USE PROHIBITED without separate arrangement. Flag before any commercial product use.
+    cost: free
+    reliability: 4
+    quality_notes: Opendatasoft platform with clean REST/records API; covers Québec except autonomous networks. The NC licence is the key constraint, not data quality.
+    verification_status: documented_only
+    last_checked: "2026-08-12"
+    notes: Key dataset - demande-electricite-quebec (province-wide demand in MW).

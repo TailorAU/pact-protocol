@@ -1,0 +1,270 @@
+# Source registry — AEMO (Australian Energy Market Operator). See ../../schemas/source.schema.json
+records:
+  - source_id: source:aemo:nemweb-dispatchis
+    publisher: Australian Energy Market Operator
+    dataset: NEMWEB Current DispatchIS Reports
+    api_type: file-drop
+    url: https://nemweb.com.au/Reports/Current/DispatchIS_Reports/
+    docs_url: https://nemweb.com.au/
+    coverage:
+      grids: [grid:au-nem]
+      countries: [au]
+    entity_types: [Grid, GridRegion, Interconnector]
+    metrics: [grid.demand.mw, grid.generation.mw, market.price.energy, intercon.flow.mw, market.price.fcas]
+    data_class: live
+    latency: ~1min after each 5-min dispatch run
+    resolution: 5min
+    update_frequency: every 5 minutes
+    history_depth: rolling ~24h in Current; deeper in Archive and MMSDM
+    authentication: none
+    licensing:
+      class: open-attribution
+      notes: AEMO copyright permits use of NEM data with attribution for informational purposes per AEMO's copyright permissions.
+    cost: free
+    reliability: 5
+    quality_notes: Authoritative market operator dispatch solution (prices, regional demand/generation, interconnector flows); corrections arrive as re-runs (RUNNO, INTERVENTION flags).
+    verification_status: documented_only
+    last_checked: "2026-08-12"
+    notes: ZIP files containing AEMO CSV C/I/D row format per the MMS Data Model (DISPATCH package - PRICE, REGIONSUM, INTERCONNECTORRES tables).
+
+  - source_id: source:aemo:nemweb-dispatch-scada
+    publisher: Australian Energy Market Operator
+    dataset: NEMWEB Current Dispatch_SCADA (unit-level SCADA MW)
+    api_type: file-drop
+    url: https://nemweb.com.au/Reports/Current/Dispatch_SCADA/
+    docs_url: https://nemweb.com.au/
+    coverage:
+      grids: [grid:au-nem]
+      countries: [au]
+    entity_types: [Generator, Storage]
+    metrics: [power.output.mw]
+    data_class: live
+    latency: ~1min after each 5-min dispatch interval
+    resolution: 5min
+    update_frequency: every 5 minutes
+    history_depth: rolling ~24h in Current; deeper in Archive and MMSDM
+    authentication: none
+    licensing:
+      class: open-attribution
+      notes: AEMO copyright permits use with attribution.
+    cost: free
+    reliability: 5
+    quality_notes: Actual instantaneous SCADA MW per DUID for every scheduled/semi-scheduled unit - the primary unit-level live generation signal for the NEM.
+    verification_status: documented_only
+    last_checked: "2026-08-12"
+    notes: ZIP of CSV (DISPATCH_UNIT_SCADA); keyed by DUID; join to the NEM Registration and Exemption List for station/fuel metadata.
+
+  - source_id: source:aemo:nemweb-tradingis
+    publisher: Australian Energy Market Operator
+    dataset: NEMWEB Current TradingIS Reports (trading/settlement prices)
+    api_type: file-drop
+    url: https://nemweb.com.au/Reports/Current/TradingIS_Reports/
+    docs_url: https://nemweb.com.au/
+    coverage:
+      grids: [grid:au-nem]
+      countries: [au]
+    entity_types: [Grid, GridRegion, Interconnector]
+    metrics: [market.price.energy, grid.demand.mw, intercon.flow.mw]
+    data_class: live
+    latency: ~minutes after each interval
+    resolution: 5min
+    update_frequency: every 5 minutes (5-minute settlement since Oct 2021)
+    history_depth: rolling ~24h in Current; deeper in Archive and MMSDM
+    authentication: none
+    licensing:
+      class: open-attribution
+      notes: AEMO copyright permits use with attribution.
+    cost: free
+    reliability: 5
+    quality_notes: Settlement-relevant trading prices per region; since five-minute settlement (1 Oct 2021) trading price equals the 5-min dispatch price, so DispatchIS and TradingIS have converged in cadence.
+    verification_status: documented_only
+    last_checked: "2026-08-12"
+    notes: ZIP of CSV (TRADING package - PRICE, REGIONSUM, INTERCONNECTORRES).
+
+  - source_id: source:aemo:nemweb-next-day-dispatch
+    publisher: Australian Energy Market Operator
+    dataset: NEMWEB Next_Day_Dispatch (full unit dispatch detail, next-day publication)
+    api_type: file-drop
+    url: https://nemweb.com.au/Reports/Current/Next_Day_Dispatch/
+    docs_url: https://nemweb.com.au/
+    coverage:
+      grids: [grid:au-nem]
+      countries: [au]
+    entity_types: [Generator, Storage, GridRegion]
+    metrics: [power.output.mw, dispatch.target.mw, dispatch.availability.mw]
+    data_class: live
+    latency: published ~04:00 AEST the following trading day
+    resolution: 5min
+    update_frequency: daily
+    history_depth: rolling window in Current; deeper in Archive and MMSDM
+    authentication: none
+    licensing:
+      class: open-attribution
+      notes: AEMO copyright permits use with attribution.
+    cost: free
+    reliability: 5
+    quality_notes: Next-day disclosure of full unit-level dispatch targets, availabilities and bid bands (DISPATCHLOAD etc.) - richer than real-time SCADA but delayed one day.
+    verification_status: documented_only
+    last_checked: "2026-08-12"
+    notes: Complements Dispatch_SCADA for reconciliation and detecting constrained-on/off behaviour.
+
+  - source_id: source:aemo:vis-nem-summary
+    publisher: Australian Energy Market Operator
+    dataset: AEMO visualisations API - ELEC_NEM_SUMMARY (NEM data dashboard JSON)
+    api_type: rest
+    url: https://visualisations.aemo.com.au/aemo/apps/api/report/ELEC_NEM_SUMMARY
+    docs_url: https://aemo.com.au/energy-systems/electricity/national-electricity-market-nem/data-nem/data-dashboard-nem
+    coverage:
+      grids: [grid:au-nem]
+      countries: [au]
+    entity_types: [Grid, GridRegion, Interconnector]
+    metrics: [grid.demand.mw, grid.generation.mw, market.price.energy, intercon.flow.mw]
+    data_class: live
+    latency: seconds to ~1min behind dispatch
+    resolution: 5min
+    update_frequency: every 5 minutes
+    history_depth: current snapshot only (no history at this endpoint)
+    authentication: none
+    licensing:
+      class: open-attribution
+      notes: Backing service for AEMO's public NEM data dashboard; AEMO copyright with attribution. Not a formally documented public API - subject to change without notice.
+    cost: free
+    reliability: 4
+    quality_notes: Convenient single-call JSON summary (per-region price/demand/generation, interconnector flows); same underlying data as DispatchIS but an undocumented dashboard endpoint - treat NEMWEB as canonical.
+    verification_status: documented_only
+    last_checked: "2026-08-12"
+    notes: Sibling reports include 5MIN and ELEC_NEM_SUMMARY_PRICES on the same /aemo/apps/api/report/ base.
+
+  - source_id: source:aemo:nem-registration-and-exemption-list
+    publisher: Australian Energy Market Operator
+    dataset: NEM Registration and Exemption List (registered participants and generating units)
+    api_type: bulk-download
+    url: https://aemo.com.au/energy-systems/electricity/national-electricity-market-nem/participate-in-the-market/registration
+    docs_url: https://aemo.com.au/energy-systems/electricity/national-electricity-market-nem/participate-in-the-market/registration
+    coverage:
+      grids: [grid:au-nem]
+      countries: [au]
+    entity_types: [Generator, Storage, Company]
+    metrics: [asset.capacity.mw]
+    data_class: static
+    latency: n/a (structural reference data)
+    resolution: unit-level (DUID / station)
+    update_frequency: updated as registrations change (roughly monthly in practice)
+    history_depth: current snapshot; no published version history
+    authentication: none
+    licensing:
+      class: open-attribution
+      notes: AEMO copyright permits use with attribution.
+    cost: free
+    reliability: 5
+    quality_notes: Authoritative DUID-to-station mapping - registered capacity, fuel source, technology type, dispatch type, region, participant. The join key for all NEM unit-level telemetry.
+    verification_status: documented_only
+    last_checked: "2026-08-12"
+    notes: Published as an XLSX workbook ("NEM Registration and Exemption List.xlsx") with multiple tabs; sheet 'PU and Scheduled Loads' carries generating unit detail.
+
+  - source_id: source:aemo:mms-data-model
+    publisher: Australian Energy Market Operator
+    dataset: MMS Data Model documentation + MMSDM historical archive
+    api_type: bulk-download
+    url: https://nemweb.com.au/Data_Archive/Wholesale_Electricity/MMSDM/
+    docs_url: https://nemweb.com.au/Reports/Current/MMSDataModelReport/
+    coverage:
+      grids: [grid:au-nem]
+      countries: [au]
+    entity_types: [Grid, GridRegion, Generator, Interconnector]
+    metrics: [power.output.mw, grid.demand.mw, market.price.energy, intercon.flow.mw]
+    data_class: both
+    latency: monthly archive lags ~1 month; documentation static
+    resolution: 5min and coarser depending on table
+    update_frequency: monthly archive drops; data model docs revised per release
+    history_depth: complete NEM history back to market start (Dec 1998)
+    authentication: none
+    licensing:
+      class: open-attribution
+      notes: AEMO copyright permits use with attribution.
+    cost: free
+    reliability: 5
+    quality_notes: The schema bible for every NEMWEB CSV (table/column definitions, keys, C/I/D row conventions) plus the complete monthly historical archive - the backfill path for all NEM telemetry.
+    verification_status: documented_only
+    last_checked: "2026-08-12"
+    notes: MMSDM monthly ZIPs are large (GB-scale); data model report defines every package/table used by the dispatchis/scada/tradingis connectors.
+
+  - source_id: source:aemo:gas-bulletin-board
+    publisher: Australian Energy Market Operator
+    dataset: Gas Bulletin Board (GBB) - east coast gas flows, capacity outlooks, notices
+    api_type: file-drop
+    url: https://nemweb.com.au/Reports/Current/GBB/
+    docs_url: https://www.aemo.com.au/energy-systems/gas/gas-bulletin-board-gbb/data-gbb
+    coverage:
+      countries: [au]
+    entity_types: [Pipeline, GasPlant, Storage, Facility]
+    metrics: [gas.pipeline.flow.tj_day, gas.production.tj_day, gas.storage.level.tj, gas.capacity.outlook.tj_day]
+    data_class: live
+    latency: actual flows typically published within ~30min of receipt; daily D+1 for most actuals
+    resolution: daily (TJ/day) per facility/connection point
+    update_frequency: intraday updates as operators submit; daily consolidated reports
+    history_depth: last 31 days in current reports; full history via historical GBB reports
+    authentication: none
+    licensing:
+      class: open-attribution
+      notes: AEMO copyright permits use with attribution; GBB data submitted by facility operators under the National Gas Rules.
+    cost: free
+    reliability: 4
+    quality_notes: Covers all major production fields, transmission pipelines, storage and demand centres in eastern/northern Australia; operator-submitted, so occasional resubmissions/corrections.
+    verification_status: documented_only
+    last_checked: "2026-08-12"
+    notes: CSV reports (Actual Flows and Storage, Capacity Outlook, Medium Term Capacity, Notices); WA has a separate WA GBB (gbbwa.aemo.com.au).
+
+  - source_id: source:aemo:wem-data-portal
+    publisher: Australian Energy Market Operator
+    dataset: WEM (Wholesale Electricity Market, WA/SWIS) public market data
+    api_type: file-drop
+    url: https://data.wa.aemo.com.au/
+    docs_url: https://www.aemo.com.au/energy-systems/electricity/wholesale-electricity-market-wem/data-wem
+    coverage:
+      grids: [grid:au-swis]
+      countries: [au]
+    entity_types: [Grid, Generator, Company]
+    metrics: [grid.demand.mw, power.output.mw, market.price.energy, market.price.stem]
+    data_class: both
+    latency: near-real-time for balancing/load files; daily-to-monthly for others
+    resolution: 5min (post-reform dispatch) / 30min trading intervals; varies by dataset
+    update_frequency: varies by file - from every dispatch interval to monthly
+    history_depth: multi-year CSV history for most datasets; ~1 day of JSON data-model snapshots
+    authentication: none
+    licensing:
+      class: open-attribution
+      notes: AEMO copyright permits use with attribution.
+    cost: free
+    reliability: 4
+    quality_notes: The SWIS is islanded from the NEM, so this portal (not NEMWEB) is the source of truth for WA; facility-level SCADA, balancing summary, STEM prices, outages, load forecasts.
+    verification_status: documented_only
+    last_checked: "2026-08-12"
+    notes: Plain CSV/JSON directory trees under /public/; WEM reform (Oct 2023) split datasets into pre/post-reform series - handle the discontinuity.
+
+  - source_id: source:aemo:isp-inputs-assumptions
+    publisher: Australian Energy Market Operator
+    dataset: Integrated System Plan (ISP) - inputs, assumptions and scenarios workbooks
+    api_type: bulk-download
+    url: https://www.aemo.com.au/energy-systems/major-publications/integrated-system-plan-isp/2026-integrated-system-plan-isp
+    docs_url: https://www.aemo.com.au/energy-systems/major-publications/integrated-system-plan-isp
+    coverage:
+      grids: [grid:au-nem]
+      countries: [au]
+    entity_types: [Grid, GridRegion, Generator, TransmissionLine]
+    metrics: [asset.capacity.mw, forecast.demand.gwh, forecast.capacity.mw]
+    data_class: static
+    latency: n/a (planning publication)
+    resolution: scenario/trace level (half-hourly demand traces; annual build schedules)
+    update_frequency: ISP biennial (2026 ISP published); IASR consultation updates in between
+    history_depth: editions back to 2018 ISP remain published
+    authentication: none
+    licensing:
+      class: open-attribution
+      notes: AEMO copyright permits use with attribution.
+    cost: free
+    reliability: 5
+    quality_notes: Forward-looking structural context (retirement schedules, committed projects, transmission options, demand traces) for Step Change / Slower Growth / Accelerated Transition scenarios - not telemetry.
+    verification_status: documented_only
+    last_checked: "2026-08-12"
+    notes: Workbooks (XLSX), demand traces and generation outlook data files accompany the 2025-26 Inputs Assumptions and Scenarios Report (IASR).

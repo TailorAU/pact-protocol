@@ -1,0 +1,75 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pact.tailor.au/intelligence/schemas/relationship.schema.json",
+  "title": "Relationship",
+  "description": "Directed, sourced, confidence-weighted edge between two entities.",
+  "type": "object",
+  "required": ["rel_id", "rel_type", "from_id", "to_id", "confidence", "source", "method"],
+  "properties": {
+    "rel_id": { "$ref": "defs.schema.json#/$defs/relId" },
+    "rel_type": {
+      "enum": [
+        "PART_OF",
+        "CONNECTED_TO",
+        "INTERCONNECTED_WITH",
+        "OWNED_BY",
+        "OPERATED_BY",
+        "EXTRACTS",
+        "SUPPLIES",
+        "MAY_SUPPLY",
+        "TRANSPORTS",
+        "GENERATES",
+        "TRANSMITS",
+        "IMPORTS_FROM",
+        "EXPORTS_TO",
+        "CONSUMES",
+        "PRODUCES",
+        "LOADS_AT",
+        "DEPARTS_FROM",
+        "ARRIVES_AT",
+        "SHIPS_TO",
+        "OBSERVED_BY",
+        "REPORTED_BY",
+        "INFERRED_FROM",
+        "SUPPORTED_BY",
+        "CONTRADICTED_BY"
+      ]
+    },
+    "from_id": { "$ref": "defs.schema.json#/$defs/entityId" },
+    "to_id": { "$ref": "defs.schema.json#/$defs/entityId" },
+    "confidence": { "$ref": "defs.schema.json#/$defs/confidence" },
+    "source": { "$ref": "defs.schema.json#/$defs/sourceId" },
+    "method": {
+      "enum": ["declared", "derived", "inferred", "manual"]
+    },
+    "valid_from": { "$ref": "defs.schema.json#/$defs/nullableTimestamp" },
+    "valid_to": { "$ref": "defs.schema.json#/$defs/nullableTimestamp" },
+    "recorded_at": { "$ref": "defs.schema.json#/$defs/nullableTimestamp" },
+    "superseded_at": { "$ref": "defs.schema.json#/$defs/nullableTimestamp" },
+    "evidence": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["kind", "ref"],
+        "properties": {
+          "kind": { "enum": ["observation", "structural", "inference"] },
+          "ref": { "type": "string" }
+        },
+        "additionalProperties": false
+      }
+    },
+    "properties": { "type": "object" },
+    "notes": { "type": "string" }
+  },
+  "if": {
+    "properties": { "method": { "const": "inferred" } },
+    "required": ["method"]
+  },
+  "then": {
+    "required": ["evidence"],
+    "properties": {
+      "evidence": { "type": "array", "minItems": 1 }
+    }
+  },
+  "additionalProperties": false
+}

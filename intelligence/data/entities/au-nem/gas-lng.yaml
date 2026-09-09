@@ -1,0 +1,150 @@
+# Structural seed — CSG-LNG chain: Surat CSG fields, feed pipelines, Curtis Island LNG plants.
+# See ../../../schemas/entity.schema.json
+records:
+  - entity_id: gasfield:au-qld:surat-csg
+    entity_type: GasField
+    name: Surat Basin CSG Fields (aggregate)
+    aliases: [Surat CSG]
+    data_class: structural
+    observability: KNOWN_LIVE
+    geometry: { type: Point, coordinates: [150.4, -26.7] }
+    country: au
+    admin: { region: Queensland, locality: Surat Basin }
+    grid_id: null
+    properties:
+      resource: coal-seam gas
+      production_tj_day: 4300
+      production_note: approximate combined CSG production feeding the three Curtis Island LNG projects plus domestic market
+    external_ids: {}
+    sources: [source:aemo:gas-bulletin-board, source:gem:global-gas-infrastructure-tracker]
+    notes: >-
+      Aggregate entity for the Surat/Bowen coal-seam gas fields (QGC's Surat fields, APLNG's Talinga/Orana/
+      Combabula, GLNG's Fairview/Roma/Scotia and others). Field-level production is published daily on the
+      AEMO Gas Bulletin Board, making the upstream leg genuinely observable.
+
+  - entity_id: pipe:au-qld:wallumbilla-gladstone
+    entity_type: Pipeline
+    name: Wallumbilla Gladstone Pipeline
+    aliases: [WGP, QCLNG Pipeline]
+    data_class: structural
+    observability: KNOWN_LIVE
+    geometry: { type: LineString, coordinates: [[149.19, -26.69], [150.48, -25.30], [151.20, -23.79]] }
+    country: au
+    admin: { region: Queensland }
+    grid_id: null
+    properties:
+      length_km: 540
+      capacity_tj_day: 1590
+      capacity_note: approximate
+      commodity: gas
+      commissioned: 2014
+    external_ids: {}
+    sources: [source:gem:global-gas-infrastructure-tracker, source:aemo:gas-bulletin-board]
+    notes: >-
+      Feed pipeline for QCLNG from the Wallumbilla hub area to Curtis Island; owned by APA Group (acquired
+      from BG Group in 2015). Flows reported on the AEMO Gas Bulletin Board.
+
+  - entity_id: pipe:au-qld:aplng-pipeline
+    entity_type: Pipeline
+    name: APLNG Pipeline
+    aliases: [Australia Pacific LNG Pipeline]
+    data_class: structural
+    observability: KNOWN_LIVE
+    geometry: { type: LineString, coordinates: [[149.50, -26.55], [150.55, -25.20], [151.21, -23.78]] }
+    country: au
+    admin: { region: Queensland }
+    grid_id: null
+    properties:
+      length_km: 530
+      capacity_tj_day: 1560
+      capacity_note: approximate
+      commodity: gas
+      commissioned: 2015
+    external_ids: {}
+    sources: [source:gem:global-gas-infrastructure-tracker, source:aemo:gas-bulletin-board]
+    notes: Feed pipeline from APLNG's Surat fields (Reedy Creek/Orana area) to the APLNG facility on Curtis Island; owned by the APLNG joint venture.
+
+  - entity_id: pipe:au-qld:glng-gtp
+    entity_type: Pipeline
+    name: GLNG Gas Transmission Pipeline
+    aliases: [GLNG GTP]
+    data_class: structural
+    observability: KNOWN_LIVE
+    geometry: { type: LineString, coordinates: [[148.85, -25.60], [150.30, -24.60], [151.19, -23.78]] }
+    country: au
+    admin: { region: Queensland }
+    grid_id: null
+    properties:
+      length_km: 420
+      capacity_tj_day: 1430
+      capacity_note: approximate
+      commodity: gas
+      commissioned: 2015
+    external_ids: {}
+    sources: [source:gem:global-gas-infrastructure-tracker, source:aemo:gas-bulletin-board]
+    notes: Feed pipeline from the Fairview/Roma CSG fields to GLNG on Curtis Island, including a Bass Strait-style marine crossing of The Narrows; owned by the GLNG joint venture (Santos-operated).
+
+  - entity_id: lng:au-qld:qclng
+    entity_type: LNGPlant
+    name: Queensland Curtis LNG
+    aliases: [QCLNG]
+    data_class: structural
+    observability: KNOWN_LIVE
+    geometry: { type: Point, coordinates: [151.203, -23.789] }
+    country: au
+    admin: { region: Queensland, locality: Curtis Island }
+    grid_id: null
+    properties:
+      capacity_mtpa: 8.5
+      trains: 2
+      commissioned: 2014
+      technology: ConocoPhillips Optimized Cascade
+    external_ids: {}
+    sources: [source:gem:global-gas-infrastructure-tracker, source:aemo:gas-bulletin-board, source:gpc:cargo-statistics]
+    notes: >-
+      First CSG-to-LNG plant in the world (first cargo January 2015). Shell-operated via QGC; CNOOC holds 50%
+      of Train 1 and Tokyo Gas 2.5% of Train 2. Gas deliveries visible daily via the Gas Bulletin Board;
+      cargo departures via GPC statistics.
+
+  - entity_id: lng:au-qld:aplng
+    entity_type: LNGPlant
+    name: Australia Pacific LNG
+    aliases: [APLNG]
+    data_class: structural
+    observability: KNOWN_LIVE
+    geometry: { type: Point, coordinates: [151.212, -23.769] }
+    country: au
+    admin: { region: Queensland, locality: Curtis Island }
+    grid_id: null
+    properties:
+      capacity_mtpa: 9.0
+      trains: 2
+      commissioned: 2015
+      technology: ConocoPhillips Optimized Cascade
+    external_ids: {}
+    sources: [source:gem:global-gas-infrastructure-tracker, source:aemo:gas-bulletin-board, source:gpc:cargo-statistics]
+    notes: >-
+      Largest of the three Curtis Island projects. JV: ConocoPhillips 47.5% (downstream operator),
+      Origin Energy 27.5% (upstream operator), Sinopec 25%. Sinopec is also the anchor offtaker.
+
+  - entity_id: lng:au-qld:glng
+    entity_type: LNGPlant
+    name: Gladstone LNG
+    aliases: [GLNG]
+    data_class: structural
+    observability: KNOWN_LIVE
+    geometry: { type: Point, coordinates: [151.196, -23.779] }
+    country: au
+    admin: { region: Queensland, locality: Curtis Island }
+    grid_id: null
+    properties:
+      capacity_mtpa: 7.8
+      trains: 2
+      commissioned: 2015
+      technology: ConocoPhillips Optimized Cascade
+    external_ids: {}
+    sources: [source:gem:global-gas-infrastructure-tracker, source:aemo:gas-bulletin-board, source:gpc:cargo-statistics]
+    notes: >-
+      Santos-operated JV: Santos 30%, PETRONAS 27.5%, TotalEnergies 27.5%, KOGAS 15%. Anchor offtakers are
+      PETRONAS (Malaysia) and KOGAS (Korea). Historically the most reliant of the three on third-party and
+      portfolio gas.

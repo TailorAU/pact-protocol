@@ -1,0 +1,723 @@
+# Structural relationships — ownership and operatorship. JV shares recorded in properties;
+# JV nuance in notes. See ../../../schemas/relationship.schema.json
+records:
+  - rel_id: rel:boyne-island-owned-by-rio-tinto
+    rel_type: OWNED_BY
+    from_id: smelter:au-qld:boyne-island
+    to_id: company:au:rio-tinto
+    confidence: 0.95
+    source: source:wikidata:sparql
+    method: declared
+    valid_from: null
+    valid_to: null
+    properties: { share: "73.5%", note: majority JV; minority partners incl. YKK, UACJ and Southern Cross (Japanese interests); Rio Tinto operates }
+
+  - rel_id: rel:gladstone-ps-operated-by-nrg
+    rel_type: OPERATED_BY
+    from_id: gen:au-nem:gladstone-ps
+    to_id: company:au:nrg-gladstone
+    confidence: 1.0
+    source: source:wikidata:sparql
+    method: declared
+    valid_from: "1994-03-01T00:00:00Z"
+    valid_to: null
+    properties: { note: NRG Gladstone Operating Services operates for the unincorporated JV since privatisation in 1994 }
+
+  - rel_id: rel:gladstone-ps-owned-by-rio-tinto
+    rel_type: OWNED_BY
+    from_id: gen:au-nem:gladstone-ps
+    to_id: company:au:rio-tinto
+    confidence: 0.9
+    source: source:wikidata:sparql
+    method: declared
+    valid_from: "1994-03-01T00:00:00Z"
+    valid_to: null
+    properties:
+      share: "42.125%"
+      note: >-
+        Unincorporated JV (verified 2025): Rio Tinto 42.125%, NRG Energy 37.5%, Southern Cross GPS 8.25%,
+        Ryowa II GPS 7.125%, YKK GPS 4.75%. CS Energy acts as market intermediary for output.
+
+  - rel_id: rel:gladstone-ps-owned-by-nrg
+    rel_type: OWNED_BY
+    from_id: gen:au-nem:gladstone-ps
+    to_id: company:au:nrg-gladstone
+    confidence: 0.85
+    source: source:wikidata:sparql
+    method: declared
+    valid_from: "1994-03-01T00:00:00Z"
+    valid_to: null
+    properties: { share: "37.5%", note: NRG Energy Inc JV interest, represented here by its Australian entity }
+
+  - rel_id: rel:qal-owned-by-rio-tinto
+    rel_type: OWNED_BY
+    from_id: refinery:au-qld:qal
+    to_id: company:au:rio-tinto
+    confidence: 0.95
+    source: source:wikidata:sparql
+    method: declared
+    valid_from: null
+    valid_to: null
+    properties: { share: "80%", note: Rusal 20% quarantined under Australian sanctions; Rio Tinto has had 100% operational control since 2022 }
+
+  - rel_id: rel:yarwun-owned-by-rio-tinto
+    rel_type: OWNED_BY
+    from_id: refinery:au-qld:yarwun
+    to_id: company:au:rio-tinto
+    confidence: 1.0
+    source: source:wikidata:sparql
+    method: declared
+    valid_from: "2004-01-01T00:00:00Z"
+    valid_to: null
+    properties: { share: "100%" }
+
+  - rel_id: rel:orica-yarwun-owned-by-orica
+    rel_type: OWNED_BY
+    from_id: chem:au-qld:orica-yarwun
+    to_id: company:au:orica
+    confidence: 1.0
+    source: source:wikidata:sparql
+    method: declared
+    valid_from: null
+    valid_to: null
+    properties: {}
+
+  - rel_id: rel:callide-b-owned-by-cs-energy
+    rel_type: OWNED_BY
+    from_id: gen:au-nem:callide-b
+    to_id: company:au:cs-energy
+    confidence: 1.0
+    source: source:wikidata:sparql
+    method: declared
+    valid_from: null
+    valid_to: null
+    properties: { share: "100%" }
+
+  - rel_id: rel:callide-c-owned-by-cs-energy
+    rel_type: OWNED_BY
+    from_id: gen:au-nem:callide-c
+    to_id: company:au:cs-energy
+    confidence: 0.95
+    source: source:wikidata:sparql
+    method: declared
+    valid_from: "2001-01-01T00:00:00Z"
+    valid_to: null
+    properties: { share: "50%" }
+
+  - rel_id: rel:callide-c-owned-by-sev-en-gi
+    rel_type: OWNED_BY
+    from_id: gen:au-nem:callide-c
+    to_id: company:au:sev-en-gi
+    confidence: 0.9
+    source: source:wikidata:sparql
+    method: declared
+    valid_from: "2025-05-01T00:00:00Z"
+    valid_to: null
+    properties:
+      share: "50%"
+      note: >-
+        Verified May 2025 - Sev.en GI acquired and recapitalised the 50% formerly held by IG Power/Genuity
+        (in administration from March 2023). Sev.en GI has publicly disputed pre-acquisition losses with CS Energy.
+
+  - rel_id: rel:callide-c-operated-by-cs-energy
+    rel_type: OPERATED_BY
+    from_id: gen:au-nem:callide-c
+    to_id: company:au:cs-energy
+    confidence: 1.0
+    source: source:wikidata:sparql
+    method: declared
+    valid_from: "2001-01-01T00:00:00Z"
+    valid_to: null
+    properties: {}
+
+  - rel_id: rel:kogan-creek-ps-owned-by-cs-energy
+    rel_type: OWNED_BY
+    from_id: gen:au-nem:kogan-creek
+    to_id: company:au:cs-energy
+    confidence: 1.0
+    source: source:wikidata:sparql
+    method: declared
+    valid_from: "2007-01-01T00:00:00Z"
+    valid_to: null
+    properties: { share: "100%" }
+
+  - rel_id: rel:kogan-creek-mine-owned-by-cs-energy
+    rel_type: OWNED_BY
+    from_id: mine:au-qld:kogan-creek
+    to_id: company:au:cs-energy
+    confidence: 1.0
+    source: source:wikidata:sparql
+    method: declared
+    valid_from: "2007-01-01T00:00:00Z"
+    valid_to: null
+    properties: { share: "100%" }
+
+  - rel_id: rel:stanwell-owned-by-stanwell-corp
+    rel_type: OWNED_BY
+    from_id: gen:au-nem:stanwell
+    to_id: company:au:stanwell-corp
+    confidence: 1.0
+    source: source:wikidata:sparql
+    method: declared
+    valid_from: null
+    valid_to: null
+    properties: { share: "100%" }
+
+  - rel_id: rel:tarong-owned-by-stanwell-corp
+    rel_type: OWNED_BY
+    from_id: gen:au-nem:tarong
+    to_id: company:au:stanwell-corp
+    confidence: 1.0
+    source: source:wikidata:sparql
+    method: declared
+    valid_from: "2011-07-01T00:00:00Z"
+    valid_to: null
+    properties: { share: "100%", note: transferred from Tarong Energy in the 2011 Queensland genco restructure }
+
+  - rel_id: rel:tarong-north-owned-by-stanwell-corp
+    rel_type: OWNED_BY
+    from_id: gen:au-nem:tarong-north
+    to_id: company:au:stanwell-corp
+    confidence: 1.0
+    source: source:wikidata:sparql
+    method: declared
+    valid_from: "2011-07-01T00:00:00Z"
+    valid_to: null
+    properties: { share: "100%" }
+
+  - rel_id: rel:meandu-owned-by-stanwell-corp
+    rel_type: OWNED_BY
+    from_id: mine:au-qld:meandu
+    to_id: company:au:stanwell-corp
+    confidence: 1.0
+    source: source:wikidata:sparql
+    method: declared
+    valid_from: null
+    valid_to: null
+    properties: { share: "100%" }
+
+  - rel_id: rel:wivenhoe-owned-by-cleanco
+    rel_type: OWNED_BY
+    from_id: gen:au-nem:wivenhoe
+    to_id: company:au:cleanco-qld
+    confidence: 1.0
+    source: source:wikidata:sparql
+    method: declared
+    valid_from: "2019-10-31T00:00:00Z"
+    valid_to: null
+    properties: { share: "100%", note: transferred from CS Energy at CleanCo commencement }
+
+  - rel_id: rel:swanbank-e-owned-by-cleanco
+    rel_type: OWNED_BY
+    from_id: gen:au-nem:swanbank-e
+    to_id: company:au:cleanco-qld
+    confidence: 1.0
+    source: source:wikidata:sparql
+    method: declared
+    valid_from: "2019-10-31T00:00:00Z"
+    valid_to: null
+    properties: { share: "100%" }
+
+  - rel_id: rel:barron-gorge-owned-by-cleanco
+    rel_type: OWNED_BY
+    from_id: gen:au-nem:barron-gorge
+    to_id: company:au:cleanco-qld
+    confidence: 1.0
+    source: source:wikidata:sparql
+    method: declared
+    valid_from: "2019-10-31T00:00:00Z"
+    valid_to: null
+    properties: { share: "100%" }
+
+  - rel_id: rel:kareeya-owned-by-cleanco
+    rel_type: OWNED_BY
+    from_id: gen:au-nem:kareeya
+    to_id: company:au:cleanco-qld
+    confidence: 1.0
+    source: source:wikidata:sparql
+    method: declared
+    valid_from: "2019-10-31T00:00:00Z"
+    valid_to: null
+    properties: { share: "100%" }
+
+  - rel_id: rel:millmerran-operated-by-intergen
+    rel_type: OPERATED_BY
+    from_id: gen:au-nem:millmerran
+    to_id: company:au:intergen-au
+    confidence: 0.9
+    source: source:wikidata:sparql
+    method: declared
+    valid_from: "2002-01-01T00:00:00Z"
+    valid_to: null
+    properties: { note: InterGen operates for the Millmerran Power Partners consortium (ownership shares not modelled - multi-party financial consortium) }
+
+  - rel_id: rel:braemar-owned-by-alinta
+    rel_type: OWNED_BY
+    from_id: gen:au-nem:braemar
+    to_id: company:au:alinta-energy
+    confidence: 0.95
+    source: source:wikidata:sparql
+    method: declared
+    valid_from: "2008-01-01T00:00:00Z"
+    valid_to: null
+    properties: { share: "100%", note: Braemar 1 only (verified ex-ERM Power); the adjacent Braemar 2 is Arrow Energy's and is out of scope }
+
+  - rel_id: rel:darling-downs-owned-by-origin
+    rel_type: OWNED_BY
+    from_id: gen:au-nem:darling-downs
+    to_id: company:au:origin-energy
+    confidence: 1.0
+    source: source:wikidata:sparql
+    method: declared
+    valid_from: "2010-01-01T00:00:00Z"
+    valid_to: null
+    properties: { share: "100%" }
+
+  - rel_id: rel:mt-stuart-owned-by-origin
+    rel_type: OWNED_BY
+    from_id: gen:au-nem:mt-stuart
+    to_id: company:au:origin-energy
+    confidence: 0.95
+    source: source:wikidata:sparql
+    method: declared
+    valid_from: null
+    valid_to: null
+    properties: { share: "100%" }
+
+  - rel_id: rel:coopers-gap-operated-by-agl
+    rel_type: OPERATED_BY
+    from_id: gen:au-nem:coopers-gap
+    to_id: company:au:agl-energy
+    confidence: 0.95
+    source: source:wikidata:sparql
+    method: declared
+    valid_from: "2020-01-01T00:00:00Z"
+    valid_to: null
+    properties: { note: owned by the Powering Australian Renewables partnership (AGL 20% with QIC/Future Fund); AGL operates and offtakes }
+
+  - rel_id: rel:western-downs-gph-owned-by-neoen
+    rel_type: OWNED_BY
+    from_id: gen:au-nem:western-downs-gph
+    to_id: company:au:neoen
+    confidence: 0.9
+    source: source:wikidata:sparql
+    method: declared
+    valid_from: "2023-01-01T00:00:00Z"
+    valid_to: null
+    properties: { share: "100%", note: Neoen group acquired by Brookfield in 2025; asset-level ownership assumed unchanged }
+
+  - rel_id: rel:macintyre-owned-by-acciona
+    rel_type: OWNED_BY
+    from_id: gen:au-nem:macintyre
+    to_id: company:au:acciona-energia
+    confidence: 0.9
+    source: source:wikidata:sparql
+    method: declared
+    valid_from: "2024-10-01T00:00:00Z"
+    valid_to: null
+    properties: { share: "~70%", note: co-owned with Ark Energy (~30%, verified); Acciona Energia operates }
+
+  - rel_id: rel:eraring-owned-by-origin
+    rel_type: OWNED_BY
+    from_id: gen:au-nem:eraring
+    to_id: company:au:origin-energy
+    confidence: 1.0
+    source: source:wikidata:sparql
+    method: declared
+    valid_from: "2013-01-01T00:00:00Z"
+    valid_to: null
+    properties: { share: "100%", note: NSW Government underwriting agreement covers extended operation to April 2029 }
+
+  - rel_id: rel:bayswater-owned-by-agl
+    rel_type: OWNED_BY
+    from_id: gen:au-nem:bayswater
+    to_id: company:au:agl-energy
+    confidence: 1.0
+    source: source:wikidata:sparql
+    method: declared
+    valid_from: "2014-01-01T00:00:00Z"
+    valid_to: null
+    properties: { share: "100%", note: via AGL Macquarie acquisition from NSW Government }
+
+  - rel_id: rel:mt-piper-owned-by-energyaustralia
+    rel_type: OWNED_BY
+    from_id: gen:au-nem:mt-piper
+    to_id: company:au:energyaustralia
+    confidence: 1.0
+    source: source:wikidata:sparql
+    method: declared
+    valid_from: "2013-01-01T00:00:00Z"
+    valid_to: null
+    properties: { share: "100%" }
+
+  - rel_id: rel:vales-point-owned-by-delta
+    rel_type: OWNED_BY
+    from_id: gen:au-nem:vales-point
+    to_id: company:au:delta-electricity
+    confidence: 1.0
+    source: source:wikidata:sparql
+    method: declared
+    valid_from: "2015-11-01T00:00:00Z"
+    valid_to: null
+    properties: { share: "100%", note: privatised by NSW in 2015 for $1m; Delta acquired by Sev.en GI in 2022 }
+
+  - rel_id: rel:delta-owned-by-sev-en-gi
+    rel_type: OWNED_BY
+    from_id: company:au:delta-electricity
+    to_id: company:au:sev-en-gi
+    confidence: 0.95
+    source: source:wikidata:sparql
+    method: declared
+    valid_from: "2022-08-01T00:00:00Z"
+    valid_to: null
+    properties: { share: "100%" }
+
+  - rel_id: rel:tallawarra-owned-by-energyaustralia
+    rel_type: OWNED_BY
+    from_id: gen:au-nem:tallawarra
+    to_id: company:au:energyaustralia
+    confidence: 1.0
+    source: source:wikidata:sparql
+    method: declared
+    valid_from: "2009-01-01T00:00:00Z"
+    valid_to: null
+    properties: { share: "100%" }
+
+  - rel_id: rel:colongra-owned-by-snowy-hydro
+    rel_type: OWNED_BY
+    from_id: gen:au-nem:colongra
+    to_id: company:au:snowy-hydro
+    confidence: 1.0
+    source: source:wikidata:sparql
+    method: declared
+    valid_from: "2014-01-01T00:00:00Z"
+    valid_to: null
+    properties: { share: "100%", note: acquired from Delta Electricity in 2014 }
+
+  - rel_id: rel:uranquinty-owned-by-origin
+    rel_type: OWNED_BY
+    from_id: gen:au-nem:uranquinty
+    to_id: company:au:origin-energy
+    confidence: 1.0
+    source: source:wikidata:sparql
+    method: declared
+    valid_from: "2008-01-01T00:00:00Z"
+    valid_to: null
+    properties: { share: "100%" }
+
+  - rel_id: rel:rg-tanna-owned-by-gpc
+    rel_type: OWNED_BY
+    from_id: terminal:au-qld:rg-tanna
+    to_id: company:au:gladstone-ports-corp
+    confidence: 1.0
+    source: source:gpc:cargo-statistics
+    method: declared
+    valid_from: null
+    valid_to: null
+    properties: { share: "100%" }
+
+  - rel_id: rel:barney-point-owned-by-gpc
+    rel_type: OWNED_BY
+    from_id: terminal:au-qld:barney-point
+    to_id: company:au:gladstone-ports-corp
+    confidence: 1.0
+    source: source:gpc:cargo-statistics
+    method: declared
+    valid_from: null
+    valid_to: null
+    properties: { share: "100%" }
+
+  - rel_id: rel:gladstone-port-operated-by-gpc
+    rel_type: OPERATED_BY
+    from_id: port:au-qld:gladstone
+    to_id: company:au:gladstone-ports-corp
+    confidence: 1.0
+    source: source:gpc:cargo-statistics
+    method: declared
+    valid_from: null
+    valid_to: null
+    properties: { note: Queensland government-owned port authority }
+
+  - rel_id: rel:wicet-owned-by-wicet-holdings
+    rel_type: OWNED_BY
+    from_id: terminal:au-qld:wicet
+    to_id: company:au:wicet-holdings
+    confidence: 0.95
+    source: source:wikidata:sparql
+    method: declared
+    valid_from: "2015-01-01T00:00:00Z"
+    valid_to: null
+    properties: { note: shipper consortium - Glencore ~40% with Coronado Curragh and Yancoal (verified); independent of GPC }
+
+  - rel_id: rel:hpct-owned-by-bma
+    rel_type: OWNED_BY
+    from_id: terminal:au-qld:hay-point
+    to_id: company:au:bhp-mitsubishi-alliance
+    confidence: 1.0
+    source: source:wikidata:sparql
+    method: declared
+    valid_from: null
+    valid_to: null
+    properties: { share: "100%" }
+
+  - rel_id: rel:dbct-operated-by-dbi
+    rel_type: OPERATED_BY
+    from_id: terminal:au-qld:dbct
+    to_id: company:au:dalrymple-bay-infrastructure
+    confidence: 0.95
+    source: source:wikidata:sparql
+    method: declared
+    valid_from: null
+    valid_to: null
+    properties: { note: terminal is Queensland government-owned; DBI holds a 99-year operating lease }
+
+  - rel_id: rel:blackwater-system-operated-by-aurizon
+    rel_type: OPERATED_BY
+    from_id: rail:au-qld:blackwater-system
+    to_id: company:au:aurizon
+    confidence: 1.0
+    source: source:wikidata:sparql
+    method: declared
+    valid_from: null
+    valid_to: null
+    properties: { note: Aurizon Network owns and operates the CQCN under regulated access }
+
+  - rel_id: rel:moura-system-operated-by-aurizon
+    rel_type: OPERATED_BY
+    from_id: rail:au-qld:moura-system
+    to_id: company:au:aurizon
+    confidence: 1.0
+    source: source:wikidata:sparql
+    method: declared
+    valid_from: null
+    valid_to: null
+    properties: {}
+
+  - rel_id: rel:goonyella-system-operated-by-aurizon
+    rel_type: OPERATED_BY
+    from_id: rail:au-qld:goonyella-system
+    to_id: company:au:aurizon
+    confidence: 1.0
+    source: source:wikidata:sparql
+    method: declared
+    valid_from: null
+    valid_to: null
+    properties: {}
+
+  - rel_id: rel:qclng-owned-by-shell-qgc
+    rel_type: OWNED_BY
+    from_id: lng:au-qld:qclng
+    to_id: company:au:shell-qgc
+    confidence: 0.95
+    source: source:gem:global-gas-infrastructure-tracker
+    method: declared
+    valid_from: "2016-02-01T00:00:00Z"
+    valid_to: null
+    properties: { note: Shell (via QGC) majority owner-operator; CNOOC 50% of Train 1, Tokyo Gas 2.5% of Train 2 }
+
+  - rel_id: rel:aplng-owned-by-origin
+    rel_type: OWNED_BY
+    from_id: lng:au-qld:aplng
+    to_id: company:au:origin-energy
+    confidence: 0.95
+    source: source:gem:global-gas-infrastructure-tracker
+    method: declared
+    valid_from: "2015-12-01T00:00:00Z"
+    valid_to: null
+    properties: { share: "27.5%", note: reduced from 37.5% in 2022; Origin operates the upstream fields }
+
+  - rel_id: rel:aplng-owned-by-conocophillips
+    rel_type: OWNED_BY
+    from_id: lng:au-qld:aplng
+    to_id: company:au:conocophillips
+    confidence: 0.95
+    source: source:gem:global-gas-infrastructure-tracker
+    method: declared
+    valid_from: "2015-12-01T00:00:00Z"
+    valid_to: null
+    properties: { share: "47.5%", note: Sinopec holds the remaining 25% (no separate company entity in this seed) }
+
+  - rel_id: rel:aplng-operated-by-conocophillips
+    rel_type: OPERATED_BY
+    from_id: lng:au-qld:aplng
+    to_id: company:au:conocophillips
+    confidence: 0.95
+    source: source:gem:global-gas-infrastructure-tracker
+    method: declared
+    valid_from: "2015-12-01T00:00:00Z"
+    valid_to: null
+    properties: { note: ConocoPhillips operates the downstream LNG facility; Origin operates upstream }
+
+  - rel_id: rel:glng-owned-by-santos
+    rel_type: OWNED_BY
+    from_id: lng:au-qld:glng
+    to_id: company:au:santos
+    confidence: 0.95
+    source: source:gem:global-gas-infrastructure-tracker
+    method: declared
+    valid_from: "2015-09-01T00:00:00Z"
+    valid_to: null
+    properties: { share: "30%", note: Santos is operator; PETRONAS 27.5%, TotalEnergies 27.5%, KOGAS 15% }
+
+  - rel_id: rel:wgp-owned-by-apa
+    rel_type: OWNED_BY
+    from_id: pipe:au-qld:wallumbilla-gladstone
+    to_id: company:au:apa-group
+    confidence: 1.0
+    source: source:gem:global-gas-infrastructure-tracker
+    method: declared
+    valid_from: "2015-06-01T00:00:00Z"
+    valid_to: null
+    properties: { share: "100%", note: acquired from BG Group in 2015 }
+
+  - rel_id: rel:aplng-pipeline-owned-by-origin
+    rel_type: OWNED_BY
+    from_id: pipe:au-qld:aplng-pipeline
+    to_id: company:au:origin-energy
+    confidence: 0.6
+    source: source:gem:global-gas-infrastructure-tracker
+    method: derived
+    valid_from: null
+    valid_to: null
+    properties: { note: pipeline is owned by the APLNG JV; edge assigned to upstream operator Origin as JV proxy - see APLNG ownership edges for the full JV }
+
+  - rel_id: rel:glng-gtp-owned-by-santos
+    rel_type: OWNED_BY
+    from_id: pipe:au-qld:glng-gtp
+    to_id: company:au:santos
+    confidence: 0.8
+    source: source:gem:global-gas-infrastructure-tracker
+    method: derived
+    valid_from: null
+    valid_to: null
+    properties: { note: owned by the GLNG JV; edge assigned to operator Santos as JV proxy }
+
+  - rel_id: rel:goonyella-riverside-owned-by-bma
+    rel_type: OWNED_BY
+    from_id: mine:au-qld:goonyella-riverside
+    to_id: company:au:bhp-mitsubishi-alliance
+    confidence: 1.0
+    source: source:gem:global-coal-mine-tracker
+    method: declared
+    valid_from: null
+    valid_to: null
+    properties: { share: "100%", note: BMA itself is a 50/50 BHP / Mitsubishi Development JV }
+
+  - rel_id: rel:peak-downs-owned-by-bma
+    rel_type: OWNED_BY
+    from_id: mine:au-qld:peak-downs
+    to_id: company:au:bhp-mitsubishi-alliance
+    confidence: 1.0
+    source: source:gem:global-coal-mine-tracker
+    method: declared
+    valid_from: null
+    valid_to: null
+    properties: { share: "100%" }
+
+  - rel_id: rel:blackwater-owned-by-whitehaven
+    rel_type: OWNED_BY
+    from_id: mine:au-qld:blackwater
+    to_id: company:au:whitehaven-coal
+    confidence: 0.95
+    source: source:gem:global-coal-mine-tracker
+    method: declared
+    valid_from: "2024-04-02T00:00:00Z"
+    valid_to: null
+    properties:
+      share: "70%"
+      note: >-
+        Verified - acquired from BMA April 2024; 30% sold to Nippon Steel (20%) and JFE Steel (10%) effective
+        1 April 2025. Whitehaven manages the unincorporated JV.
+
+  - rel_id: rel:curragh-owned-by-coronado
+    rel_type: OWNED_BY
+    from_id: mine:au-qld:curragh
+    to_id: company:au:coronado
+    confidence: 0.95
+    source: source:gem:global-coal-mine-tracker
+    method: declared
+    valid_from: "2018-01-01T00:00:00Z"
+    valid_to: null
+    properties: { share: "100%", note: acquired from Wesfarmers 2018; Coronado under liquidity pressure through 2025 - ownership could change, monitor }
+
+  - rel_id: rel:callide-mine-owned-by-batchfire
+    rel_type: OWNED_BY
+    from_id: mine:au-qld:callide
+    to_id: company:au:batchfire-resources
+    confidence: 0.95
+    source: source:gem:global-coal-mine-tracker
+    method: declared
+    valid_from: "2016-10-31T00:00:00Z"
+    valid_to: null
+    properties: { share: "100%" }
+
+  - rel_id: rel:callide-mine-owned-by-anglo-historical
+    rel_type: OWNED_BY
+    from_id: mine:au-qld:callide
+    to_id: company:au:anglo-american
+    confidence: 1.0
+    source: source:gem:global-coal-mine-tracker
+    method: declared
+    valid_from: "2000-01-01T00:00:00Z"
+    valid_to: "2016-10-31T00:00:00Z"
+    properties: { note: historical edge - Anglo American sold Callide to Batchfire Resources in October 2016 }
+
+  - rel_id: rel:hvo-owned-by-yancoal
+    rel_type: OWNED_BY
+    from_id: mine:au-nsw:hunter-valley-operations
+    to_id: company:au:yancoal
+    confidence: 0.95
+    source: source:gem:global-coal-mine-tracker
+    method: declared
+    valid_from: "2017-09-01T00:00:00Z"
+    valid_to: null
+    properties: { share: "51%", note: Yancoal operates the HVO JV }
+
+  - rel_id: rel:hvo-owned-by-glencore
+    rel_type: OWNED_BY
+    from_id: mine:au-nsw:hunter-valley-operations
+    to_id: company:au:glencore
+    confidence: 0.95
+    source: source:gem:global-coal-mine-tracker
+    method: declared
+    valid_from: "2017-09-01T00:00:00Z"
+    valid_to: null
+    properties: { share: "49%" }
+
+  - rel_id: rel:tomago-owned-by-tac
+    rel_type: OWNED_BY
+    from_id: smelter:au-nsw:tomago
+    to_id: company:au:tomago-aluminium
+    confidence: 1.0
+    source: source:wikidata:sparql
+    method: declared
+    valid_from: "1983-01-01T00:00:00Z"
+    valid_to: null
+    properties: { note: TAC JV - Rio Tinto ~51.55%, CSR ~36.05%, Hydro Aluminium ~12.4% }
+
+  - rel_id: rel:port-kembla-owned-by-bluescope
+    rel_type: OWNED_BY
+    from_id: steel:au-nsw:port-kembla
+    to_id: company:au:bluescope
+    confidence: 1.0
+    source: source:wikidata:sparql
+    method: declared
+    valid_from: "2002-07-01T00:00:00Z"
+    valid_to: null
+    properties: { share: "100%", note: since the BHP Steel spin-off }
+
+  - rel_id: rel:basslink-owned-by-apa
+    rel_type: OWNED_BY
+    from_id: intercon:au-nem:basslink
+    to_id: company:au:apa-group
+    confidence: 1.0
+    source: source:wikidata:sparql
+    method: declared
+    valid_from: "2022-10-01T00:00:00Z"
+    valid_to: null
+    properties:
+      share: "100%"
+      note: >-
+        Verified - APA acquired Basslink Pty Ltd out of administration in 2022 (it is APA-owned, not
+        state-owned); AER approved conversion to a prescribed regulated transmission service in June 2025,
+        effective as a regulated asset from July 2026.

@@ -1,0 +1,25 @@
+{
+  "name": "@pact-tailor/intelligence-workspace",
+  "version": "0.1.0",
+  "private": true,
+  "description": "PACT.TAILOR intelligence network — Tailor extension workspace: real-time energy, industry & trade intelligence over the PACT protocol",
+  "type": "module",
+  "workspaces": [
+    "packages/*"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "npm run build -w @pact-tailor/ontology && npm run build -w @pact-tailor/registry && npm run build -w @pact-tailor/store && npm run build -w @pact-tailor/graph && npm run build -w @pact-tailor/state && npm run build -w @pact-tailor/connectors && npm run build -w @pact-tailor/intel && npm run build -w @pact-tailor/pact-bridge && npm run build -w @pact-tailor/api",
+    "build:globe": "npm run build -w @pact-tailor/globe",
+    "test": "npm test --workspaces --if-present",
+    "validate:data": "node packages/registry/scripts/validate-data.mjs",
+    "verify:live": "node packages/connectors/dist/verify-live.js",
+    "smoke": "bash scripts/smoke.sh"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "typescript": "^5.7.2"
+  }
+}

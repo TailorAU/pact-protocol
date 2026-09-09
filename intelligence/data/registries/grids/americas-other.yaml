@@ -1,0 +1,100 @@
+# Grid registry — Americas (other). Class-A structural records. See ../../schemas/grid.schema.json
+records:
+  - grid_id: grid:br-sin
+    name: Sistema Interligado Nacional (Brazil)
+    kind: national_grid
+    parent_grid: null
+    countries: [br]
+    frequency_hz: 60
+    timezone: America/Sao_Paulo
+    operators:
+      - { name: Operador Nacional do Sistema Eletrico (ONS), role: system_operator }
+      - { name: Camara de Comercializacao de Energia Eletrica (CCEE), role: market_operator }
+      - { name: ANEEL, role: regulator }
+    market:
+      structure: cost-based centralized dispatch; regulated and free contracting environments
+      price_mechanism: hourly settlement price (PLD) derived from dispatch models
+      dispatch_interval: null
+    interconnections: []
+    live_data:
+      availability: rich
+      notes: ONS open-data platform plus real-time operation dashboards; CCEE market data
+      source_ids: [source:ons-brazil:open-data]
+    demand_range_mw: { min: 55000, max: 103000 }
+    sources: [source:ons-brazil:open-data]
+    notes: "Continental-scale hydro-dominated system in four subsystems (SE/CO, S, NE, N); Itaipu shared with Paraguay; asynchronous frequency-converter ties to Argentina and Uruguay; isolated systems remain in parts of the Amazon."
+
+  - grid_id: grid:ar-sadi
+    name: Sistema Argentino de Interconexion (SADI)
+    kind: national_grid
+    parent_grid: null
+    countries: [ar]
+    frequency_hz: 50
+    timezone: America/Argentina/Buenos_Aires
+    operators:
+      - { name: CAMMESA, role: system_operator }
+      - { name: CAMMESA, role: market_operator }
+      - { name: Transener, role: transmission_owner }
+      - { name: ENRE, role: regulator }
+    market:
+      structure: cost-based wholesale market (MEM) administered by CAMMESA; heavy price regulation
+      price_mechanism: audited-cost dispatch with regulated seasonal prices
+      dispatch_interval: null
+    interconnections: []
+    live_data:
+      availability: partial
+      notes: CAMMESA publishes demand, generation and market data with modest delay; some near-real-time aggregates
+      source_ids: [source:wikidata:sparql]
+    demand_range_mw: { min: 12000, max: 30000 }
+    sources: [source:wikidata:sparql]
+    notes: "50 Hz system with synchronous ties to Uruguay and Paraguay (Salto Grande, Yacyreta); asynchronous frequency-converter links to Brazil; minor rarely-used tie to Chile at Salta."
+
+  - grid_id: grid:cl-sen
+    name: Sistema Electrico Nacional (Chile)
+    kind: national_grid
+    parent_grid: null
+    countries: [cl]
+    frequency_hz: 50
+    timezone: America/Santiago
+    operators:
+      - { name: Coordinador Electrico Nacional, role: system_operator }
+      - { name: Transelec, role: transmission_owner }
+      - { name: Comision Nacional de Energia, role: regulator }
+    market:
+      structure: mandatory cost-based pool; no bid-based market; contracts via auctions
+      price_mechanism: audited-cost marginal pricing at system nodes
+      dispatch_interval: null
+    interconnections: []
+    live_data:
+      availability: partial
+      notes: extensive open-data platform from the Coordinador with hourly operational data and some real-time aggregates
+      source_ids: [source:wikidata:sparql]
+    demand_range_mw: { min: 7000, max: 12000 }
+    sources: [source:wikidata:sparql]
+    notes: "Formed 2017 by merging the SIC and SING; ~3100 km long and thin; world-class Atacama solar driving big daily flows; Aysen and Magallanes systems remain separate; small tie to Argentina."
+
+  - grid_id: grid:siepac
+    name: SIEPAC / Central American Interconnection
+    kind: interconnection
+    parent_grid: null
+    countries: [gt, sv, hn, ni, cr, pa]
+    frequency_hz: 60
+    timezone: America/Guatemala
+    operators:
+      - { name: Ente Operador Regional (EOR), role: system_operator }
+      - { name: Ente Operador Regional (EOR), role: market_operator }
+      - { name: Empresa Propietaria de la Red (EPR), role: transmission_owner }
+      - { name: CRIE, role: regulator }
+    market:
+      structure: regional electricity market (MER) layered over six national markets
+      price_mechanism: regional nodal prices for cross-border transactions
+      dispatch_interval: null
+    interconnections:
+      - { to_grid: grid:mx-sin, name: "AC tie Mexico-Guatemala, normally operated radially", capacity_mw: 200 }
+    live_data:
+      availability: minimal
+      notes: EOR publishes regional operational and market reports; no public real-time feed
+      source_ids: [source:wikidata:sparql]
+    demand_range_mw: null
+    sources: [source:wikidata:sparql]
+    notes: "1800 km 230 kV backbone (~300 MW design transfer) linking six synchronously operated national grids from Guatemala to Panama; Colombia link long planned; listed here rather than under Africa/Middle East despite the tasking bullet."

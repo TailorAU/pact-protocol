@@ -1,0 +1,95 @@
+# Grid registry — Africa & Middle East. Class-A structural records. See ../../schemas/grid.schema.json
+records:
+  - grid_id: grid:za
+    name: South African National Grid (Eskom)
+    kind: national_grid
+    parent_grid: null
+    countries: [za]
+    frequency_hz: 50
+    timezone: Africa/Johannesburg
+    operators:
+      - { name: National Transmission Company South Africa (NTCSA), role: system_operator }
+      - { name: National Transmission Company South Africa (NTCSA), role: transmission_owner }
+      - { name: NERSA, role: regulator }
+    market:
+      structure: vertically integrated single buyer; unbundling under way with NTCSA carved out of Eskom in 2024
+      price_mechanism: regulated tariffs; wheeling and trading framework emerging
+      dispatch_interval: null
+    interconnections: []
+    live_data:
+      availability: partial
+      notes: hourly system data (demand, generation by source, loadshedding) on the Eskom data portal with short delay
+      source_ids: [source:eskom:data-portal]
+    demand_range_mw: { min: 19000, max: 34000 }
+    sources: [source:eskom:data-portal]
+    notes: "Anchor of the Southern African Power Pool with synchronous ties to Mozambique, Botswana, Zimbabwe, Namibia, Eswatini and beyond; HVDC import from Cahora Bassa; coal-dominated, loadshedding-prone."
+
+  - grid_id: grid:gccia
+    name: GCC Interconnection
+    kind: interconnection
+    parent_grid: null
+    countries: [kw, sa, bh, qa, ae, om]
+    frequency_hz: 50
+    timezone: Asia/Riyadh
+    operators:
+      - { name: Gulf Cooperation Council Interconnection Authority (GCCIA), role: system_operator }
+    market:
+      structure: primarily reserve sharing and emergency support; regional energy trading platform developing
+      price_mechanism: bilateral and scheduled exchanges
+      dispatch_interval: null
+    interconnections: []
+    live_data:
+      availability: minimal
+      notes: periodic GCCIA reports only; no public operational feed
+      source_ids: [source:wikidata:sparql]
+    demand_range_mw: null
+    sources: [source:wikidata:sparql]
+    notes: "400 kV 50 Hz spine linking Kuwait, Bahrain, Qatar, UAE and Oman; Saudi Arabia's 60 Hz system connects via an 1800 MW back-to-back HVDC at Al Fadhili; first-phase link to southern Iraq energized 2024."
+
+  - grid_id: grid:eg
+    name: Egyptian National Grid
+    kind: national_grid
+    parent_grid: null
+    countries: [eg]
+    frequency_hz: 50
+    timezone: Africa/Cairo
+    operators:
+      - { name: Egyptian Electricity Transmission Company (EETC), role: tso }
+      - { name: Egyptian Electricity Transmission Company (EETC), role: transmission_owner }
+      - { name: EgyptERA, role: regulator }
+    market:
+      structure: single buyer (EETC) under gradual liberalization
+      price_mechanism: regulated tariffs
+      dispatch_interval: null
+    interconnections: []
+    live_data:
+      availability: minimal
+      notes: annual and periodic reports from EEHC and the ministry; no public operational feed
+      source_ids: [source:wikidata:sparql]
+    demand_range_mw: { min: 20000, max: 38000 }
+    sources: [source:wikidata:sparql]
+    notes: "AC ties to Libya and Jordan (legacy Eight Country Interconnection); 3000 MW HVDC to Saudi Arabia under construction (first stage mid-2020s); gas-dominated with Benban solar complex."
+
+  - grid_id: grid:ng
+    name: Nigerian National Grid
+    kind: national_grid
+    parent_grid: null
+    countries: [ng]
+    frequency_hz: 50
+    timezone: Africa/Lagos
+    operators:
+      - { name: Nigerian Independent System Operator (NISO), role: system_operator }
+      - { name: Transmission Company of Nigeria (TCN), role: transmission_owner }
+      - { name: Nigerian Electricity Regulatory Commission, role: regulator }
+    market:
+      structure: transitional electricity market; NBET-legacy and bilateral contracts; state markets emerging under the 2023 Electricity Act
+      price_mechanism: regulated multi-year tariff orders
+      dispatch_interval: null
+    interconnections: []
+    live_data:
+      availability: partial
+      notes: daily operational reports with hourly generation from the system operator; frequent grid-event reporting
+      source_ids: [source:wikidata:sparql]
+    demand_range_mw: { min: 3500, max: 5800 }
+    sources: [source:wikidata:sparql]
+    notes: "Grid delivers ~5 GW against ~13 GW installed and far larger latent demand; repeated system collapses; WAPP member with ties to Benin and Niger; NISO carved out of TCN in 2025."

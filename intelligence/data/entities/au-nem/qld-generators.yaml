@@ -1,0 +1,443 @@
+# Structural seed — Queensland generators (QLD1). See ../../../schemas/entity.schema.json
+records:
+  - entity_id: gen:au-nem:gladstone-ps
+    entity_type: Generator
+    name: Gladstone Power Station
+    aliases: [GPS]
+    data_class: structural
+    observability: KNOWN_LIVE
+    geometry: { type: Point, coordinates: [151.171, -23.855] }
+    country: au
+    admin: { region: Queensland, locality: Gladstone }
+    grid_id: grid:au-nem
+    properties:
+      fuel: coal
+      capacity_mw: 1680
+      technology: steam subcritical
+      commissioned: 1976
+      unit_count: 6
+      status: operating
+      closure_announced: "2029-03"
+    external_ids:
+      aemo_duid: [GSTONE1, GSTONE2, GSTONE3, GSTONE4, GSTONE5, GSTONE6]
+      aemo_station_id: GSTONE
+    sources: [source:aemo:nem-registration-and-exemption-list, source:gem:global-coal-plant-tracker]
+    notes: >-
+      Queensland's largest power station; NRG operates for the Gladstone JV (Rio Tinto 42.125%, NRG Energy 37.5%,
+      Southern Cross GPS 8.25%, Ryowa II GPS 7.125%, YKK GPS 4.75%). Most output is committed to the Boyne Island
+      smelter. On 1 October 2025 CS Energy (as market intermediary) formally notified AEMO of potential retirement
+      in March 2029, aligned with expiry of supply and operating arrangements incl. the Boyne Smelters contract;
+      no final closure decision has been made (verified Oct 2025 Rio Tinto release).
+
+  - entity_id: gen:au-nem:callide-b
+    entity_type: Generator
+    name: Callide B Power Station
+    aliases: [Callide B]
+    data_class: structural
+    observability: KNOWN_LIVE
+    geometry: { type: Point, coordinates: [150.627, -24.343] }
+    country: au
+    admin: { region: Queensland, locality: Biloela }
+    grid_id: grid:au-nem
+    properties:
+      fuel: coal
+      capacity_mw: 700
+      technology: steam subcritical
+      commissioned: 1988
+      unit_count: 2
+      status: operating
+    external_ids:
+      aemo_duid: [CALL_B_1, CALL_B_2]
+      aemo_station_id: CALL_B
+    sources: [source:aemo:nem-registration-and-exemption-list, source:gem:global-coal-plant-tracker]
+    notes: >-
+      CS Energy owned and operated; fed by the adjacent Callide mine. Closure around 2028 was flagged under the
+      2022 Queensland Energy and Jobs Plan; that timeline is under review by the current Queensland government,
+      so no firm retirement date is recorded here.
+
+  - entity_id: gen:au-nem:callide-c
+    entity_type: Generator
+    name: Callide C Power Station
+    aliases: [Callide C]
+    data_class: structural
+    observability: KNOWN_LIVE
+    geometry: { type: Point, coordinates: [150.632, -24.345] }
+    country: au
+    admin: { region: Queensland, locality: Biloela }
+    grid_id: grid:au-nem
+    properties:
+      fuel: coal
+      capacity_mw: 810
+      technology: steam supercritical
+      commissioned: 2001
+      unit_count: 2
+      status: operating
+    external_ids:
+      aemo_duid: [CPP_3, CPP_4]
+      aemo_station_id: CPP
+    sources: [source:aemo:nem-registration-and-exemption-list, source:gem:global-coal-plant-tracker]
+    notes: >-
+      50/50 unincorporated JV. C4 was destroyed by a turbine hall explosion in May 2021; both units returned to
+      service across 2023-24. The non-CS Energy 50% (formerly IG Power / Genuity, in administration from March 2023)
+      was acquired and recapitalised by Sev.en Global Investments in May 2025 (verified). CS Energy operates.
+      Unit ratings quoted variously 405-420 MW each; 810 MW nameplate used here.
+
+  - entity_id: gen:au-nem:stanwell
+    entity_type: Generator
+    name: Stanwell Power Station
+    aliases: [Stanwell PS]
+    data_class: structural
+    observability: KNOWN_LIVE
+    geometry: { type: Point, coordinates: [150.331, -23.508] }
+    country: au
+    admin: { region: Queensland, locality: Stanwell }
+    grid_id: grid:au-nem
+    properties:
+      fuel: coal
+      capacity_mw: 1460
+      technology: steam subcritical
+      commissioned: 1993
+      unit_count: 4
+      status: operating
+    external_ids:
+      aemo_duid: [STAN-1, STAN-2, STAN-3, STAN-4]
+      aemo_station_id: STANWELL
+    sources: [source:aemo:nem-registration-and-exemption-list, source:gem:global-coal-plant-tracker]
+    notes: >-
+      Stanwell Corporation's flagship station near Rockhampton; coal railed from the Curragh mine under a
+      long-standing supply arrangement (see fuel-supply relationships).
+
+  - entity_id: gen:au-nem:kogan-creek
+    entity_type: Generator
+    name: Kogan Creek Power Station
+    aliases: [Kogan Creek]
+    data_class: structural
+    observability: KNOWN_LIVE
+    geometry: { type: Point, coordinates: [150.746, -26.928] }
+    country: au
+    admin: { region: Queensland, locality: Chinchilla }
+    grid_id: grid:au-nem
+    properties:
+      fuel: coal
+      capacity_mw: 744
+      technology: steam supercritical, air-cooled
+      commissioned: 2007
+      unit_count: 1
+      status: operating
+    external_ids:
+      aemo_duid: [KPP_1]
+      aemo_station_id: KPP
+    sources: [source:aemo:nem-registration-and-exemption-list, source:gem:global-coal-plant-tracker]
+    notes: Australia's largest single generating unit; CS Energy owned, fed by the adjacent captive Kogan Creek mine.
+
+  - entity_id: gen:au-nem:tarong
+    entity_type: Generator
+    name: Tarong Power Station
+    aliases: [Tarong PS]
+    data_class: structural
+    observability: KNOWN_LIVE
+    geometry: { type: Point, coordinates: [151.914, -26.781] }
+    country: au
+    admin: { region: Queensland, locality: Nanango }
+    grid_id: grid:au-nem
+    properties:
+      fuel: coal
+      capacity_mw: 1400
+      technology: steam subcritical
+      commissioned: 1984
+      unit_count: 4
+      status: operating
+    external_ids:
+      aemo_duid: ["TARONG#1", "TARONG#2", "TARONG#3", "TARONG#4"]
+      aemo_station_id: TARONG
+    sources: [source:aemo:nem-registration-and-exemption-list, source:gem:global-coal-plant-tracker]
+    notes: Stanwell Corporation; fed by the captive Meandu mine.
+
+  - entity_id: gen:au-nem:tarong-north
+    entity_type: Generator
+    name: Tarong North Power Station
+    aliases: [Tarong North]
+    data_class: structural
+    observability: KNOWN_LIVE
+    geometry: { type: Point, coordinates: [151.910, -26.777] }
+    country: au
+    admin: { region: Queensland, locality: Nanango }
+    grid_id: grid:au-nem
+    properties:
+      fuel: coal
+      capacity_mw: 443
+      technology: steam supercritical
+      commissioned: 2003
+      unit_count: 1
+      status: operating
+    external_ids:
+      aemo_duid: [TNPS1]
+      aemo_station_id: TNPS
+    sources: [source:aemo:nem-registration-and-exemption-list, source:gem:global-coal-plant-tracker]
+    notes: Supercritical single unit adjacent to Tarong; Stanwell Corporation; Meandu coal.
+
+  - entity_id: gen:au-nem:millmerran
+    entity_type: Generator
+    name: Millmerran Power Station
+    aliases: [Millmerran]
+    data_class: structural
+    observability: KNOWN_LIVE
+    geometry: { type: Point, coordinates: [151.271, -27.956] }
+    country: au
+    admin: { region: Queensland, locality: Millmerran }
+    grid_id: grid:au-nem
+    properties:
+      fuel: coal
+      capacity_mw: 852
+      technology: steam supercritical, air-cooled
+      commissioned: 2002
+      unit_count: 2
+      status: operating
+    external_ids:
+      aemo_duid: [MPP_1, MPP_2]
+      aemo_station_id: MPP
+    sources: [source:aemo:nem-registration-and-exemption-list, source:gem:global-coal-plant-tracker]
+    notes: >-
+      Operated by InterGen for the Millmerran Power Partners consortium; fed by the adjacent captive
+      Commodore mine (not modelled separately in this seed).
+
+  - entity_id: gen:au-nem:wivenhoe
+    entity_type: Generator
+    name: Wivenhoe Power Station
+    aliases: [Wivenhoe Pumped Storage, Splityard Creek]
+    data_class: structural
+    observability: KNOWN_LIVE
+    geometry: { type: Point, coordinates: [152.608, -27.394] }
+    country: au
+    admin: { region: Queensland, locality: Wivenhoe Pocket }
+    grid_id: grid:au-nem
+    properties:
+      fuel: pumped-hydro
+      capacity_mw: 570
+      technology: pumped storage hydro
+      commissioned: 1984
+      unit_count: 2
+      status: operating
+      storage_note: Pumps from Lake Wivenhoe to Splityard Creek dam off-peak; net electricity consumer over a cycle.
+    external_ids:
+      aemo_duid: ["W/HOE#1", "W/HOE#2"]
+      aemo_station_id: WHOE
+    sources: [source:aemo:nem-registration-and-exemption-list]
+    notes: Queensland's only operating pumped-storage station; owned by CleanCo Queensland (transferred from CS Energy in 2019).
+
+  - entity_id: gen:au-nem:braemar
+    entity_type: Generator
+    name: Braemar Power Station
+    aliases: [Braemar 1]
+    data_class: structural
+    observability: KNOWN_LIVE
+    geometry: { type: Point, coordinates: [150.868, -27.128] }
+    country: au
+    admin: { region: Queensland, locality: Dalby }
+    grid_id: grid:au-nem
+    properties:
+      fuel: gas
+      capacity_mw: 504
+      technology: open-cycle gas turbine
+      commissioned: 2006
+      unit_count: 3
+      status: operating
+    external_ids:
+      aemo_duid: [BRAEMAR1, BRAEMAR2, BRAEMAR3]
+      aemo_station_id: BRAEMAR
+    sources: [source:aemo:nem-registration-and-exemption-list]
+    notes: >-
+      Braemar 1 (this record) is owned by Alinta Energy (acquired from ERM Power in 2008, verified). The adjacent
+      Braemar 2 station (BRAEMAR5-7, ~519 MW) is separately owned by Arrow Energy and is not modelled in this seed.
+      Coal-seam gas fuelled.
+
+  - entity_id: gen:au-nem:darling-downs
+    entity_type: Generator
+    name: Darling Downs Power Station
+    aliases: [Darling Downs]
+    data_class: structural
+    observability: KNOWN_LIVE
+    geometry: { type: Point, coordinates: [150.837, -27.106] }
+    country: au
+    admin: { region: Queensland, locality: Dalby }
+    grid_id: grid:au-nem
+    properties:
+      fuel: gas
+      capacity_mw: 644
+      technology: combined-cycle gas turbine
+      commissioned: 2010
+      unit_count: 4
+      status: operating
+    external_ids:
+      aemo_duid: [DDPS1]
+      aemo_station_id: DDPS
+    sources: [source:aemo:nem-registration-and-exemption-list]
+    notes: Australia's largest combined-cycle plant when built; Origin Energy; coal-seam gas fuelled.
+
+  - entity_id: gen:au-nem:swanbank-e
+    entity_type: Generator
+    name: Swanbank E Power Station
+    aliases: [Swanbank E]
+    data_class: structural
+    observability: KNOWN_LIVE
+    geometry: { type: Point, coordinates: [152.830, -27.652] }
+    country: au
+    admin: { region: Queensland, locality: Ipswich }
+    grid_id: grid:au-nem
+    properties:
+      fuel: gas
+      capacity_mw: 385
+      technology: combined-cycle gas turbine
+      commissioned: 2002
+      unit_count: 1
+      status: operating
+    external_ids:
+      aemo_duid: [SWAN_E]
+      aemo_station_id: SWAN_E
+    sources: [source:aemo:nem-registration-and-exemption-list]
+    notes: >-
+      CleanCo Queensland. Mothballed 2017-2022, returned to service October 2022; offline April-October 2025
+      after a gas turbine cooling-air fault, since returned to service (verified).
+
+  - entity_id: gen:au-nem:mt-stuart
+    entity_type: Generator
+    name: Mt Stuart Power Station
+    aliases: [Mount Stuart]
+    data_class: structural
+    observability: KNOWN_LIVE
+    geometry: { type: Point, coordinates: [146.833, -19.352] }
+    country: au
+    admin: { region: Queensland, locality: Townsville }
+    grid_id: grid:au-nem
+    properties:
+      fuel: diesel
+      capacity_mw: 423
+      technology: open-cycle gas turbine (kerosene-fuelled)
+      commissioned: 1999
+      unit_count: 3
+      status: operating
+    external_ids:
+      aemo_duid: [MSTUART1, MSTUART2, MSTUART3]
+      aemo_station_id: MSTUART
+    sources: [source:aemo:nem-registration-and-exemption-list]
+    notes: Origin Energy peaker in Townsville; runs on aviation-grade kerosene (recorded under fuel 'diesel' as nearest liquid-fuel enum). Unit 3 added 2009.
+
+  - entity_id: gen:au-nem:barron-gorge
+    entity_type: Generator
+    name: Barron Gorge Hydro Power Station
+    aliases: [Barron Gorge]
+    data_class: structural
+    observability: KNOWN_LIVE
+    geometry: { type: Point, coordinates: [145.648, -16.845] }
+    country: au
+    admin: { region: Queensland, locality: Kuranda }
+    grid_id: grid:au-nem
+    properties:
+      fuel: hydro
+      capacity_mw: 66
+      technology: run-of-river hydro
+      commissioned: 1963
+      unit_count: 2
+      status: operating
+    external_ids:
+      aemo_duid: [BARRON-1, BARRON-2]
+      aemo_station_id: BARRON
+    sources: [source:aemo:nem-registration-and-exemption-list]
+    notes: Far North Queensland hydro on the Barron River; CleanCo Queensland.
+
+  - entity_id: gen:au-nem:kareeya
+    entity_type: Generator
+    name: Kareeya Hydro Power Station
+    aliases: [Kareeya]
+    data_class: structural
+    observability: KNOWN_LIVE
+    geometry: { type: Point, coordinates: [145.577, -17.776] }
+    country: au
+    admin: { region: Queensland, locality: Tully }
+    grid_id: grid:au-nem
+    properties:
+      fuel: hydro
+      capacity_mw: 88
+      technology: run-of-river hydro
+      commissioned: 1957
+      unit_count: 4
+      status: operating
+    external_ids:
+      aemo_duid: [KAREEYA1, KAREEYA2, KAREEYA3, KAREEYA4]
+      aemo_station_id: KAREEYA
+    sources: [source:aemo:nem-registration-and-exemption-list]
+    notes: Hydro on the Tully River, Far North Queensland; CleanCo Queensland.
+
+  - entity_id: gen:au-nem:coopers-gap
+    entity_type: Generator
+    name: Coopers Gap Wind Farm
+    aliases: [Coopers Gap]
+    data_class: structural
+    observability: KNOWN_LIVE
+    geometry: { type: Point, coordinates: [151.418, -26.723] }
+    country: au
+    admin: { region: Queensland, locality: Cooranga North }
+    grid_id: grid:au-nem
+    properties:
+      fuel: wind
+      capacity_mw: 453
+      technology: onshore wind (123 turbines)
+      commissioned: 2020
+      unit_count: 123
+      status: operating
+    external_ids:
+      aemo_duid: [COOPGWF1]
+      aemo_station_id: COOPGWF
+    sources: [source:aemo:nem-registration-and-exemption-list]
+    notes: Owned by the Powering Australian Renewables partnership (AGL 20% with QIC/Future Fund); operated by AGL.
+
+  - entity_id: gen:au-nem:western-downs-gph
+    entity_type: Generator
+    name: Western Downs Green Power Hub
+    aliases: [Western Downs Solar]
+    data_class: structural
+    observability: KNOWN_LIVE
+    geometry: { type: Point, coordinates: [150.79, -26.88] }
+    country: au
+    admin: { region: Queensland, locality: Chinchilla }
+    grid_id: grid:au-nem
+    properties:
+      fuel: solar
+      capacity_mw: 460
+      technology: single-axis tracking PV (460 MWp DC, ~400 MW AC)
+      commissioned: 2023
+      unit_count: 1
+      status: operating
+    external_ids:
+      aemo_duid: [WDGPH1]
+      aemo_station_id: WDGPH
+    sources: [source:aemo:nem-registration-and-exemption-list]
+    notes: >-
+      Australia's largest operating solar farm (verified 460 MWp, ~1M panels, 22 km SE of Chinchilla); developed
+      and owned by Neoen (Neoen group acquired by Brookfield in 2025). Co-located Western Downs Battery
+      (270 MW, expanding) is a separate asset not modelled here.
+
+  - entity_id: gen:au-nem:macintyre
+    entity_type: Generator
+    name: MacIntyre Wind Farm
+    aliases: [MacIntyre]
+    data_class: structural
+    observability: KNOWN_LIVE
+    geometry: { type: Point, coordinates: [151.40, -28.35] }
+    country: au
+    admin: { region: Queensland, locality: Karara }
+    grid_id: grid:au-nem
+    properties:
+      fuel: wind
+      capacity_mw: 923
+      technology: onshore wind (162 x 5.7 MW Nordex Delta4000)
+      commissioned: 2024
+      unit_count: 162
+      status: operating
+    external_ids: {}
+    sources: [source:aemo:nem-registration-and-exemption-list]
+    notes: >-
+      Largest wind farm in the Southern Hemisphere (verified 923 MW; first power October 2024, fully operational
+      2025). Acciona Energia majority owner with Ark Energy ~30%; the adjacent 103 MW CleanCo Karara wind farm is
+      part of the same precinct but separately owned. DUID omitted pending verification against the AEMO
+      registration list (staged registration across multiple units).

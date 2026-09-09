@@ -1,0 +1,132 @@
+# Source registry — Australia (non-AEMO). See ../../schemas/source.schema.json
+records:
+  - source_id: source:openelectricity:api
+    publisher: OpenElectricity (formerly OpenNEM; The Superpower Institute)
+    dataset: OpenElectricity API - curated Australian electricity market data
+    api_type: rest
+    url: https://api.openelectricity.org.au/
+    docs_url: https://docs.openelectricity.org.au/
+    coverage:
+      grids: [grid:au-nem, grid:au-swis]
+      countries: [au]
+    entity_types: [Grid, GridRegion, Generator, Facility]
+    metrics: [power.output.mw, grid.demand.mw, market.price.energy, emissions.rate.tco2e]
+    data_class: both
+    latency: minutes behind AEMO source data
+    resolution: 5min native; aggregations to hourly/daily/monthly
+    update_frequency: continuous (tracks AEMO 5-min cadence)
+    history_depth: full NEM history (1998+) and WEM history, cleaned and facility-mapped
+    authentication: api_key
+    licensing:
+      class: open-attribution
+      notes: Platform data published under CC BY 4.0; underlying AEMO data under AEMO attribution terms. API key issued free via platform.openelectricity.org.au with rate-limited free tier.
+    cost: free tier; paid tiers for higher limits
+    reliability: 4
+    quality_notes: Best-in-class cleaned/harmonised layer over NEMWEB and WEM data with stable facility IDs and fuel-tech mapping; third-party (not the market operator), so treat AEMO as canonical for disputes.
+    verification_status: documented_only
+    last_checked: "2026-08-12"
+    notes: Official TypeScript and Python clients (opennem/openelectricity-*); set OPENELECTRICITY_API_KEY.
+
+  - source_id: source:artc:hunter-valley-network
+    publisher: Australian Rail Track Corporation (ARTC)
+    dataset: Hunter Valley coal network publications (corridor capacity strategy, network performance reporting)
+    api_type: html
+    url: https://www.artc.com.au/about/hv-strategy/
+    docs_url: https://www.artc.com.au/
+    coverage:
+      countries: [au]
+    entity_types: [RailNetwork, RailCorridor]
+    metrics: [rail.capacity.mtpa, rail.trains.per_day]
+    data_class: static
+    latency: n/a (periodic publications)
+    resolution: corridor/zone level
+    update_frequency: annual (Hunter Valley Corridor Capacity Strategy); monthly performance reporting goes to the Rail Capacity Group, not the public
+    history_depth: strategy documents back to ~2010 remain online
+    authentication: none
+    licensing:
+      class: restricted
+      notes: Standard website copyright; documents are publicly downloadable PDFs but no open-data licence is stated. Operational KPI reporting is provided to industry (RCG/HVCCC), not published openly.
+    cost: free
+    reliability: 3
+    quality_notes: No live public feed - this is structural/capacity context for the world's largest coal export rail chain (~250 trains/day incl. ~half coal). Live coal-chain throughput is an observability gap; HVCCC publishes limited aggregate performance data.
+    verification_status: documented_only
+    last_checked: "2026-08-12"
+    notes: PDF documents. Pair with Port of Newcastle trade reports for chain throughput ground truth.
+
+  - source_id: source:aurizon:investor-reports
+    publisher: Aurizon Holdings Limited (ASX:AZJ)
+    dataset: Investor and operational reports - above-rail coal haulage volumes
+    api_type: html
+    url: https://www.aurizon.com.au/investors
+    docs_url: https://www.aurizon.com.au/investors
+    coverage:
+      countries: [au]
+    entity_types: [Company, RailNetwork]
+    metrics: [rail.haulage.mt, rail.network.tonnes.mt]
+    data_class: static
+    latency: weeks after period end
+    resolution: half-yearly / annual (segment-level tonnages; occasional quarterly updates)
+    update_frequency: half-yearly results (Feb/Aug) plus ASX announcements
+    history_depth: ASX filings back to 2010 listing
+    authentication: none
+    licensing:
+      class: restricted
+      notes: Public ASX disclosure documents; copyright Aurizon. Facts (tonnages) usable; documents not redistributable.
+    cost: free
+    reliability: 3
+    quality_notes: The dominant QLD coal hauler (~190Mt+/yr across CQCN and NSW); volumes are audited but coarse-grained and lagged - context/calibration data, not telemetry.
+    verification_status: documented_only
+    last_checked: "2026-08-12"
+    notes: PDF results packs; Central Queensland Coal Network (below-rail) throughput also reported. FY2026 results due 17 Aug 2026.
+
+  - source_id: source:qld-gov:coal-industry-statistics
+    publisher: Queensland Government (Department of Natural Resources and Mines / Resources)
+    dataset: Queensland coal industry statistics (quarterly coal reports; annual coal statistics; coal industry review tables)
+    api_type: bulk-download
+    url: https://www.data.qld.gov.au/dataset/coal-industry-review-statistical-tables
+    docs_url: https://www.data.qld.gov.au/dataset/quarterly-coal-reports
+    coverage:
+      countries: [au]
+    entity_types: [Mine, Port, Company]
+    metrics: [production.saleable.mt, production.raw.mt, export.tonnes.mt, stockpile.balance.mt]
+    data_class: static
+    latency: ~2-3 months after quarter end
+    resolution: per-mine (annual review) and aggregate (quarterly); exports by port and destination country
+    update_frequency: quarterly and annual releases
+    history_depth: multi-decade series in the coal industry review tables
+    authentication: none
+    licensing:
+      class: open-attribution
+      notes: Creative Commons Attribution 4.0 (Queensland Government Open Data Portal standard licence).
+    cost: free
+    reliability: 4
+    quality_notes: The authoritative per-mine saleable/raw production and per-port export series for Queensland - the calibration backbone for any inferred mine-to-port coal flow model.
+    verification_status: documented_only
+    last_checked: "2026-08-12"
+    notes: XLSX/CSV resources on a CKAN portal (data.qld.gov.au) - machine-readable and stable resource URLs.
+
+  - source_id: source:disr:resources-energy-quarterly
+    publisher: Australian Department of Industry, Science and Resources (Office of the Chief Economist)
+    dataset: Resources and Energy Quarterly (REQ) - production, export volumes/values and forecasts
+    api_type: bulk-download
+    url: https://www.industry.gov.au/publications/resources-and-energy-quarterly
+    docs_url: https://www.industry.gov.au/publications/resources-and-energy-quarterly
+    coverage:
+      countries: [au]
+    entity_types: [Commodity, Market]
+    metrics: [export.tonnes.mt, export.value.aud, production.rate.mtpa, price.commodity.usd]
+    data_class: static
+    latency: published quarterly (Mar/Jun/Sep/Dec)
+    resolution: commodity x country, quarterly/annual with 2-year forecasts
+    update_frequency: quarterly
+    history_depth: editions back to ~2011; underlying ABS trade series much deeper
+    authentication: none
+    licensing:
+      class: open-attribution
+      notes: Creative Commons Attribution 4.0 International (standard Commonwealth publication licence).
+    cost: free
+    reliability: 4
+    quality_notes: The Australian Government's official commodity outlook - iron ore, met/thermal coal, LNG, aluminium chain, lithium etc.; forecast tables in XLSX. Forecasts are scenarios, not observations - keep in derived/context class.
+    verification_status: documented_only
+    last_checked: "2026-08-12"
+    notes: PDF report + data tables workbook per edition.

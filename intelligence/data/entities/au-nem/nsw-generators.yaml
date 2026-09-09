@@ -1,0 +1,171 @@
+# Structural seed — New South Wales generators (NSW1). See ../../../schemas/entity.schema.json
+records:
+  - entity_id: gen:au-nem:eraring
+    entity_type: Generator
+    name: Eraring Power Station
+    aliases: [Eraring]
+    data_class: structural
+    observability: KNOWN_LIVE
+    geometry: { type: Point, coordinates: [151.521, -33.062] }
+    country: au
+    admin: { region: New South Wales, locality: Eraring }
+    grid_id: grid:au-nem
+    properties:
+      fuel: coal
+      capacity_mw: 2880
+      technology: steam subcritical
+      commissioned: 1982
+      unit_count: 4
+      status: operating
+      closure_announced: "2029-04-30"
+    external_ids:
+      aemo_duid: [ER01, ER02, ER03, ER04]
+      aemo_station_id: ERARING
+    sources: [source:aemo:nem-registration-and-exemption-list, source:gem:global-coal-plant-tracker]
+    notes: >-
+      Australia's largest power station; Origin Energy. Closure was announced for August 2025, extended to August
+      2027 under a May 2024 underwriting agreement with the NSW Government, then extended again in February 2026
+      to 30 April 2029 (verified Feb 2026 Origin announcement). Co-located Eraring battery (700 MW / 3,160 MWh
+      when complete) is a separate asset.
+
+  - entity_id: gen:au-nem:bayswater
+    entity_type: Generator
+    name: Bayswater Power Station
+    aliases: [Bayswater]
+    data_class: structural
+    observability: KNOWN_LIVE
+    geometry: { type: Point, coordinates: [150.948, -32.393] }
+    country: au
+    admin: { region: New South Wales, locality: Muswellbrook }
+    grid_id: grid:au-nem
+    properties:
+      fuel: coal
+      capacity_mw: 2640
+      technology: steam subcritical
+      commissioned: 1985
+      unit_count: 4
+      status: operating
+      closure_announced: "2033"
+    external_ids:
+      aemo_duid: [BW01, BW02, BW03, BW04]
+      aemo_station_id: BAYSW
+    sources: [source:aemo:nem-registration-and-exemption-list, source:gem:global-coal-plant-tracker]
+    notes: AGL Energy, Hunter Valley; AGL has announced closure no later than 2033. Coal from Hunter Valley mines by rail and conveyor.
+
+  - entity_id: gen:au-nem:mt-piper
+    entity_type: Generator
+    name: Mt Piper Power Station
+    aliases: [Mount Piper]
+    data_class: structural
+    observability: KNOWN_LIVE
+    geometry: { type: Point, coordinates: [150.074, -33.360] }
+    country: au
+    admin: { region: New South Wales, locality: Portland }
+    grid_id: grid:au-nem
+    properties:
+      fuel: coal
+      capacity_mw: 1400
+      technology: steam subcritical
+      commissioned: 1993
+      unit_count: 2
+      status: operating
+    external_ids:
+      aemo_duid: [MP1, MP2]
+      aemo_station_id: MTPIPER
+    sources: [source:aemo:nem-registration-and-exemption-list, source:gem:global-coal-plant-tracker]
+    notes: EnergyAustralia; western coalfields near Lithgow, supplied mainly by Centennial's Springvale/Angus Place complex (not modelled in this seed). Expected to be NSW's last operating coal station (~2040).
+
+  - entity_id: gen:au-nem:vales-point
+    entity_type: Generator
+    name: Vales Point B Power Station
+    aliases: [Vales Point]
+    data_class: structural
+    observability: KNOWN_LIVE
+    geometry: { type: Point, coordinates: [151.526, -33.163] }
+    country: au
+    admin: { region: New South Wales, locality: Mannering Park }
+    grid_id: grid:au-nem
+    properties:
+      fuel: coal
+      capacity_mw: 1320
+      technology: steam subcritical
+      commissioned: 1978
+      unit_count: 2
+      status: operating
+      closure_announced: "2033"
+    external_ids:
+      aemo_duid: [VP5, VP6]
+      aemo_station_id: VPGS
+    sources: [source:aemo:nem-registration-and-exemption-list, source:gem:global-coal-plant-tracker]
+    notes: >-
+      Owned by Delta Electricity (Sev.en Global Investments group since 2022). Closure previously flagged for 2029,
+      now indicated around 2033; confidence moderate as timing remains commercially contingent.
+
+  - entity_id: gen:au-nem:tallawarra
+    entity_type: Generator
+    name: Tallawarra Power Station
+    aliases: [Tallawarra A, Tallawarra B]
+    data_class: structural
+    observability: KNOWN_LIVE
+    geometry: { type: Point, coordinates: [150.809, -34.535] }
+    country: au
+    admin: { region: New South Wales, locality: Yallah }
+    grid_id: grid:au-nem
+    properties:
+      fuel: gas
+      capacity_mw: 755
+      technology: combined-cycle (A, 435 MW) plus open-cycle (B, 320 MW)
+      commissioned: 2009
+      unit_count: 2
+      status: operating
+    external_ids:
+      aemo_duid: [TALWA1, TALWB1]
+      aemo_station_id: TALWA
+    sources: [source:aemo:nem-registration-and-exemption-list]
+    notes: EnergyAustralia, Lake Illawarra. Tallawarra B (2024) is a dual-fuel hydrogen-capable OCGT; modelled here as one station record covering both stages.
+
+  - entity_id: gen:au-nem:colongra
+    entity_type: Generator
+    name: Colongra Power Station
+    aliases: [Colongra]
+    data_class: structural
+    observability: KNOWN_LIVE
+    geometry: { type: Point, coordinates: [151.543, -33.205] }
+    country: au
+    admin: { region: New South Wales, locality: Colongra }
+    grid_id: grid:au-nem
+    properties:
+      fuel: gas
+      capacity_mw: 667
+      technology: open-cycle gas turbine
+      commissioned: 2009
+      unit_count: 4
+      status: operating
+    external_ids:
+      aemo_duid: [CG1, CG2, CG3, CG4]
+      aemo_station_id: CG
+    sources: [source:aemo:nem-registration-and-exemption-list]
+    notes: Snowy Hydro peaker on the Central Coast, adjacent to the former Munmorah site.
+
+  - entity_id: gen:au-nem:uranquinty
+    entity_type: Generator
+    name: Uranquinty Power Station
+    aliases: [Uranquinty]
+    data_class: structural
+    observability: KNOWN_LIVE
+    geometry: { type: Point, coordinates: [147.247, -35.194] }
+    country: au
+    admin: { region: New South Wales, locality: Uranquinty }
+    grid_id: grid:au-nem
+    properties:
+      fuel: gas
+      capacity_mw: 664
+      technology: open-cycle gas turbine
+      commissioned: 2009
+      unit_count: 4
+      status: operating
+    external_ids:
+      aemo_duid: [URANQ11, URANQ12, URANQ13, URANQ14]
+      aemo_station_id: URANQ
+    sources: [source:aemo:nem-registration-and-exemption-list]
+    notes: Origin Energy peaker near Wagga Wagga.

@@ -1,0 +1,22 @@
+{
+  "name": "@pact-tailor/store",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Embedded bronze/silver/gold medallion storage — verbatim raw artifacts, append-only observations, hash-chained gold deltas",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": "./dist/index.js"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "test": "npm run build && node --test \"test/*.test.mjs\""
+  },
+  "dependencies": {
+    "@pact-tailor/ontology": "*"
+  }
+}

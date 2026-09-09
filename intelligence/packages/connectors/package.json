@@ -1,0 +1,33 @@
+{
+  "name": "@pact-tailor/connectors",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Connector SDK (discover/fetch/parse/normalize/verify, replay|live HttpGate) + AEMO, AIS, BOM, ENTSO-E, EIA connectors and fixtures",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": "./dist/index.js"
+  },
+  "bin": {
+    "pt-ingest": "dist/cli.js"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "test": "npm run build && node --test \"test/*.test.mjs\"",
+    "make-fixtures": "node scripts/make-fixtures.mjs"
+  },
+  "dependencies": {
+    "@pact-tailor/ontology": "*",
+    "@pact-tailor/registry": "*",
+    "@pact-tailor/store": "*",
+    "fflate": "^0.8.2",
+    "ws": "^8.18.0"
+  },
+  "devDependencies": {
+    "@types/ws": "^8.5.13"
+  }
+}

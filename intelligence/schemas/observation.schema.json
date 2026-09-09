@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pact.tailor.au/intelligence/schemas/observation.schema.json",
+  "title": "Observation (class B)",
+  "description": "A single time-stamped metric observation about an entity.",
+  "type": "object",
+  "required": ["observation_id", "entity_id", "metric", "value", "event_time", "ingest_time", "source_id", "feed_id", "quality"],
+  "properties": {
+    "observation_id": { "$ref": "defs.schema.json#/$defs/ulid" },
+    "entity_id": { "$ref": "defs.schema.json#/$defs/entityId" },
+    "metric": { "$ref": "defs.schema.json#/$defs/metric" },
+    "value": {
+      "type": ["number", "string", "object"],
+      "description": "Scalar value, or an object for structured metrics (e.g. vessel.position {lat, lon, speed_kn, heading_deg, draught_m?})"
+    },
+    "event_time": { "$ref": "defs.schema.json#/$defs/timestamp" },
+    "ingest_time": { "$ref": "defs.schema.json#/$defs/timestamp" },
+    "source_id": { "$ref": "defs.schema.json#/$defs/sourceId" },
+    "feed_id": { "$ref": "defs.schema.json#/$defs/feedId" },
+    "quality": {
+      "enum": ["good", "suspect", "estimated", "interpolated", "missing"]
+    },
+    "unit": { "type": "string" },
+    "is_correction": { "type": "boolean", "default": false },
+    "corrects": {
+      "anyOf": [
+        { "$ref": "defs.schema.json#/$defs/ulid" },
+        { "type": "null" }
+      ]
+    },
+    "source_sequence": { "type": "string" },
+    "meta": { "type": "object" }
+  },
+  "additionalProperties": false
+}

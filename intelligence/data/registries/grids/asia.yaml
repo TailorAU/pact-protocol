@@ -1,0 +1,301 @@
+# Grid registry — Asia. Class-A structural records. See ../../schemas/grid.schema.json
+records:
+  - grid_id: grid:jp-east
+    name: Eastern Japan 50 Hz Area
+    kind: synchronous_area
+    parent_grid: null
+    countries: [jp]
+    frequency_hz: 50
+    timezone: Asia/Tokyo
+    operators:
+      - { name: "Organization for Cross-regional Coordination of Transmission Operators (OCCTO)", role: system_operator }
+      - { name: TEPCO Power Grid, role: tso }
+      - { name: Tohoku Electric Power Network, role: tso }
+      - { name: Hokkaido Electric Power Network, role: tso }
+      - { name: Japan Electric Power Exchange (JEPX), role: market_operator }
+    market:
+      structure: liberalized retail; JEPX day-ahead/intraday spot with area prices; TSO balancing markets
+      price_mechanism: zonal (area) marginal prices on JEPX, 30-minute products
+      dispatch_interval: null
+    interconnections:
+      - { to_grid: grid:jp-west, name: "frequency converter stations (Sakuma, Shin-Shinano, Higashi-Shimizu, Minami-Fukumitsu)", capacity_mw: 2100 }
+    live_data:
+      availability: partial
+      notes: real-time area demand and hourly generation mix published by TSOs and OCCTO; JEPX prices public; no unit-level dispatch API
+      source_ids: [source:occto:web]
+    demand_range_mw: null
+    sources: [source:occto:web]
+    notes: "Tokyo, Tohoku and Hokkaido areas; Hokkaido is joined to Honshu by HVDC within the 50 Hz half; the 50/60 Hz split dates to 1890s generator imports; converter capacity being expanded toward 3 GW under OCCTO's plan."
+
+  - grid_id: grid:jp-west
+    name: Western Japan 60 Hz Area
+    kind: synchronous_area
+    parent_grid: null
+    countries: [jp]
+    frequency_hz: 60
+    timezone: Asia/Tokyo
+    operators:
+      - { name: "Organization for Cross-regional Coordination of Transmission Operators (OCCTO)", role: system_operator }
+      - { name: Kansai Transmission and Distribution, role: tso }
+      - { name: Chubu Electric Power Grid, role: tso }
+      - { name: Kyushu Electric Power Transmission and Distribution, role: tso }
+      - { name: Japan Electric Power Exchange (JEPX), role: market_operator }
+    market:
+      structure: liberalized retail; JEPX day-ahead/intraday spot with area prices; TSO balancing markets
+      price_mechanism: zonal (area) marginal prices on JEPX, 30-minute products
+      dispatch_interval: null
+    interconnections:
+      - { to_grid: grid:jp-east, name: "frequency converter stations (Sakuma, Shin-Shinano, Higashi-Shimizu, Minami-Fukumitsu)", capacity_mw: 2100 }
+    live_data:
+      availability: partial
+      notes: real-time area demand and hourly generation mix published by TSOs and OCCTO; JEPX prices public
+      source_ids: [source:occto:web]
+    demand_range_mw: null
+    sources: [source:occto:web]
+    notes: "Comprises the Chubu, Hokuriku, Kansai, Chugoku, Shikoku and Kyushu TSO areas; Okinawa is a separate isolated 60 Hz island system outside both synchronous areas."
+
+  - grid_id: grid:cn-sgcc
+    name: State Grid Corporation of China Area
+    kind: national_grid
+    parent_grid: null
+    countries: [cn]
+    frequency_hz: 50
+    timezone: Asia/Shanghai
+    operators:
+      - { name: State Grid Corporation of China, role: system_operator }
+      - { name: State Grid Corporation of China, role: transmission_owner }
+      - { name: National Energy Administration, role: regulator }
+    market:
+      structure: medium/long-term contracts dominant; provincial spot markets rolling out; unified national market planned
+      price_mechanism: provincial spot prices where operating; regulated tariffs elsewhere
+      dispatch_interval: null
+    interconnections: []
+    live_data:
+      availability: minimal
+      notes: no public real-time data; monthly statistics from the China Electricity Council and NEA
+      source_ids: [source:wikidata:sparql]
+    demand_range_mw: null
+    sources: [source:wikidata:sparql]
+    notes: "World's largest utility, covering ~88% of China's territory; not one synchronous system: North, Northeast, East, Central, Northwest and Southwest regional grids are linked largely by UHV AC/DC; massive west-to-east HVDC corridors."
+
+  - grid_id: grid:cn-csg
+    name: China Southern Power Grid
+    kind: regional_grid
+    parent_grid: null
+    countries: [cn]
+    frequency_hz: 50
+    timezone: Asia/Shanghai
+    operators:
+      - { name: China Southern Power Grid, role: system_operator }
+      - { name: China Southern Power Grid, role: transmission_owner }
+      - { name: National Energy Administration, role: regulator }
+    market:
+      structure: Guangdong spot market most advanced in China; regional market integration under way
+      price_mechanism: provincial spot prices where operating; regulated tariffs elsewhere
+      dispatch_interval: null
+    interconnections: []
+    live_data:
+      availability: minimal
+      notes: no public real-time data; periodic statistics via the China Electricity Council
+      source_ids: [source:wikidata:sparql]
+    demand_range_mw: null
+    sources: [source:wikidata:sparql]
+    notes: "Serves Guangdong, Guangxi, Yunnan, Guizhou and Hainan; supplies Hong Kong and Macau via ties; Yunnan operates asynchronously (back-to-back HVDC) from the rest since 2016; extensive west-east HVDC."
+
+  - grid_id: grid:in
+    name: Indian National Grid
+    kind: national_grid
+    parent_grid: null
+    countries: [in]
+    frequency_hz: 50
+    timezone: Asia/Kolkata
+    operators:
+      - { name: Grid Controller of India (Grid-India), role: system_operator }
+      - { name: Power Grid Corporation of India, role: transmission_owner }
+      - { name: Indian Energy Exchange, role: market_operator }
+      - { name: Central Electricity Regulatory Commission, role: regulator }
+    market:
+      structure: long-term PPAs dominant; ~10% traded on exchanges (IEX, PXIL, HPX); real-time market since 2020
+      price_mechanism: exchange market-clearing prices in 15-minute blocks
+      dispatch_interval: 15min
+    interconnections: []
+    live_data:
+      availability: partial
+      notes: real-time national demand and frequency dashboards from Grid-India; daily power supply position reports; no unit-level API
+      source_ids: [source:wikidata:sparql]
+    demand_range_mw: { min: 120000, max: 250000 }
+    sources: [source:wikidata:sparql]
+    notes: "One-nation-one-grid: five regional grids fully synchronous since Dec 2013; synchronous ties to Bhutan and Nepal; HVDC back-to-back tie to Bangladesh; Sri Lanka link proposed."
+
+  - grid_id: grid:kr
+    name: South Korea National Grid
+    kind: national_grid
+    parent_grid: null
+    countries: [kr]
+    frequency_hz: 60
+    timezone: Asia/Seoul
+    operators:
+      - { name: Korea Power Exchange (KPX), role: system_operator }
+      - { name: Korea Power Exchange (KPX), role: market_operator }
+      - { name: Korea Electric Power Corporation (KEPCO), role: transmission_owner }
+    market:
+      structure: mandatory cost-based pool (CBP); KEPCO sole retailer
+      price_mechanism: system marginal price with fuel-cost pass-through
+      dispatch_interval: null
+    interconnections: []
+    live_data:
+      availability: partial
+      notes: real-time supply-demand dashboard and EPSIS statistics from KPX; no dispatch-level API
+      source_ids: [source:wikidata:sparql]
+    demand_range_mw: { min: 45000, max: 100000 }
+    sources: [source:wikidata:sparql]
+    notes: "Electrically isolated national system (no international ties); Jeju island supplied via HVDC; nuclear and coal heavy with growing offshore wind plans."
+
+  - grid_id: grid:tw
+    name: Taiwan Power Grid
+    kind: isolated_grid
+    parent_grid: null
+    countries: [tw]
+    frequency_hz: 60
+    timezone: Asia/Taipei
+    operators:
+      - { name: Taiwan Power Company (Taipower), role: system_operator }
+      - { name: Taiwan Power Company (Taipower), role: transmission_owner }
+      - { name: Energy Administration MOEA, role: regulator }
+    market:
+      structure: vertically integrated single buyer; ancillary services trading platform since 2021
+      price_mechanism: regulated tariffs; IPP contracts
+      dispatch_interval: null
+    interconnections: []
+    live_data:
+      availability: partial
+      notes: 10-minute system generation mix and reserve margin published on Taipower open data
+      source_ids: [source:wikidata:sparql]
+    demand_range_mw: { min: 22000, max: 42000 }
+    sources: [source:wikidata:sparql]
+    notes: "Isolated 60 Hz island system; nuclear phase-out completed 2025; LNG-dominated with tight reserve margins; offshore wind buildout."
+
+  - grid_id: grid:th
+    name: Thailand National Grid (EGAT)
+    kind: national_grid
+    parent_grid: null
+    countries: [th]
+    frequency_hz: 50
+    timezone: Asia/Bangkok
+    operators:
+      - { name: Electricity Generating Authority of Thailand (EGAT), role: system_operator }
+      - { name: Electricity Generating Authority of Thailand (EGAT), role: transmission_owner }
+      - { name: Energy Regulatory Commission, role: regulator }
+    market:
+      structure: enhanced single buyer; EGAT purchases from IPPs and imports
+      price_mechanism: regulated tariffs with fuel adjustment (Ft)
+      dispatch_interval: null
+    interconnections:
+      - { to_grid: grid:my-peninsular, name: "HVDC link plus AC ties (Thailand-Malaysia)", capacity_mw: 300 }
+    live_data:
+      availability: partial
+      notes: real-time national demand dashboard from EGAT; periodic statistics from EPPO
+      source_ids: [source:wikidata:sparql]
+    demand_range_mw: { min: 18000, max: 36000 }
+    sources: [source:wikidata:sparql]
+    notes: "Major importer of Lao hydropower over radial AC and HVDC ties; transit leg of the Laos-Thailand-Malaysia-Singapore (LTMS) multilateral trade; gas-dominated fleet."
+
+  - grid_id: grid:my-peninsular
+    name: Peninsular Malaysia Grid
+    kind: regional_grid
+    parent_grid: null
+    countries: [my]
+    frequency_hz: 50
+    timezone: Asia/Kuala_Lumpur
+    operators:
+      - { name: Grid System Operator (GSO), role: system_operator }
+      - { name: Tenaga Nasional Berhad, role: transmission_owner }
+      - { name: Single Buyer, role: market_operator }
+      - { name: Energy Commission (Suruhanjaya Tenaga), role: regulator }
+    market:
+      structure: single-buyer model with incentive-based regulation; no wholesale spot market
+      price_mechanism: regulated tariffs with imbalance cost pass-through
+      dispatch_interval: null
+    interconnections:
+      - { to_grid: grid:th, name: "HVDC link plus AC ties (Thailand-Malaysia)", capacity_mw: 300 }
+    live_data:
+      availability: partial
+      notes: GSO publishes system demand and generation data; not real-time dispatch level
+      source_ids: [source:wikidata:sparql]
+    demand_range_mw: { min: 11000, max: 20000 }
+    sources: [source:wikidata:sparql]
+    notes: "Peninsular grid only: Sabah and Sarawak run separate systems on Borneo; AC tie to Singapore (~450 MW) carries LTMS trade; cross-border sales to Singapore expanding."
+
+  - grid_id: grid:id-jamali
+    name: Java-Madura-Bali System (Jamali)
+    kind: regional_grid
+    parent_grid: null
+    countries: [id]
+    frequency_hz: 50
+    timezone: Asia/Jakarta
+    operators:
+      - { name: Perusahaan Listrik Negara (PLN), role: system_operator }
+      - { name: Perusahaan Listrik Negara (PLN), role: transmission_owner }
+      - { name: Ministry of Energy and Mineral Resources, role: regulator }
+    market:
+      structure: vertically integrated single buyer (PLN) with IPP contracts
+      price_mechanism: regulated tariffs
+      dispatch_interval: null
+    interconnections: []
+    live_data:
+      availability: minimal
+      notes: no public real-time data; PLN and ministry periodic statistics only
+      source_ids: [source:wikidata:sparql]
+    demand_range_mw: { min: 17000, max: 31000 }
+    sources: [source:wikidata:sparql]
+    notes: "Indonesia's dominant system (~70% of national demand) on a 500 kV backbone; other islands run separate PLN grids; coal-heavy with large captive-industry growth elsewhere."
+
+  - grid_id: grid:ph
+    name: Philippine Grid (Luzon-Visayas-Mindanao)
+    kind: national_grid
+    parent_grid: null
+    countries: [ph]
+    frequency_hz: 60
+    timezone: Asia/Manila
+    operators:
+      - { name: National Grid Corporation of the Philippines (NGCP), role: system_operator }
+      - { name: National Grid Corporation of the Philippines (NGCP), role: transmission_owner }
+      - { name: Independent Electricity Market Operator of the Philippines (IEMOP), role: market_operator }
+      - { name: Energy Regulatory Commission, role: regulator }
+    market:
+      structure: gross pool (WESM) spanning all three island grids
+      price_mechanism: nodal ex-ante pricing, 5-minute dispatch
+      dispatch_interval: 5min
+    interconnections: []
+    live_data:
+      availability: partial
+      notes: WESM prices and dispatch data published by IEMOP as downloads rather than a real-time API; NGCP system bulletins
+      source_ids: [source:wikidata:sparql]
+    demand_range_mw: { min: 9000, max: 17000 }
+    sources: [source:wikidata:sparql]
+    notes: "Luzon and Visayas joined by 350 MW HVDC; Mindanao joined via the 450 MW Mindanao-Visayas Interconnection (energized 2023, full commercial operation Jan 2024), unifying the three grids and the WESM."
+
+  - grid_id: grid:vn
+    name: Vietnam National Grid
+    kind: national_grid
+    parent_grid: null
+    countries: [vn]
+    frequency_hz: 50
+    timezone: Asia/Ho_Chi_Minh
+    operators:
+      - { name: National Power System and Market Operator (NSMO), role: system_operator }
+      - { name: National Power System and Market Operator (NSMO), role: market_operator }
+      - { name: EVN National Power Transmission Corporation (EVNNPT), role: transmission_owner }
+      - { name: Electricity Regulatory Authority of Vietnam, role: regulator }
+    market:
+      structure: wholesale market (VWEM) in transition; EVN dominant buyer; DPPA scheme since 2024
+      price_mechanism: cost-based dispatch with market price caps
+      dispatch_interval: null
+    interconnections: []
+    live_data:
+      availability: minimal
+      notes: limited daily operational data from NSMO and EVN; no real-time public feed
+      source_ids: [source:wikidata:sparql]
+    demand_range_mw: { min: 25000, max: 51000 }
+    sources: [source:wikidata:sparql]
+    notes: "Long 500 kV north-south backbone; NSMO separated from EVN in Aug 2024 under the Ministry of Industry and Trade; imports from China and Laos over radial ties; world-scale rooftop solar boom of 2020."

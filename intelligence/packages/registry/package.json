@@ -1,0 +1,23 @@
+{
+  "name": "@pact-tailor/registry",
+  "version": "0.1.0",
+  "private": true,
+  "description": "YAML registry loaders (grids, sources, gaps, structural seed), cross-reference validation, entity-resolution candidates",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": "./dist/index.js"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "test": "npm run build && node --test \"test/*.test.mjs\""
+  },
+  "dependencies": {
+    "@pact-tailor/ontology": "*",
+    "yaml": "^2.6.1"
+  }
+}

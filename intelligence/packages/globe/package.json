@@ -1,0 +1,22 @@
+{
+  "name": "@pact-tailor/globe",
+  "version": "0.1.0",
+  "private": true,
+  "description": "GPU-rendered interactive globe (deck.gl _GlobeView) over the intelligence API — grids, generators, flows, vessels, observability gaps",
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -p tsconfig.json --noEmit && vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "deck.gl": "^9.0.38"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.2",
+    "vite": "^6.0.5"
+  }
+}

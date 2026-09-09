@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pact.tailor.au/intelligence/schemas/entity-types/vessel.properties.json",
+  "title": "Vessel properties",
+  "type": "object",
+  "properties": {
+    "vessel_type": { "type": "string" },
+    "dwt": { "type": "number" },
+    "loa_m": { "type": "number" },
+    "beam_m": { "type": "number" },
+    "flag": { "type": "string" },
+    "synthetic": {
+      "type": "boolean",
+      "description": "true marks exemplar/demo vessels that are NOT real ships"
+    }
+  },
+  "additionalProperties": true
+}
